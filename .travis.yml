@@ -1,54 +1,55 @@
 language: ruby
 bundler_args: --without development production --deployment --jobs=4 --retry=5
 cache: bundler
-env: JRUBY_OPTS="--dev -J-Xmx900m" DISPLAY=:99.0 LOGGER_LEVEL=WARN
 jdk: openjdk8
 node_js: 10.1.0
 os: linux
 rvm: jruby-9.1.14.0
 
+env:
+  global:
+    - JRUBY_OPTS="--dev -J-Xmx900m"
+    - DISPLAY=:99.0
+    - LOGGER_LEVEL=WARN
+    - DEPLOY_S3_FOLDER="${TRAVIS_BRANCH}_$(date +%F_%T)"
+    - ARTIFACTS_PATHS="./calcentral.knob"
+
 before_install:
+  - gem uninstall bundler --force -x
   - gem install bundler -v '1.15.4'
 
 jobs:
   include:
     - stage: Test
-      if: type = pull_request OR env(ALWAYS_RUN_TYPE_LINT) = 'true'
+      if: type = pull_request
       script:
         - npm config set strict-ssl false
         - npm install
         - npm run build
         - npm run lint
-    - # Lint SCSS (parallel with above)
-      if: type = pull_request OR env(ALWAYS_RUN_TYPE_LINT) = 'true'
+    - # Lint SCSS
+      if: type = pull_request
       script:
         - gem cleanup scss_lint
         - gem install scss_lint --version 0.49.0
         - scss-lint src/assets/stylesheets
     - # RSpec
-      if: type = pull_request OR env(ALWAYS_RUN_TYPE_RSPEC) = 'true'
+      if: type = pull_request
       script:
         - RAILS_ENV=test bundle exec rspec
-    - stage: Package
-      if: env(DEPLOY_CALCENTRAL_KNOB) = 'true'
+    - stage: Deploy
+      if: type = push OR env(DEPLOY_CALCENTRAL_KNOB) = 'true'
       script:
-        - echo $APP_TRAVIS_ACCESS_KEY
-        - echo $APP_TRAVIS_SECRET
         - bundle install --deployment --local --retry 3
         - bundle package --all
         - bundle exec rake assets:precompile
         - bundle exec rake fix_assets
         - bundle exec rake torquebox:archive NAME=calcentral 2>&1 1>/dev/null
-        - ls -la
 
-deploy:
-  provider: codedeploy
-  access_key_id: $APP_TRAVIS_ACCESS_KEY
-  secret_access_key: $APP_TRAVIS_SECRET
-  bucket: rtl-junction
-  key: calcentral.knob
-  bundle_type: zip
-  application: CalCentral
-  region: us-west-2
-  on:
-    all_branches: true
+addons:
+  artifacts:
+    if: type = push OR env(DEPLOY_CALCENTRAL_KNOB) = 'true'
+    s3_region: 'us-west-2'
+    debug: true
+    target_paths:
+      - /$TRAVIS_BRANCH/$(date -u +%Y%m%d_%H%M%SZ)
