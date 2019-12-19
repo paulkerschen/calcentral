@@ -80,6 +80,7 @@ module Berkeley
         'LEGALST' => 'Legal Studies',
         'LPSPP' =>  'Department of Spanish and Portuguese',
         'LQAPR' =>  'Department of Art Practice',
+        'LS1HU' =>  'L&S Arts and Humanities',
         'LSCLA' =>  'Department of Classics',
         'LTSLL' =>  'Department of Slavic Languages and Literatures',
         'MANRD' =>  'College of Natural Resources',

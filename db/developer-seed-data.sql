@@ -91,6 +91,7 @@ INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_o
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (90, 'HISTART', '', 'HARTH', false, '2015-09-21 13:23:12.661', '2015-09-21 13:23:12.661');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (91, 'HISTORY', '', 'SHIST', true, '2015-09-21 13:23:12.665', '2015-09-21 13:23:12.665');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (92, 'HMEDSCI', '', 'CPACA', true, '2015-09-21 13:23:12.669', '2016-08-10 16:44:51.962');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (93, 'HUM', '', 'LS1HU', true, '2015-09-21 13:23:12.673', '2015-09-21 13:23:12.673');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (93, 'HUNGARI', '', 'LTSLL', true, '2015-09-21 13:23:12.673', '2015-09-21 13:23:12.673');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (94, 'IAS', '', 'QIIAS', true, '2015-09-21 13:23:12.677', '2017-08-10 17:57:16.254');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (95, 'ICELAND', '', 'HSCAN', true, '2015-09-21 13:23:12.681', '2015-09-21 13:23:12.681');
