@@ -6,13 +6,34 @@
 #
 ######################################################
 
+JUNCTION_DEPLOY_PROPERTIES="${HOME}/.calcentral_config/junction-deploy.properties"
+
+function getDeployProperty {
+  # Default properties file
+  PROPERTIES="./config/settings/junction-deploy.properties"
+
+  if [ "$(grep -c "^${1}=" "${JUNCTION_DEPLOY_PROPERTIES}")" -ne '0' ]; then
+    # If value found in custom properties file then use it.
+    PROPERTIES="${JUNCTION_DEPLOY_PROPERTIES}"
+  fi
+
+  grep "^${1}=" "${PROPERTIES}" | cut -d'=' -f2
+}
+
+GET_KNOB_FILE_FROM_AWS_S3=false
+
+if [ -f "${JUNCTION_DEPLOY_PROPERTIES}" ]; then
+  GET_KNOB_FILE_FROM_AWS_S3=$(getProperty 'feature.flag.s3.deploy' | awk '{print tolower($0)}')
+  GET_KNOB_FILE_FROM_AWS_S3="$(echo -e "${GET_KNOB_FILE_FROM_AWS_S3}" | tr -d '[:space:]')"
+fi
+
 HOST=$(uname -n)
 if [[ "${HOST}" = *calcentral* ]]; then
   APP_MODE="calcentral"
 else
   APP_MODE="junction"
 fi
-WAR_URL=${WAR_URL:="https://bamboo.media.berkeley.edu/bamboo/browse/MYB-MVPWAR/latest/artifact/JOB1/warfile/calcentral.knob"}
+
 MAX_ASSET_AGE_IN_DAYS=${MAX_ASSET_AGE_IN_DAYS:="45"}
 DOC_ROOT="/var/www/html/${APP_MODE}"
 
@@ -42,7 +63,36 @@ echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
 echo "$(date): Fetching new calcentral.knob from ${WAR_URL}..." | ${LOGIT}
 
-curl -k -s ${WAR_URL} > calcentral.knob
+if [ "${GET_KNOB_FILE_FROM_AWS_S3}" == 'true' ]; then
+
+  # Get calcentral.knob file from S3 bucket in AWS
+  aws_access_key_id=$(getProperty 'aws.access.key')
+  aws_secret_access_key=$(getProperty 'aws.secret.access')
+  aws_s3_bucket=$(getProperty 'aws.s3.bucket')
+  junction_knob_id=$(getProperty 'junction.knob.id')
+  junction_git_branch=$(getProperty 'junction.git.branch')
+
+  if [[ -z "${aws_access_key_id}" || -z "${aws_secret_access_key}" || -z "${aws_s3_bucket}" || -z "${junction_git_branch}" ]]; then
+    echo "[ERROR] One or more required settings not found in ${JUNCTION_DEPLOY_PROPERTIES}."
+    exit 1
+  fi
+
+  # Download from S3
+  export AWS_ACCESS_KEY_ID="${aws_access_key_id}"
+  export AWS_SECRET_ACCESS_KEY="${aws_secret_access_key}"
+
+  s3_path="s3://${aws_s3_bucket}/${junction_git_branch}/${junction_knob_id}/calcentral.knob"
+
+  echo "Begin download: ${s3_path}"; echo
+
+  aws s3 cp "${s3_path}" .
+
+else
+  # Get calcentral.knob file from Bamboo (deprecated deployment strategy)
+  WAR_URL=${WAR_URL:="https://bamboo.media.berkeley.edu/bamboo/browse/MYB-MVPWAR/latest/artifact/JOB1/warfile/calcentral.knob"}
+  curl -k -s ${WAR_URL} > calcentral.knob
+
+fi
 
 echo "Unzipping knob..." | ${LOGIT}
 
