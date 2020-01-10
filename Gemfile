@@ -166,7 +166,7 @@ end
 
 group :development do
   # A better development webserver than WEBrick, especially on JRuby
-  gem 'puma'
+  gem 'puma', '~> 3.12.2'
 
   # Automatically reloads your browser when 'view' files are modified.
   # https://github.com/guard/guard-livereload
