@@ -157,6 +157,33 @@
   addCreateSiteButton();
   removeCreateSiteUserNav();
 
+  /* ACADEMIC POLICIES LINK */
+
+  /**
+   * Add 'Academic Policies' above 'Help' in left-hand global navigation
+   */
+
+  var addAcademicPoliciesLink = function() {
+    waitUntilAvailable(".ic-app-header__menu-list .ic-app-header__menu-list-item:contains('Help')", false, function($helpMenuItem) {
+      var $policiesMenuItem = $helpMenuItem.clone();
+
+      $policiesMenuItem.find('.menu-item__text')
+        .text('Academic Policies');
+      $policiesMenuItem.find('a')
+        .attr('id', 'global_nav_academic_policies_link')
+        .attr('href', 'https://evcp.berkeley.edu/programs-resources/academic-accommodations-hub');
+
+      // Add SVG source for https://fontawesome.com/icons/university
+      $policiesMenuItem.find('path')
+        .attr('transform', 'scale(0.39,0.39)')
+        .attr('d', 'M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 4.941-7.392l232-88a7.996 7.996 0 0 1 6.118 0l232 88A8 8 0 0 1 496 128zm-24 304H40c-13.255 0-24 10.745-24 24v16a8 8 0 0 0 8 8h464a8 8 0 0 0 8-8v-16c0-13.255-10.745-24-24-24zM96 192v192H60c-6.627 0-12 5.373-12 12v20h416v-20c0-6.627-5.373-12-12-12h-36V192h-64v192h-64V192h-64v192h-64V192H96z');
+
+      $helpMenuItem.before($policiesMenuItem);
+    });
+  };
+
+  addAcademicPoliciesLink();
+
   /* E-GRADES EXPORT */
 
   /**
