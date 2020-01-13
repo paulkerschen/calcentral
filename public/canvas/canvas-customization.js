@@ -171,7 +171,11 @@
         .text('Academic Policies');
       $policiesMenuItem.find('a')
         .attr('id', 'global_nav_academic_policies_link')
-        .attr('href', 'https://evcp.berkeley.edu/programs-resources/academic-accommodations-hub');
+        .attr('href', 'https://evcp.berkeley.edu/programs-resources/academic-accommodations-hub')
+        .attr('target', '_blank')
+        .attr('role', null)
+        .attr('data-track-category', null)
+        .attr('data-track-label', null);
 
       // Add SVG source for https://fontawesome.com/icons/university
       $policiesMenuItem.find('path')
