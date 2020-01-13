@@ -29,7 +29,7 @@ jobs:
       if: type = pull_request
       script:
         - npm config set strict-ssl false
-        - npm install
+        - npm install --production
         - npm run build
         - npm run lint
     - # Lint SCSS
@@ -49,6 +49,7 @@ jobs:
         - aws configure list
         - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc7.jar .
         - mv ./ojdbc7.jar ./lib
+        - git log --pretty=format:'%H' -n 1 > versions/git.txt
         - bundle install --deployment --local --retry 3
         - bundle package --all
         - bundle exec rake assets:precompile
