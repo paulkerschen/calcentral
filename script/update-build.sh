@@ -75,11 +75,12 @@ if [ "${FEATURE_FLAG_S3_DEPLOY}" == 'true' ]; then
     s3_path="${git_branch}/latest.txt"
     signature=$(echo -en "GET\n\n${content_type}\n${date_rfc_2822}\n/${aws_s3_bucket}/${s3_path}" | openssl sha1 -hmac ${aws_secret_access_key} -binary | base64)
 
-    curl -H "Host: ${aws_s3_bucket}.s3.amazonaws.com" \
+    curl -sS \
+         -H "Host: ${aws_s3_bucket}.s3.amazonaws.com" \
          -H "Date: ${date_rfc_2822}" \
          -H "Content-Type: ${content_type}" \
          -H "Authorization: AWS ${aws_access_key_id}:${signature}" \
-         "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o latest.txt
+         "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o latest.txt > /dev/null
 
     latest_knob_file_id=$(head -1 latest.txt)
     latest_knob_file_id=${latest_knob_file_id#"/${git_branch}/"}
@@ -148,11 +149,12 @@ if [ "${FEATURE_FLAG_S3_DEPLOY}" == 'true' ]; then
   # Download from S3
   echo "$(date): [INFO] Fetching new calcentral.knob from ${s3_path}" | ${LOGIT}
 
-  curl -H "Host: ${aws_s3_bucket}.s3.amazonaws.com" \
+  curl -sS \
+       -H "Host: ${aws_s3_bucket}.s3.amazonaws.com" \
        -H "Date: ${date_rfc_2822}" \
        -H "Content-Type: ${content_type}" \
        -H "Authorization: AWS ${aws_access_key_id}:${signature}" \
-       "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o calcentral.knob
+       "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o calcentral.knob > /dev/null
 
 else
   echo "$(date): [INFO] Fetching new calcentral.knob from ${WAR_URL}" | ${LOGIT}
