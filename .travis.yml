@@ -22,19 +22,16 @@ env:
 before_install:
   - gem uninstall bundler --force -x
   - gem install bundler -v '1.15.4'
+  - npm config set strict-ssl false
+  - npm install --production
+  - npm run build
 
 jobs:
   include:
-    - stage: Test
+    - # Lint
       if: type = pull_request
       script:
-        - npm config set strict-ssl false
-        - npm install --production
-        - npm run build
         - npm run lint
-    - # Lint SCSS
-      if: type = pull_request
-      script:
         - gem cleanup scss_lint
         - gem install scss_lint --version 0.49.0
         - scss-lint src/assets/stylesheets
