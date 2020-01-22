@@ -12,7 +12,7 @@ export LOGGER_STDOUT=only
 export JRUBY_OPTS="--dev"
 
 echo "------------------------------------------"
-echo "`date`: Redeploying CalCentral on app nodes..."
+echo "$(date): [INFO] Redeploying CalCentral on app nodes..."
 
-echo "`date`: cap calcentral_dev:update..."
-cap -l STDOUT calcentral_dev:update || { echo "ERROR: capistrano deploy failed" ; exit 1 ; }
+echo "$(date): [INFO] Execute: cap deploy_to_all_servers:bamboo_artifact"
+cap -l STDOUT deploy_to_all_servers:bamboo_artifact || { echo "ERROR: capistrano deploy failed" ; exit 1 ; }

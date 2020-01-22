@@ -10,7 +10,7 @@ LOG=$(date +"${PWD}/log/start-stop_%Y-%m-%d.log")
 LOGIT="tee -a ${LOG}"
 VERSION=${1}
 
-cd $( dirname "${BASH_SOURCE[0]}" )/..
+cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
 
 if [ -z ${1} ]; then
   # Default db version is the latest one in our code tree
@@ -40,8 +40,8 @@ echo "$(date): Database migration CalCentral on app node: $(hostname -s)" | ${LO
 echo | ${LOGIT}
 echo "$(date): rake db:migrate VERSION=${VERSION} RAILS_ENV=${RAILS_ENV} ..." | ${LOGIT}
 
-cd deploy
+cd deploy || exit 1
 
-bundle exec rake db:migrate VERSION=${VERSION} RAILS_ENV=${RAILS_ENV} |& ${LOGIT}
+bundle exec rake db:migrate VERSION="${VERSION}" RAILS_ENV="${RAILS_ENV}" |& ${LOGIT}
 
 exit 0
