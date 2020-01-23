@@ -12,11 +12,8 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
-# Verify presence of local properties file
-deploy_properties="${HOME}/.calcentral_config/junction-deploy.properties"
-
-if [ ! -f "${deploy_properties}" ]; then
-  log_error "Missing properties file: ${deploy_properties}"
+if [ ! -w "${PWD}/log" ]; then
+  echo; echo "$(date): [ERROR] '${PWD}/log' directoy does not exist or is not writable"; echo
   exit 1
 fi
 
@@ -31,12 +28,26 @@ function log_error {
   echo | ${LOGIT}
 }
 
-./script/init.d/calcentral maint
+function log_info {
+  echo "$(date): [INFO] ${1}" | ${LOGIT}
+}
 
-./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
+if [ "$(./script/deploy/_is_deploy_necessary.sh)" == "true" ]; then
 
-if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
-  ./script/migrate.sh
+  ./script/init.d/calcentral maint
+
+  ./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
+
+  if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
+    ./script/migrate.sh
+  fi
+
+else
+
+  log_info "No deployment necessary. Requested knob file is already running on ${HOSTNAME}."
+
 fi
+
+log_info "Done."
 
 exit 0
