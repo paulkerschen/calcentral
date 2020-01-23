@@ -9,8 +9,6 @@
 # Abort immediately if a command fails
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
-
 # Boilerplate logging scheme
 LOG=$(date +"${PWD}/log/update-build_%Y-%m-%d.log")
 LOGIT="tee -a ${LOG}"
@@ -26,6 +24,8 @@ function log_info {
 }
 
 echo | ${LOGIT}
+
+cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
 # Local properties file
 deploy_properties="${HOME}/.calcentral_config/junction-deploy.properties"
@@ -49,7 +49,7 @@ log_info "Updating Junction source code from: ${git_remote}, branch: ${git_branc
 git fetch "${git_remote}" 2>&1 | ${LOGIT}
 git fetch -t "${git_remote}" 2>&1 | ${LOGIT}
 git reset --hard HEAD 2>&1 | ${LOGIT}
-git checkout -qf "${git_branch}" 2>&1 | ${LOGIT}
+git checkout -qf "${git_remote}/${git_branch}" 2>&1 | ${LOGIT}
 
 log_info "Last commit in source tree:"
 git log -1 | ${LOGIT}
@@ -81,6 +81,7 @@ if [ ! -d "versions" ]; then
   log_error "Missing or malformed calcentral.knob file!"
   exit 1
 fi
+
 log_info "Last commit in calcentral.knob:"
 cat versions/git.txt | ${LOGIT}
 
@@ -113,7 +114,7 @@ cp -Rvf public/oauth ${DOC_ROOT} | ${LOGIT}
 # Keep a record of what was deployed
 echo "${knob_file_id}" > "${deployment_summary_file}"
 
-log_info "Congratulations, deployment complete."
+log_info "${HOSTNAME} deployment complete."
 
 echo | ${LOGIT}
 
