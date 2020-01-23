@@ -54,23 +54,24 @@ git checkout -qf "${git_branch}" 2>&1 | ${LOGIT}
 log_info "Last commit in source tree:"
 git log -1 | ${LOGIT}
 
-
 echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
 log_info "Stopping Junction..."
 
 ./script/stop-torquebox.sh
 
+# Download the proper knob file
+knob_file_id=$(./script/deploy/_get-knob-file-id.sh)
+./script/deploy/_download-knob-file.sh "${knob_file_id}"
+
+# Move the knob file into the new deploy directory
 rm -rf deploy
 mkdir deploy
+mv ./calcentral.knob ./deploy
 cd deploy || exit 1
 
 echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
-
-knob_file_id=$(./script/deploy/_get_knob_file_id.sh)
-
-./script/deploy/_download-knob-file.sh "${knob_file_id}"
 
 log_info "Unzipping knob: ${git_branch}/${knob_file_id}/calcentral.knob"
 
