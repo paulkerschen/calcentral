@@ -17,7 +17,7 @@ env:
     - JRUBY_OPTS="--dev -J-Xmx900m"
     - LOGGER_LEVEL=WARN
     - PATH="${HOME}/.local/bin:$PATH"
-    - S3_PATH="/${TRAVIS_BRANCH}/$(date -u +%Y%m%d_%H%M%SZ)"
+    - S3_PATH="/${TRAVIS_BRANCH}/$(date -u +%Y%m%d_%H%M%SZ)_${TRAVIS_COMMIT}"
 
 before_install:
   - gem uninstall bundler --force -x
