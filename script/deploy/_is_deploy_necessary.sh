@@ -1,4 +1,15 @@
+#!/bin/bash
 
+######################################################
+#
+# If the knob-id in 'junction-deploy.properties' does
+# not match the knob-id running on the server then
+# this script returns true.
+#
+######################################################
+
+# Abort immediately if a command fails
+set -e
 
 deployment_summary_file="${HOME}/.calcentral_config/.junction-deployment-summary"
 
