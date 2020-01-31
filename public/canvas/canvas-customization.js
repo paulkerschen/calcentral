@@ -620,16 +620,14 @@
     var footerLinks = [
       '<div class="footer-rows">',
       '  <div>',
-      '    <a href="http://www.ets.berkeley.edu/discover-services/bcourses" target="_blank">Support</a>',
+      '    <a href="https://dls.berkeley.edu/services/bcourses-0" target="_blank">About</a>',
       '    <a href="http://www.canvaslms.com/policies/privacy" target="_blank">Privacy Policy</a>',
       '    <a href="http://www.canvaslms.com/policies/terms-of-use-internet2" target="_blank">Terms of Service</a>',
-      '    <a href="http://www.facebook.com/pages/UC-Berkeley-Educational-Technology-Services/108164709233254" target="_blank" class="icon-facebook-boxed"><span class="screenreader-only">Facebook</span></a>',
-      '    <a href="http://www.twitter.com/etsberkeley" target="_blank" class="icon-twitter"><span class="screenreader-only">Twitter</span></a>',
       '  </div>',
       '  <div>',
-      '    <a href="https://www.ets.berkeley.edu/bcourses-data-use-and-analytics" target="_blank">Data Use &amp; Analytics</a>',
+      '    <a href="https://dls.berkeley.edu/bcourses-data-use-and-analytics" target="_blank">Data Use &amp; Analytics</a>',
       '    <a href="http://teaching.berkeley.edu/berkeley-honor-code" target="_blank">UC Berkeley Honor Code</a>',
-      '    <a href="http://www.wellness.asuc.org" target="_blank">Student Wellness Resources</a>',
+      '    <a href="https://asuc.org/resources/" target="_blank">Student Resources</a>',
       '  </div>',
       '</div>'
     ].join('');
