@@ -32,20 +32,12 @@ function log_info {
   echo "$(date): [INFO] ${1}" | ${LOGIT}
 }
 
-if [ "$(./script/deploy/_is_deploy_necessary.sh)" == "true" ]; then
+./script/init.d/calcentral maint
 
-  ./script/init.d/calcentral maint
+./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
 
-  ./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
-
-  if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
-    ./script/migrate.sh
-  fi
-
-else
-
-  log_info "No deployment necessary. Requested knob file is already running on ${HOSTNAME}."
-
+if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
+  ./script/migrate.sh
 fi
 
 log_info "Done."

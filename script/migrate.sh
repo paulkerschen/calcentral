@@ -12,7 +12,7 @@ VERSION=${1}
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
 
-if [ -z ${1} ]; then
+if [ -z "${1}" ]; then
   # Default db version is the latest one in our code tree
   if [ ! -d "deploy/db/migrate" ]
   then
