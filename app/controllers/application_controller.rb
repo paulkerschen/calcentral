@@ -6,12 +6,6 @@ class ApplicationController < ActionController::Base
   after_filter :access_log
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-  # Disable most of the default headers provided by secure_headers gem, leaving just x-frame for now
-  # http://rubydoc.info/gems/secure_headers/0.5.0/frames
-  # Rails 4 will DENY X-Frame by default
-  ensure_security_headers
-  skip_before_filter :set_csp_header, :set_hsts_header, :set_x_content_type_options_header, :set_x_xss_protection_header
-
   def authenticate(force = false)
     redirect_to url_for_path('/auth/cas') unless !force && session['user_id']
   end
