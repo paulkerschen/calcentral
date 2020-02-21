@@ -47,15 +47,22 @@ module CanvasCsv
 
     def make_csv(filename, headers, rows)
       csv = CSV.open(
-        filename, 'wb',
+        filename, 'wb:UTF-8',
         {
           headers: headers,
           write_headers: true
         }
       )
+      safe_encode = ->(v) { v.to_s.encode(Encoding::UTF_8, {invalid: :replace, undef: :replace, replace: ''}) }
       if rows
         rows.each do |row|
-          csv << row
+          if row.respond_to? :transform_values
+            csv << row.transform_values(&safe_encode)
+          elsif row.is_a? Array
+            csv << row.map(&safe_encode)
+          else
+            csv << row
+          end
         end
         csv.close
         filename
