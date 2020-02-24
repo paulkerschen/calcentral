@@ -161,6 +161,26 @@ module EdoOracle
       safe_query(sql, do_not_stringify: true)
     end
 
+    def self.get_latest_academic_standing(advisee_sids)
+      sids_in = advisee_sids.map {|sid| "'#{sid}'"}.join ','
+      sql = <<-SQL
+        SELECT
+          sas.STUDENT_ID, sas.TERM_ID,
+          sas.ACAD_STANDING_ACTION, sas.ACAD_STANDING_ACTION_DESCR,
+          sas.ACAD_STANDING_STATUS, sas.ACAD_STANDING_STATUS_DESCR,
+          sas.ACTION_DATE
+        FROM SISEDO.STUDENT_ACAD_STNDNGV00_VW sas
+        JOIN (
+          SELECT STUDENT_ID, MAX(ACTION_DATE) AS ACTION_DATE
+          FROM SISEDO.STUDENT_ACAD_STNDNGV00_VW
+          WHERE STUDENT_ID IN (#{sids_in})
+          GROUP BY STUDENT_ID
+        ) ugrd_latest_actions
+        ON sas.STUDENT_ID = ugrd_latest_actions.STUDENT_ID AND sas.ACTION_DATE = ugrd_latest_actions.ACTION_DATE;
+      SQL
+      safe_query(sql, do_not_stringify: true)
+    end
+
     def self.get_advising_notes()
       sql = <<-SQL
         SELECT

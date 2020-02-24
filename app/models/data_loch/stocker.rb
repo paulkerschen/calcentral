@@ -115,6 +115,10 @@ module DataLoch
               job_paths[job] = DataLoch::Zipper.zip_query_sliced_matches(job, sids) do |subset|
                 EdoOracle::Bulk.get_demographics subset
               end
+            elsif job == 'academic_standing'
+              job_paths[job] = DataLoch::Zipper.zip_query_sliced_matches(job, sids) do |subset|
+                EdoOracle::Bulk.get_latest_academic_standing subset
+              end
             else
               job_paths[job] = DataLoch::Zipper.zip_query job do
                 case job
