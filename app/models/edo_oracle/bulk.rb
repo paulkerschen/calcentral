@@ -176,7 +176,7 @@ module EdoOracle
           WHERE STUDENT_ID IN (#{sids_in})
           GROUP BY STUDENT_ID
         ) ugrd_latest_actions
-        ON sas.STUDENT_ID = ugrd_latest_actions.STUDENT_ID AND sas.ACTION_DATE = ugrd_latest_actions.ACTION_DATE;
+        ON sas.STUDENT_ID = ugrd_latest_actions.STUDENT_ID AND sas.ACTION_DATE = ugrd_latest_actions.ACTION_DATE
       SQL
       safe_query(sql, do_not_stringify: true)
     end
