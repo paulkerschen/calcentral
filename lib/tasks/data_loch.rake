@@ -21,6 +21,7 @@ namespace :data_loch do
     targets = s3_targets
     term_ids = ENV['TERM_ID']
     advisee_data = []
+    advisee_data.concat ['academic_standing'] if ENV['ACADEMIC_STANDING']
     advisee_data.concat ['demographics'] if ENV['DEMOGRAPHICS']
     advisee_data.concat ['edw_demographics'] if ENV['EDW_DEMOGRAPHICS']
     advisee_data.concat ['intended_majors'] if ENV['INTENDED_MAJORS']
