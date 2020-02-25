@@ -2,7 +2,7 @@
 
 ######################################################
 #
-# Get unique id associated with the latest 'calcentral.knob' in AWS S3.
+# Get unique id associated with the latest 'junction.war' in AWS S3.
 # For example, the id of the latest build (master branch) is in s3://rtl-travis-junction/master/latest.txt
 #
 # IMPORTANT: This script can write ONE AND ONLY ONE thing to stdout: ${knob_file_id}
@@ -26,10 +26,10 @@ function getDeployProperty {
 
 # We will abort if no update is necessary.
 # I.e., the latest knob file in S3 is identical to what is running in this enviroment.
-junction_knob_id=$(getDeployProperty 'junction.knob.id')
+junction_war_id=$(getDeployProperty 'junction.war.id')
 
 if [ -z "${junction_knob_id}" ]; then
-  echo "$(date): [ERROR] The 'junction.knob.id' config is blank or missing." > "${LOG}"
+  echo "$(date): [ERROR] The 'junction.war.id' config is blank or missing." > "${LOG}"
   exit 1
 fi
 
@@ -52,22 +52,22 @@ if [ "${junction_knob_id}" == 'latest' ]; then
        -H "Authorization: AWS ${aws_access_key_id}:${signature}" \
        "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o latest.txt > /dev/null
 
-  latest_knob_file_id=$(head -1 latest.txt)
-  latest_knob_file_id=${latest_knob_file_id#"/${git_branch}/"}
-  latest_knob_file_id=${latest_knob_file_id%"/calcentral.knob"}
+  latest_war_file_id=$(head -1 latest.txt)
+  latest_war_file_id=${latest_knob_file_id#"/${git_branch}/"}
+  latest_war_file_id=${latest_knob_file_id%"/junction.war"}
 
-  if [ -z "${latest_knob_file_id}" ]; then
+  if [ -z "${latest_war_file_id}" ]; then
     echo "$(date): [ERROR] The file s3://${aws_s3_bucket}/${git_branch}/latest.txt has bad data." > "${LOG}"
     exit 1
   else
-    knob_file_id="${latest_knob_file_id}"
+    war_file_id="${latest_war_file_id}"
   fi
 
 else
-  # In production, the version of knob file will be specified in deploy_properties (see file info above)
-  knob_file_id="${junction_knob_id}"
+  # In production, the version of WAR file will be specified in deploy_properties (see file info above)
+  war_file_id="${junction_war_id}"
 fi
 
-echo "${knob_file_id}"
+echo "${war_file_id}"
 
 exit 0

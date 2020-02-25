@@ -273,24 +273,6 @@ This will check for any potential JavaScript issues and whether you formatted th
 
 1. If you're not able to connect to Google or Canvas, export the data in the oauth2 from your development db and import them into the same table in your production db.
 
-1. After testing, remember to remove the static assets, or run another build before the next task.
-
-### Start the server with TorqueBox
-
-In production we use [TorqueBox](http://torquebox.org/) as this provides us with messaging, scheduling, caching, and daemons.
-
-1. Deploy into TorqueBox (only needs to happen once in a while):
-
-    ```bash
-    bundle exec torquebox deploy .
-    ```
-
-1. Start the server:
-
-    ```bash
-    bundle exec torquebox run -p=3000
-    ```
-
 ### Test connection
 
 Make sure you are on the Berkeley network or connected through [preconfigured VPN](https://kb.berkeley.edu/page.php?id=23065) for the Oracle connection.

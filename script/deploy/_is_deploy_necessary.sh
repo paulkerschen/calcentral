@@ -2,8 +2,8 @@
 
 ######################################################
 #
-# If the knob-id in 'junction-deploy.properties' does
-# not match the knob-id running on the server then
+# If the war-id in 'junction-deploy.properties' does
+# not match the war-id running on the server then
 # this script returns true.
 #
 ######################################################
@@ -13,9 +13,9 @@ set -e
 
 deployment_summary_file="${HOME}/.calcentral_config/.deployment-summary-$(hostname -s)"
 
-knob_file_id=$(./script/deploy/_get-knob-file-id.sh)
+war_file_id=$(./script/deploy/_get-war-file-id.sh)
 
-if grep -q "${knob_file_id}" "${deployment_summary_file}"; then
+if grep -q "${war_file_id}" "${deployment_summary_file}"; then
   echo false
 else
   echo true

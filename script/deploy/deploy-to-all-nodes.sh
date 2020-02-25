@@ -35,7 +35,7 @@ if [ "$(./script/deploy/_is_deploy_necessary.sh)" == "true" ]; then
 
 else
 
-  log_info "No deployment necessary. Requested knob file is already running on ${HOSTNAME}."
+  log_info "No deployment necessary. Requested WAR file is already running on ${HOSTNAME}."
 
 fi
 
