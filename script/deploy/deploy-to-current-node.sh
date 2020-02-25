@@ -34,11 +34,13 @@ function log_info {
 
 ./script/init.d/calcentral maint
 
-./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
+./script/deploy/_download-war-for-tomcat.sh || { log_error "download-war-for-tomcat failed"; exit 1; }
 
 if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
   ./script/migrate.sh
 fi
+
+./script/_start-tomcat.sh
 
 log_info "Done."
 
