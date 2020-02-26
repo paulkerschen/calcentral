@@ -171,12 +171,14 @@ module EdoOracle
           sas.ACTION_DATE
         FROM SISEDO.STUDENT_ACAD_STNDNGV00_VW sas
         JOIN (
-          SELECT STUDENT_ID, MAX(ACTION_DATE) AS ACTION_DATE
+          SELECT STUDENT_ID, TERM_ID, MAX(ACTION_DATE) AS ACTION_DATE
           FROM SISEDO.STUDENT_ACAD_STNDNGV00_VW
           WHERE STUDENT_ID IN (#{sids_in})
-          GROUP BY STUDENT_ID
+          GROUP BY STUDENT_ID, TERM_ID
         ) ugrd_latest_actions
-        ON sas.STUDENT_ID = ugrd_latest_actions.STUDENT_ID AND sas.ACTION_DATE = ugrd_latest_actions.ACTION_DATE
+        ON sas.STUDENT_ID = ugrd_latest_actions.STUDENT_ID
+        AND sas.TERM_ID = ugrd_latest_actions.TERM_ID
+        AND sas.ACTION_DATE = ugrd_latest_actions.ACTION_DATE
       SQL
       safe_query(sql, do_not_stringify: true)
     end
