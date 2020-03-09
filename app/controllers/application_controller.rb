@@ -220,7 +220,7 @@ class ApplicationController < ActionController::Base
   end
 
   def disable_xframe_options
-    response.headers.except! 'X-Frame-Options'
+    use_secure_headers_override(:disable_xframe_options)
   end
 
 end

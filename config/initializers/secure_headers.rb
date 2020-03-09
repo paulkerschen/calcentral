@@ -16,6 +16,10 @@ module Calcentral
         config.x_permitted_cross_domain_policies = SecureHeaders::OPT_OUT
         config.referrer_policy = SecureHeaders::OPT_OUT
       end
+
+      SecureHeaders::Configuration.override(:disable_xframe_options) do |config|
+        config.x_frame_options = SecureHeaders::OPT_OUT
+      end
     end
   end
 end
