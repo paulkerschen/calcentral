@@ -96,7 +96,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     # Answer "yes" if it asks you to trust a new .rvmrc file.
     ```
 
-1. Install JRuby (requires ):
+1. Install JRuby (requires):
 
      **Note**: To install JRuby, you must first install [rvm](https://rvm.io/rvm/install/).
 
