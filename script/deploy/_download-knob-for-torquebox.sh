@@ -29,7 +29,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
 # Local properties file
 deploy_properties="${HOME}/.calcentral_config/junction-deploy.properties"
-deployment_summary_file="${HOME}/.calcentral_config/.junction-deployment-summary"
+deployment_summary_file="${HOME}/.calcentral_config/.deployment-summary-$(hostname -s)"
 
 function getDeployProperty {
   grep "^${1}=" "${deploy_properties}" | cut -d'=' -f2
