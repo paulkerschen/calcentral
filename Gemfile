@@ -13,10 +13,12 @@ gem 'activeresource', '~>4.0.0'
 gem 'protected_attributes', '~> 1.0.8'
 gem 'rails-observers', '~>0.1.2'
 gem 'rails-perftest', '~>0.0.5'
-gem 'rails_same_site_cookie', '~>0.1.5'
 gem 'responders', '~> 2.0'
 
 gem 'rake', '~> 12.3.3'
+
+# ETS is temporarily maintaining its own fork of Rack to support the SameSite=None cookie property.
+gem 'rack', '~> 1.6.13', git: 'https://github.com/ets-berkeley-edu/rack.git', branch: 'ets-1-6-samesite'
 
 gem 'activerecord-jdbc-adapter', '~> 1.3.16'
 
