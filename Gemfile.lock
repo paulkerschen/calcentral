@@ -14,6 +14,13 @@ GIT
       omniauth (~> 1.9.0)
 
 GIT
+  remote: https://github.com/ets-berkeley-edu/rack.git
+  revision: fe61ce633e0892e65ef0b84ed2f700a7c1763753
+  branch: ets-1-6-samesite
+  specs:
+    rack (1.6.13)
+
+GIT
   remote: https://github.com/instructure/ims-lti.git
   revision: 016adac413022a451f722b25fb6574cc4f9899ae
   specs:
@@ -332,7 +339,6 @@ GEM
     puma (3.12.4-java)
     pundit (0.3.0)
       activesupport (>= 3.0.0)
-    rack (1.6.12)
     rack-pjax (0.8.0)
       nokogiri (~> 1.5)
       rack (~> 1.1)
@@ -373,9 +379,6 @@ GEM
       rails (>= 4.0, < 6)
       remotipart (~> 1.3)
       sass-rails (>= 4.0, < 6)
-    rails_same_site_cookie (0.1.5)
-      railties (>= 4.1)
-      user_agent_parser (~> 2.5)
     railties (4.2.11.1)
       actionpack (= 4.2.11.1)
       activesupport (= 4.2.11.1)
@@ -511,7 +514,6 @@ GEM
     torquebox-web (3.2.0-java)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    user_agent_parser (2.5.1)
     useragent (0.16.10)
     warbler (2.0.5)
       jruby-jars (>= 9.0.0.0)
@@ -577,11 +579,11 @@ DEPENDENCIES
   protected_attributes (~> 1.0.8)
   puma (~> 3.12.2)
   pundit (~> 0.3.0)
+  rack (~> 1.6.13)!
   rails (= 4.2.11.1)
   rails-observers (~> 0.1.2)
   rails-perftest (~> 0.0.5)
   rails_admin (= 1.3.0)
-  rails_same_site_cookie (~> 0.1.5)
   rake (~> 12.3.3)
   responders (~> 2.0)
   retriable (~> 1.4)
