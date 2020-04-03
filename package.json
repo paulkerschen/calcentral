@@ -52,7 +52,6 @@
     "lodash": "^4.17.15",
     "ngtemplate-loader": "^2.0.1",
     "node-sass": "^4.13.1",
-    "pikaday": "~1.8.0",
     "prop-types": "^15.7.2",
     "querystringify": "^2.1.1",
     "raven-js": "~3.27.2",
