@@ -60,38 +60,6 @@ describe CanvasCourseGradeExportController do
     end
   end
 
-  describe 'when resolving issues with course site state related to grade export' do
-    before { allow_any_instance_of(CanvasLti::Egrades).to receive(:resolve_issues).and_return(nil) }
-
-    it_should_behave_like 'an endpoint' do
-      let(:make_request) { post :resolve_issues, canvas_course_id: 'embedded', :enableGradingScheme => 1, :format => :csv }
-      let(:error_text) { 'Something went wrong' }
-      before { allow_any_instance_of(CanvasLti::Egrades).to receive(:resolve_issues).and_raise(RuntimeError, error_text) }
-    end
-
-    it_should_behave_like 'an authenticated endpoint' do
-      let(:make_request) { post :resolve_issues, canvas_course_id: 'embedded', :enableGradingScheme => 1, :format => :csv }
-    end
-
-    it 'supports enableGradingScheme option' do
-      expect_any_instance_of(CanvasLti::Egrades).to receive(:resolve_issues).with(true, false)
-      post :resolve_issues, :canvas_course_id => canvas_course_id, :enableGradingScheme => 1, :format => :csv
-      expect(response.status).to eq(200)
-      json_response = JSON.parse(response.body)
-      expect(json_response).to be_an_instance_of Hash
-      expect(json_response['status']).to eq 'Resolved'
-    end
-
-    it 'supports unmuteAssignments option' do
-      expect_any_instance_of(CanvasLti::Egrades).to receive(:resolve_issues).with(false, true)
-      post :resolve_issues, :canvas_course_id => canvas_course_id, :unmuteAssignments => 1, :format => :csv
-      expect(response.status).to eq(200)
-      json_response = JSON.parse(response.body)
-      expect(json_response).to be_an_instance_of Hash
-      expect(json_response['status']).to eq 'Resolved'
-    end
-  end
-
   describe '#job_status' do
     let(:background_job_id) { 'CanvasLti::Egrades.1383330151057-67f4b934525501cb' }
 
@@ -145,19 +113,12 @@ describe CanvasCourseGradeExportController do
         'grading_standard_id' => 0
       }
     end
-    let(:muted_assignments) do
-      [
-        {'name' => 'Assignment 4', 'due_at' => 'Oct 13, 2015 at 8:30am', 'points_possible' => 25},
-        {'name' => 'Assignment 7', 'due_at' => 'Oct 18, 2015 at 9:30am', 'points_possible' => 100},
-      ]
-    end
     let(:section_terms) { [{:term_cd => 'C', :term_yr => '2014'}, {:term_cd => 'D', :term_yr => '2015'}] }
     let(:export_options) do
       {
         :officialSections => official_course_sections,
         :gradingStandardEnabled => false,
         :sectionTerms => section_terms,
-        :mutedAssignments => muted_assignments
       }
     end
     before do
@@ -191,9 +152,6 @@ describe CanvasCourseGradeExportController do
       section_terms = json_response['sectionTerms']
       expect(section_terms).to be_an_instance_of Array
       expect(section_terms.count).to eq 2
-
-      muted_assignments = json_response['mutedAssignments']
-      expect(muted_assignments).to be_an_instance_of Array
     end
 
     it 'supports canvas course id parameter when absent in session' do

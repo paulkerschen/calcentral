@@ -9,8 +9,6 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
 
   $scope.appState = 'initializing';
   $scope.canvasCourseId = $routeParams.canvasCourseId || 'embedded';
-  $scope.enableDefaultGradingScheme = false;
-  $scope.resolvingCourseState = false;
   $scope.focusOnSelectionHeader = false;
 
   // Sends message to parent window to switch to gradebook
@@ -97,10 +95,10 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
           loadOfficialSections(response.data.officialSections);
         }
         if ($scope.appState !== 'error') {
-          validateCourseState(response.data.gradingStandardEnabled, response.data.mutedAssignments);
-        }
-        if ($scope.appState !== 'error') {
-          $scope.appState = 'selection';
+          $scope.appState = 'preselection';
+          if (!response.data.gradingStandardEnabled) {
+            $scope.noGradingStandardEnabled = true;
+          }
         }
       }, function errorCallback() {
         $scope.appState = 'error';
@@ -110,56 +108,11 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
     );
   };
 
-  $scope.notReadyForPreparation = function() {
-    if ($scope.noGradingStandardEnabled && $scope.mutedAssignmentsPresent && $scope.enableDefaultGradingScheme && $scope.unmuteAllAssignments) {
-      return false;
-    }
-    if ($scope.noGradingStandardEnabled && !$scope.mutedAssignmentsPresent && $scope.enableDefaultGradingScheme) {
-      return false;
-    }
-    if (!$scope.noGradingStandardEnabled && $scope.mutedAssignmentsPresent && $scope.unmuteAllAssignments) {
-      return false;
-    }
-    return true;
-  };
-
   // Switches to 'selection' step and scrolls to top of page
   $scope.switchToSelection = function() {
     apiService.util.iframeScrollToTop();
     $scope.appState = 'selection';
     $scope.focusOnSelectionHeader = true;
-  };
-
-  $scope.resolveIssues = function() {
-    $scope.accessibilityAnnounce('Updating course settings');
-    $scope.resolvingCourseState = true;
-    canvasCourseGradeExportFactory.resolveIssues($scope.canvasCourseId, $scope.enableDefaultGradingScheme, $scope.unmuteAllAssignments).then(
-      function successCallback(response) {
-        if (response.data.status && response.data.status === 'Resolved') {
-          $scope.accessibilityAnnounce('Course settings updated. Export form options loaded.');
-          $scope.resolvingCourseState = false;
-          $scope.switchToSelection();
-        } else {
-          $scope.resolvingCourseState = false;
-          $scope.appState = 'error';
-          $scope.contactSupport = true;
-          $scope.errorStatus = 'Error resolving course site state for E-Grades Export.';
-        }
-      },
-      function errorCallback() {
-        $scope.appState = 'error';
-        $scope.contactSupport = true;
-        if ($scope.enableDefaultGradingScheme) {
-          $scope.errorStatus = 'Error enabling grading scheme.';
-        }
-        if ($scope.unmuteAllAssignments) {
-          $scope.errorStatus = 'Error enabling unmuting assignments.';
-        }
-        if ($scope.enableDefaultGradingScheme && $scope.unmuteAllAssignments) {
-          $scope.errorStatus = 'Error enabling grading scheme and unmuting assignments.';
-        }
-      }
-    );
   };
 
   // Triggers auto-download of selected CSV download
@@ -218,19 +171,6 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
       $scope.appState = 'error';
       $scope.errorStatus = 'No sections found in this course representing a currently maintained campus term.';
       $scope.unexpectedContactSupport = true;
-    }
-  };
-
-  // Load and initialize application based on grading standard and muted assignment states for course
-  var validateCourseState = function(gradingStandardEnabled, mutedAssignments) {
-    $scope.mutedAssignments = mutedAssignments;
-    if (!gradingStandardEnabled) {
-      $scope.appState = 'error';
-      $scope.noGradingStandardEnabled = true;
-    }
-    if (mutedAssignments.length > 0) {
-      $scope.appState = 'error';
-      $scope.mutedAssignmentsPresent = true;
     }
   };
 

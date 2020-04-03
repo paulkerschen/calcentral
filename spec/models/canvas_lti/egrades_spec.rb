@@ -161,46 +161,6 @@ describe CanvasLti::Egrades do
     end
   end
 
-  context 'when resolving course state issues' do
-    let(:course_settings) do
-      {
-        statusCode: 200,
-        body: {
-          'id' => canvas_course_id
-        }
-      }
-    end
-    let(:muted_assignments) { [] }
-    before do
-      allow_any_instance_of(Canvas::CourseSettings).to receive(:set_grading_scheme).and_return course_settings
-      allow(subject).to receive(:unmute_course_assignments).and_return muted_assignments
-    end
-
-    context 'when enabling grading scheme' do
-      it 'enables the grading scheme' do
-        expect_any_instance_of(Canvas::CourseSettings).to receive(:set_grading_scheme).and_return course_settings
-        subject.resolve_issues(true, false)
-      end
-
-      it 'does not unmute assignments' do
-        expect(subject).to_not receive :unmute_course_assignments
-        subject.resolve_issues(true, false)
-      end
-    end
-
-    context 'when unmuting assignments' do
-      it 'unmutes assignments' do
-        expect(subject).to receive(:unmute_course_assignments).and_return muted_assignments
-        subject.resolve_issues(false, true)
-      end
-
-      it 'does not enable the grading scheme' do
-        expect_any_instance_of(Canvas::CourseSettings).to_not receive :set_grading_scheme
-        subject.resolve_issues(false, true)
-      end
-    end
-  end
-
   context 'when providing canvas course student grades' do
     let(:course_users_array) do
       [
@@ -488,38 +448,6 @@ describe CanvasLti::Egrades do
     end
   end
 
-  context 'when providing muted assignments' do
-    let(:muted_course_assignments) { [ course_assignments[1] ] }
-    before do
-      allow_any_instance_of(Canvas::CourseAssignments).to receive(:muted_assignments).and_return muted_course_assignments
-    end
-
-    it 'provides current muted assignments' do
-      muted_assignments = subject.muted_assignments
-      expect(muted_assignments.count).to eq 1
-      expect(muted_assignments[0]['name']).to eq 'Assignment 2'
-      expect(muted_assignments[0]['points_possible']).to eq 50
-    end
-
-    it 'converts due at timestamp to display format' do
-      muted_assignments = subject.muted_assignments
-      expect(muted_assignments[0]['due_at']).to eq 'Oct 13, 2015 at 6:05am'
-    end
-  end
-
-  context 'when unmuting all course assignments' do
-    let(:muted_course_assignments) do
-      course_assignments.collect { |assignment| assignment['muted'] = true; assignment }
-    end
-    it 'unmutes all muted assignments for the course specified' do
-      allow_any_instance_of(Canvas::CourseAssignments).to receive(:muted_assignments).and_return(muted_course_assignments)
-      expect_any_instance_of(Canvas::CourseAssignments).to receive(:unmute_assignment).exactly(1).times.with 19082
-      expect_any_instance_of(Canvas::CourseAssignments).to receive(:unmute_assignment).exactly(1).times.with 19083
-      expect_any_instance_of(Canvas::CourseAssignments).to receive(:unmute_assignment).exactly(1).times.with 19084
-      subject.unmute_course_assignments
-    end
-  end
-
   context 'when providing course states for grade export validation' do
     let(:official_course_sections) do
       [
@@ -564,12 +492,6 @@ describe CanvasLti::Egrades do
         }
       }
     end
-    let(:muted_assignments) do
-      [
-        {'name' => 'Assignment 4', 'due_at' => 'Oct 13, 2015 at 8:30am', 'points_possible' => 25},
-        {'name' => 'Assignment 7', 'due_at' => 'Oct 18, 2015 at 9:30am', 'points_possible' => 100},
-      ]
-    end
     let(:grade_types) {
       {
         number_grades_present: true,
@@ -593,7 +515,6 @@ describe CanvasLti::Egrades do
       allow_any_instance_of(CanvasLti::OfficialCourse).to receive(:section_terms).and_return section_terms
       allow(subject).to receive(:official_sections).and_return official_course_sections
       allow(subject).to receive(:grade_types_present).and_return grade_types
-      allow(subject).to receive(:muted_assignments).and_return muted_assignments
     end
 
     it 'provides official course sections' do
@@ -618,14 +539,6 @@ describe CanvasLti::Egrades do
       expect(section_terms[0][:term_yr]).to eq '2017'
       expect(section_terms[1][:term_cd]).to eq 'C'
       expect(section_terms[1][:term_yr]).to eq '2017'
-    end
-
-    it 'provides muted assignments existing within course' do
-      export_options = subject.export_options
-      muted_assignments = export_options[:mutedAssignments]
-      expect(muted_assignments.count).to eq 2
-      expect(muted_assignments[0]['name']).to eq 'Assignment 4'
-      expect(muted_assignments[1]['name']).to eq 'Assignment 7'
     end
   end
 end

@@ -47,17 +47,6 @@ module CanvasLti
       official_grades
     end
 
-    def resolve_issues(enable_grading_scheme = false, unmute_assignments = false)
-      if enable_grading_scheme
-        course_settings = Canvas::CourseSettings.new(:course_id => @canvas_course_id)
-        course_settings.set_grading_scheme
-        logger.warn("Enabled default grading scheme for Canvas Course ID #{@canvas_course_id}")
-      end
-      if unmute_assignments
-        unmute_course_assignments
-      end
-    end
-
     def bg_canvas_course_student_grades(force = false)
       background_job_initialize
       background.canvas_course_student_grades(force)
@@ -120,26 +109,7 @@ module CanvasLti
           :officialSections => official_sections,
           :gradingStandardEnabled => course_settings['grading_standard_enabled'],
           :sectionTerms => @canvas_official_course.section_terms,
-          :mutedAssignments => muted_assignments
         }
-      end
-    end
-
-    def muted_assignments
-      muted_assignments = Canvas::CourseAssignments.new(:course_id => @canvas_course_id).muted_assignments
-      muted_assignments.collect do |assignment|
-        assignment['due_at'] = assignment['due_at'].nil? ? nil : Time.iso8601(assignment['due_at']).strftime('%b %-e, %Y at %-l:%M%P')
-        assignment
-      end
-    end
-
-    def unmute_course_assignments
-      worker = Canvas::CourseAssignments.new(course_id: @canvas_course_id)
-      muted_assignments = worker.muted_assignments
-      logger.warn "Unmuting #{muted_assignments.count} assignments for Canvas course ID #{@canvas_course_id}"
-      muted_assignments.each do |assignment|
-        worker.unmute_assignment(assignment['id'])
-        logger.warn "Unmuted assignment ID #{assignment['id']} for Canvas course ID #{@canvas_course_id}"
       end
     end
 

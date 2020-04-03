@@ -12,13 +12,6 @@ angular.module('calcentral.factories').factory('canvasCourseGradeExportFactory',
     return $http.post('/api/academics/canvas/egrade_export/prepare/' + canvasCourseId);
   };
 
-  var resolveIssues = function(canvasCourseId, enableGradingScheme, unmuteAllAssignments) {
-    return $http.post('/api/academics/canvas/egrade_export/resolve/' + canvasCourseId, {
-      enableGradingScheme: !!enableGradingScheme,
-      unmuteAssignments: !!unmuteAllAssignments
-    });
-  };
-
   var jobStatus = function(canvasCourseId, jobId) {
     return $http.get('/api/academics/canvas/egrade_export/status/' + canvasCourseId + '?jobId=' + jobId);
   };
@@ -26,7 +19,6 @@ angular.module('calcentral.factories').factory('canvasCourseGradeExportFactory',
   return {
     exportOptions: exportOptions,
     jobStatus: jobStatus,
-    prepareGradesCacheJob: prepareGradesCacheJob,
-    resolveIssues: resolveIssues
+    prepareGradesCacheJob: prepareGradesCacheJob
   };
 });
