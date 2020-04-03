@@ -21,12 +21,6 @@ class CanvasCourseGradeExportController < ApplicationController
     render json: { jobRequestStatus: 'Success', jobId: egrades.background_job_id }.to_json
   end
 
-  # POST /api/academics/canvas/egrade_export/resolve/:canvas_course_id.json?enableGradingScheme=1&unmuteAssignments=0
-  def resolve_issues
-    egrades.resolve_issues(!!params['enableGradingScheme'], !!params['unmuteAssignments'])
-    render json: { status: 'Resolved' }
-  end
-
   # GET /api/academics/canvas/egrade_export/status/:canvas_course_id.json?jobId=Canvas::BackgroundJob.1383330151057-67f4b934525501cb
   def job_status
     background_job = BackgroundJob.find(params['jobId'])
