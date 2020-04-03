@@ -4,9 +4,6 @@
 // Foundation Overrides
 @import "foundation_overrides";
 
-// Pikdaday styles
-@import "../../../node_modules/pikaday/css/pikaday.css";
-
 // CalCentral Specific
 @import "colors";
 @import "base";
@@ -45,8 +42,6 @@
 @import "tables";
 // Scrollbars
 @import "scrollbars";
-// Date Picker
-@import "datepicker";
 // Act As
 @import "act_as";
 

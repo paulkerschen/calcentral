@@ -9,7 +9,6 @@ require('angular-sanitize');
 require('lodash');
 require('js-natural-sort');
 require('raven-js');
-require('pikaday');
 
 // CalCentral JS - Initialization
 require('./angular/calcentral.js');
