@@ -35,10 +35,10 @@ describe CanvasLti::Egrades do
   context 'when serving official student grades csv' do
     let(:official_student_grades_list) do
       [
-        {sis_login_id: '872584', final_grade: 'F', current_grade: 'C', pnp_flag: 'N', grading_basis: 'GRD', student_id: '2004491', name: 'Gregory, Matt'},
-        {sis_login_id: '4000123', final_grade: 'B', current_grade: 'B', pnp_flag: 'N', grading_basis: 'GRD', student_id: '24000123', name: 'Lyons, Marcus'},
-        {sis_login_id: '872527', final_grade: 'P', current_grade: 'P', pnp_flag: 'Y', grading_basis: 'PNP', student_id: '2004445', name: 'Tarpey, Luke'},
-        {sis_login_id: '872529', final_grade: 'D-', current_grade: 'C', pnp_flag: 'N', grading_basis: 'GRD', student_id: '2004421', name: 'MacDougall, Johnny'}
+        {sis_login_id: '872584', final_grade: 'F', current_grade: 'C', grading_basis: 'GRD', student_id: '2004491', name: 'Gregory, Matt'},
+        {sis_login_id: '4000123', final_grade: 'C', current_grade: 'C', grading_basis: 'ESU', student_id: '24000123', name: 'Lyons, Marcus'},
+        {sis_login_id: '872527', final_grade: 'D-', current_grade: 'C', grading_basis: 'DPN', student_id: '2004445', name: 'Tarpey, Luke'},
+        {sis_login_id: '872529', final_grade: 'D-', current_grade: 'C', grading_basis: 'GRD', student_id: '2004421', name: 'MacDougall, Johnny'}
       ]
     end
 
@@ -48,11 +48,12 @@ describe CanvasLti::Egrades do
 
     it 'raises error when called with invalid type argument' do
       expect {
-        subject.official_student_grades_csv('B', '2017', '7309', 'finished')
+        subject.official_student_grades_csv('B', '2017', '7309', 'finished', 'D-')
       }.to raise_error(ArgumentError, 'type argument must be \'final\' or \'current\'')
     end
 
-    let(:official_grades_csv_string) { subject.official_student_grades_csv('B', '2017', '7309', grade_type) }
+    let(:pnp_cutoff) { 'D' }
+    let(:official_grades_csv_string) { subject.official_student_grades_csv('B', '2017', '7309', grade_type, pnp_cutoff) }
     let(:official_grades_csv) { CSV.parse official_grades_csv_string.strip, headers: true }
 
     context 'current grades' do
@@ -72,19 +73,39 @@ describe CanvasLti::Egrades do
         expect(official_grades_csv[0]['Name']).to eq 'Gregory, Matt'
         expect(official_grades_csv[0]['Grade']).to eq 'C'
         expect(official_grades_csv[0]['Grading Basis']).to eq 'GRD'
-        expect(official_grades_csv[0]['Comments']).to eq ''
+        expect(official_grades_csv[0]['Comments']).to eq 'Opted for letter grade'
 
         expect(official_grades_csv[2]['ID']).to eq '2004445'
         expect(official_grades_csv[2]['Name']).to eq 'Tarpey, Luke'
         expect(official_grades_csv[2]['Grade']).to eq 'P'
-        expect(official_grades_csv[2]['Grading Basis']).to eq 'PNP'
-        expect(official_grades_csv[2]['Comments']).to eq 'Opted for P/NP Grade'
+        expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
+        expect(official_grades_csv[2]['Comments']).to eq ''
 
         expect(official_grades_csv[3]['ID']).to eq '2004421'
         expect(official_grades_csv[3]['Name']).to eq 'MacDougall, Johnny'
         expect(official_grades_csv[3]['Grade']).to eq 'C'
         expect(official_grades_csv[3]['Grading Basis']).to eq 'GRD'
-        expect(official_grades_csv[3]['Comments']).to eq ''
+        expect(official_grades_csv[3]['Comments']).to eq 'Opted for letter grade'
+      end
+
+      context 'a lax P/NP cutoff' do
+        let(:pnp_cutoff) { 'D' }
+        it 'respects cutoff per grading basis' do
+          expect(official_grades_csv[1]['Grade']).to eq 'S'
+          expect(official_grades_csv[1]['Grading Basis']).to eq 'ESU'
+          expect(official_grades_csv[2]['Grade']).to eq 'P'
+          expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
+        end
+      end
+
+      context 'a strict P/NP cutoff' do
+        let(:pnp_cutoff) { 'B-' }
+        it 'respects cutoff per grading basis' do
+          expect(official_grades_csv[1]['Grade']).to eq 'U'
+          expect(official_grades_csv[1]['Grading Basis']).to eq 'ESU'
+          expect(official_grades_csv[2]['Grade']).to eq 'NP'
+          expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
+        end
       end
     end
 
@@ -97,19 +118,19 @@ describe CanvasLti::Egrades do
         expect(official_grades_csv[0]['Name']).to eq 'Gregory, Matt'
         expect(official_grades_csv[0]['Grade']).to eq 'F'
         expect(official_grades_csv[0]['Grading Basis']).to eq 'GRD'
-        expect(official_grades_csv[0]['Comments']).to eq ''
+        expect(official_grades_csv[0]['Comments']).to eq 'Opted for letter grade'
 
         expect(official_grades_csv[2]['ID']).to eq '2004445'
         expect(official_grades_csv[2]['Name']).to eq 'Tarpey, Luke'
-        expect(official_grades_csv[2]['Grade']).to eq 'P'
-        expect(official_grades_csv[2]['Grading Basis']).to eq 'PNP'
-        expect(official_grades_csv[2]['Comments']).to eq 'Opted for P/NP Grade'
+        expect(official_grades_csv[2]['Grade']).to eq 'NP'
+        expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
+        expect(official_grades_csv[2]['Comments']).to eq ''
 
         expect(official_grades_csv[3]['ID']).to eq '2004421'
         expect(official_grades_csv[3]['Name']).to eq 'MacDougall, Johnny'
         expect(official_grades_csv[3]['Grade']).to eq 'D-'
         expect(official_grades_csv[3]['Grading Basis']).to eq 'GRD'
-        expect(official_grades_csv[3]['Comments']).to eq ''
+        expect(official_grades_csv[3]['Comments']).to eq 'Opted for letter grade'
       end
     end
   end
@@ -117,9 +138,9 @@ describe CanvasLti::Egrades do
   context 'when serving official student grades' do
     let(:primary_section_enrollees) do
       [
-        {'ldap_uid' => '872584', 'enroll_status' => 'E', 'pnp_flag' => 'N', 'student_id' => '2004491', 'grading_basis' => 'GRD'},
-        {'ldap_uid' => '872527', 'enroll_status' => 'E', 'pnp_flag' => 'N', 'student_id' => '2004445', 'grading_basis' => 'GRD'},
-        {'ldap_uid' => '872529', 'enroll_status' => 'E', 'pnp_flag' => 'Y', 'student_id' => '2004421', 'grading_basis' => 'PNP'},
+        {'ldap_uid' => '872584', 'enroll_status' => 'E', 'student_id' => '2004491', 'grading_basis' => 'GRD'},
+        {'ldap_uid' => '872527', 'enroll_status' => 'E', 'student_id' => '2004445', 'grading_basis' => 'GRD'},
+        {'ldap_uid' => '872529', 'enroll_status' => 'E', 'student_id' => '2004421', 'grading_basis' => 'PNP'},
       ]
     end
 
@@ -142,14 +163,6 @@ describe CanvasLti::Egrades do
       expect(result[0][:sis_login_id]).to eq '872584'
       expect(result[1][:sis_login_id]).to eq '872527'
       expect(result[2][:sis_login_id]).to eq '872529'
-    end
-
-    it 'includes pass/no-pass indicator' do
-      result = subject.official_student_grades('B', '2017', '7309')
-      expect(result.count).to eq 3
-      expect(result[0][:pnp_flag]).to eq 'N'
-      expect(result[1][:pnp_flag]).to eq 'N'
-      expect(result[2][:pnp_flag]).to eq 'Y'
     end
 
     it 'includes student IDs' do

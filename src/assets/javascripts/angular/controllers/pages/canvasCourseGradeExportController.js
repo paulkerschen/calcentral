@@ -85,6 +85,11 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
     );
   };
 
+  var initializePnpCutoffGrades = function() {
+    $scope.letterGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+    $scope.selectedPnpCutoffGrade = 'C-';
+  };
+
   $scope.getExportOptions = function() {
     canvasCourseGradeExportFactory.exportOptions($scope.canvasCourseId).then(
       function successCallback(response) {
@@ -99,6 +104,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
           if (!response.data.gradingStandardEnabled) {
             $scope.noGradingStandardEnabled = true;
           }
+          initializePnpCutoffGrades();
         }
       }, function errorCallback() {
         $scope.appState = 'error';
@@ -123,7 +129,8 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
       'ccn=' + $scope.selectedSection.course_cntl_num + '&',
       'term_cd=' + $scope.selectedSection.term_cd + '&',
       'term_yr=' + $scope.selectedSection.term_yr + '&',
-      'type=' + $scope.selectedType
+      'type=' + $scope.selectedType + '&',
+      'pnp_cutoff=' + encodeURIComponent($scope.selectedPnpCutoffGrade)
     ].join('');
     $window.location.href = downloadPath;
   };
