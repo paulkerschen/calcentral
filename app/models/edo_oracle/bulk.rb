@@ -280,8 +280,7 @@ module EdoOracle
         SELECT
           A.USER_ID,
           A.CS_ID,
-          A.PERMISSION_LIST,
-          A.DISPLAY_ONLY
+          A.PERMISSION_LIST
         FROM SYSADM.BOA_ADV_NOTES_ACCESS_VW A
       SQL
       safe_query(sql, do_not_stringify: true)
