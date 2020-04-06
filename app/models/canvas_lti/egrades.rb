@@ -10,6 +10,7 @@ module CanvasLti
     include ClassLogger
 
     GRADE_TYPES = %w(final current)
+    LETTER_GRADES = %w(A+ A A- B+ B B- C+ C C- D+ D D- F)
 
     def initialize(options = {})
       raise RuntimeError, 'canvas_course_id required' unless options.include?(:canvas_course_id)
@@ -17,15 +18,20 @@ module CanvasLti
       @canvas_official_course = CanvasLti::OfficialCourse.new(canvas_course_id: @canvas_course_id)
     end
 
-    def official_student_grades_csv(term_cd, term_yr, ccn, type)
+    def official_student_grades_csv(term_cd, term_yr, ccn, type, pnp_cutoff)
       raise ArgumentError, 'type argument must be \'final\' or \'current\'' unless GRADE_TYPES.include?(type)
       # Campus Solutions expects Windows-style line endings.
       csv_string = CSV.generate(row_sep: "\r\n") do |csv|
         csv << ['ID', 'Name', 'Grade', 'Grading Basis', 'Comments']
         official_student_grades(term_cd, term_yr, ccn).each do |student|
-          grade = student["#{type}_grade".to_sym].to_s
+          grade = convert_to_basis(student["#{type}_grade".to_sym].to_s, student[:grading_basis], pnp_cutoff)
           basis = student[:grading_basis] || ''
-          comment = (student[:pnp_flag] == 'Y') ? 'Opted for P/NP Grade' : ''
+          comment = case student[:grading_basis]
+            when 'GRD' then 'Opted for letter grade'
+            when 'ESU', 'SUS' then 'S/U grade'
+            when 'CNC' then 'C/NC grade'
+            else ''
+          end
           csv << [student[:student_id], student[:name], grade, basis, comment]
         end
       end
@@ -40,7 +46,6 @@ module CanvasLti
         next unless (enrollment = enrollments_by_uid[canvas_grades[:sis_login_id]])
         official_grades << canvas_grades.merge(
           grading_basis: enrollment['grading_basis'],
-          pnp_flag: enrollment['pnp_flag'],
           student_id: enrollment['student_id']
         )
       end
@@ -63,6 +68,19 @@ module CanvasLti
             sis_login_id: course_user['login_id']
           )
         end
+      end
+    end
+
+    def convert_to_basis(grade, basis, pnp_cutoff)
+      if LETTER_GRADES.include?(grade) && %w(CNC DPN EPN ESU PNP SUS).include?(basis)
+        passing = LETTER_GRADES.index(grade) <= LETTER_GRADES.index(pnp_cutoff)
+        case basis
+          when 'CNC' then (passing ? 'C' : 'NC')
+          when 'DPN', 'EPN', 'PNP' then (passing ? 'P' : 'NP')
+          when 'ESU', 'SUS' then (passing ? 'S' : 'U')
+        end
+      else
+        grade
       end
     end
 
