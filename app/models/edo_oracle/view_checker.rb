@@ -292,7 +292,7 @@ class EdoOracle::ViewChecker
     },
     {
       :id => 'SYSADM.BOA_ADV_NOTES_ACCESS_VW',
-      :columns => %w(USER_ID CS_ID PERMISSION_LIST DISPLAY_ONLY)
+      :columns => %w(USER_ID CS_ID PERMISSION_LIST)
     },
     {
       :id => 'SYSADM.BOA_INSTRUCTOR_ADVISOR_VW',
