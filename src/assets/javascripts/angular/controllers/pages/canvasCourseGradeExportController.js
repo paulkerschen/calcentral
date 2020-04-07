@@ -87,7 +87,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
 
   var initializePnpCutoffGrades = function() {
     $scope.letterGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
-    $scope.selectedPnpCutoffGrade = 'C-';
+    $scope.selectedPnpCutoffGrade = null;
   };
 
   $scope.getExportOptions = function() {
