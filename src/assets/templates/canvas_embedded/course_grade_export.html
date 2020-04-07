@@ -68,20 +68,6 @@
 
       <div class="row collapse">
         <div class="medium-12 columns">
-          <h2 class="bc-page-course-grade-export-sub-header">3. Set P/NP cutoff point:</h2>
-          <p class="bc-page-course-grade-export-download-description">
-            The E-Grades export will automatically convert bCourses letter grades to the student-selected grading option. Please select the lowest passing letter grade.
-          </p>
-          <select
-            id="select-pnp-grade-cutoff"
-            class="bc-form-input-select bc-page-course-grade-export-select-pnp-cutoff"
-            data-ng-model="selectedPnpCutoffGrade"
-            data-ng-options="grade for grade in letterGrades"></select>
-        </div>
-      </div>
-
-      <div class="row collapse">
-        <div class="medium-12 columns">
           <div class="cc-text-right">
             <button class="bc-canvas-button" type="button" data-ng-click="goToGradebook()" aria-label="Go Back to Gradebook">Cancel</button>
             <button data-ng-disabled="noGradingStandardEnabled" data-ng-click="switchToSelection()" class="bc-canvas-button bc-canvas-button-primary" type="button">
@@ -103,7 +89,7 @@
 
       <div class="row collapse">
         <div class="medium-12 columns">
-          <h1 class="bc-page-course-grade-export-header bc-accessibility-no-outline" data-cc-focus-reset-directive="focusOnSelectionHeader">What would you like to download?</h1>
+          <h1 class="bc-page-course-grade-export-header bc-accessibility-no-outline" data-cc-focus-reset-directive="focusOnSelectionHeader">Export E-Grades</h1>
         </div>
       </div>
 
@@ -111,39 +97,62 @@
         <a data-ng-click="goToGradebook()">Back to Gradebook</a>
       </div>
 
-      <div class="row collapse">
-        <div class="medium-5 small-12 columns">
-          <div class="row collapse" data-ng-show="officialSections.length > 1">
-            <div class="medium-12 columns">
-              <label for="course-sections" class="bc-page-course-grade-export-form-label">
-                <strong>Select Section</strong>:
-              </label>
-              <select id="course-sections" class="bc-form-input-select" data-ng-model="selectedSection" data-ng-options="section as section.display_name for section in officialSections"></select>
-            </div>
-          </div>
-
+      <div class="row collapse" data-ng-show="officialSections.length > 1">
+        <h2 class="bc-page-course-grade-export-download-header">Select section</h2>
+        <div class="medium-5 columns end">
+          <select id="course-sections" class="bc-form-input-select" data-ng-model="selectedSection" data-ng-options="section as section.display_name for section in officialSections"></select>
         </div>
       </div>
 
       <div class="row collapse">
+        <h2 class="bc-page-course-grade-export-download-header">Select P/NP cutoff grade</h2>
         <div class="medium-5 columns end">
-          <h2 class="bc-page-course-grade-export-download-header">Current Grades Download</h2>
+          <p class="bc-page-course-grade-export-download-description">
+            The E-Grades export will automatically convert bCourses letter grades to the student-selected grading option. Please select the lowest passing letter grade.
+          </p>
+          <select
+            id="select-pnp-grade-cutoff"
+            class="bc-form-input-select bc-page-course-grade-export-select-pnp-cutoff"
+            data-ng-model="selectedPnpCutoffGrade"
+            data-ng-options="grade for grade in letterGrades">
+            <option value="">Select a grade</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row collapse">
+        <h2 class="bc-page-course-grade-export-download-header">What would you like to download?</h2>
+      </div>
+
+      <div class="row collapse">
+        <h2 class="bc-page-course-grade-export-download-header">Current Grades</h2>
+        <div class="medium-5 columns end">
           <p class="bc-page-course-grade-export-download-description">
             Current grades download ignores unsubmitted assignments when calculating grades.
             Use this download when you want to excuse unsubmitted assignments.
           </p>
-          <button data-ng-click="preloadGrades('current')" class="bc-canvas-button bc-canvas-button-primary">Download Current Grades</button>
+          <button
+            data-ng-click="preloadGrades('current')"
+            data-ng-disabled="!selectedPnpCutoffGrade"
+            class="bc-canvas-button bc-canvas-button-primary">
+            Download Current Grades
+          </button>
         </div>
       </div>
 
       <div class="row collapse">
-        <div class="medium-5 columns">
-          <h2 class="bc-page-course-grade-export-download-header">Final Grades Download</h2>
+        <h2 class="bc-page-course-grade-export-download-header">Final Grades</h2>
+        <div class="medium-5 columns end">
           <p class="bc-page-course-grade-export-download-description">
             Final grades download counts unsubmitted assignments as zeroes when calculating grades.
             Use this download when you want to include all unsubmitted assignments as part of the grade.
           </p>
-          <button data-ng-click="preloadGrades('final')" class="bc-canvas-button bc-canvas-button-primary">Download Final Grades</button>
+          <button
+            data-ng-click="preloadGrades('final')"
+            data-ng-disabled="!selectedPnpCutoffGrade"
+            class="bc-canvas-button bc-canvas-button-primary">
+            Download Final Grades
+          </button>
         </div>
       </div>
 
