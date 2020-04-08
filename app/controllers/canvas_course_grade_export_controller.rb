@@ -32,7 +32,7 @@ class CanvasCourseGradeExportController < ApplicationController
   def download_egrades_csv
     %w(term_cd term_yr ccn type pnp_cutoff).each { |field| raise Errors::BadRequestError, "#{field} required" unless params[field] }
     raise Errors::BadRequestError, "invalid value for 'type' parameter" unless CanvasLti::Egrades::GRADE_TYPES.include?(params['type'])
-    raise Errors::BadRequestError, "invalid value for 'pnp_cutoff' parameter" unless CanvasLti::Egrades::LETTER_GRADES.include?(params['pnp_cutoff'])
+    raise Errors::BadRequestError, "invalid value for 'pnp_cutoff' parameter" unless (CanvasLti::Egrades::LETTER_GRADES + %w(ignore)).include?(params['pnp_cutoff'])
     official_student_grades = egrades.official_student_grades_csv(params['term_cd'], params['term_yr'], params['ccn'], params['type'], params['pnp_cutoff'])
     term_season = {
       'B' => 'Spring',
