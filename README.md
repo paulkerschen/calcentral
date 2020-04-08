@@ -9,10 +9,10 @@
 * [Git](https://help.github.com/articles/set-up-git)
 * [JDBC Oracle driver](http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html)
 * [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [JRuby 9.1.14.0](http://jruby.org/)
+* [JRuby 9.1.17.0](http://jruby.org/)
 * [Node.js >=8.9.4](http://nodejs.org/)
 * [PostgreSQL](http://www.postgresql.org/)
-* [Rubygems 2.5.1](https://rubygems.org/pages/download)
+* [Rubygems 2.7.10](https://rubygems.org/pages/download)
 * [RVM](https://rvm.io/rvm/install/) - Ruby version managers
 * [xvfb](http://xquartz.macosforge.org/landing/) - xvfb headless browser, included for Macs with XQuartz
 
@@ -102,7 +102,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
     ```bash
     rvm get head
-    rvm install jruby-9.1.14.0
+    rvm install jruby-9.1.17.0
     cd ..
     cd calcentral
     # Answer "yes" again if it asks you to trust a new .rvmrc file.
@@ -120,7 +120,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
     ```bash
     cd ~
-    rvm use jruby-9.1.14.0 --default # This may output 'Unknown ruby string (do not know how to handle): jruby-9.1.14.0.', which can be ignored.
+    rvm use jruby-9.1.17.0 --default # This may output 'Unknown ruby string (do not know how to handle): jruby-9.1.17.0.', which can be ignored.
     rvm gemset use global
 
     ```
@@ -132,12 +132,12 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     **Important**: Make sure you have the JRuby-upgraded CalCentral codebase in your calcentral directory before running `bundle install`.
 
     ```bash
-    rvm rubygems 2.5.1 --force
+    rvm rubygems 2.7.10 --force
     gem --version
-    # Should output '2.5.1'
+    # Should output '2.7.10'
 
     gem uninstall bundler --force -x
-    gem install bundler --version="1.15.4"
+    gem install bundler --version="1.17.3"
     bundle install
     ```
 
@@ -156,7 +156,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     * Download [ojdbc7_g.jar](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html)
     * Note: You do not have to open the file.
     * Rename the file to `ojdbc7.jar`
-    * Copy `ojdbc7.jar` to `~/.rvm/rubies/jruby-9.1.14.0/lib/`
+    * Copy `ojdbc7.jar` to `~/.rvm/rubies/jruby-9.1.17.0/lib/`
 
 1. Initialize PostgreSQL database tables:
 
