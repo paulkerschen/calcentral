@@ -62,7 +62,7 @@
           </p>
           <ul class="bc-page-course-grade-export-download-list">
             <li>
-              Click the three vertical dot menu
+              Mouse over the assignment name and select the three vertical dot menu
               <span class="cc-nowrap">(<img class="bc-page-course-grade-export-image-inline" src="/canvas/images/three_vertical_dots.png" alt="Three vertical dots">)</span>
             </li>
             <li>Select "Post grades"</li>
@@ -117,18 +117,46 @@
       </div>
 
       <div class="row collapse">
-        <h2 class="bc-page-course-grade-export-download-header">Select P/NP cutoff grade</h2>
+        <h2 class="bc-page-course-grade-export-download-header">Configure P/NP grade options</h2>
+      </div>
+      <div class="row collapse">
         <div class="medium-5 columns end">
           <p class="bc-page-course-grade-export-download-description">
-            The E-Grades export will automatically convert bCourses letter grades to the student-selected grading option. Please select the lowest passing letter grade.
+            <input id="input-enable-pnp-conversion-true"
+              type="radio" name="enablePnpCoversion" value="true"
+              data-ng-model="enablePnpConversion"
+              data-ng-change="selectedPnpCutoffGrade = null">
+            <label for="input-enable-pnp-conversion-true">
+              Automatically convert letter grades in the E-Grades export to the student-selected grading option. Please select the lowest passing letter grade.
+            </label>
           </p>
-          <select
-            id="select-pnp-grade-cutoff"
-            class="bc-form-input-select bc-page-course-grade-export-select-pnp-cutoff"
-            data-ng-model="selectedPnpCutoffGrade"
-            data-ng-options="grade for grade in letterGrades">
-            <option value="">Select a grade</option>
-          </select>
+        </div>
+      </div>
+      <div class="row collapse">
+        <div class="medium-5 columns end">
+          <p class="bc-page-course-grade-export-download-description">
+            <select
+              id="select-pnp-grade-cutoff"
+              class="bc-form-input-select bc-page-course-grade-export-select-pnp-cutoff"
+              data-ng-disabled="enablePnpConversion !== 'true'"
+              data-ng-model="selectedPnpCutoffGrade"
+              data-ng-options="grade for grade in letterGrades">
+              <option value="">Select a grade</option>
+            </select>
+          </p>
+        </div>
+      </div>
+      <div class="row collapse">
+        <div class="medium-5 columns end">
+          <p class="bc-page-course-grade-export-download-description">
+            <input id="input-enable-pnp-conversion-false"
+              type="radio" name="enablePnpConversion" value="false"
+              data-ng-model="enablePnpConversion"
+              data-ng-change="selectedPnpCutoffGrade = null">
+            <label for="input-enable-pnp-conversion-true">
+              Do not automatically convert any letter grades to P/NP. I have applied a P/NP grading scheme to all grades in this course, or will manually adjust the grades in the E-Grades Export CSV to reflect the student-selected grading option.
+            </label>
+          </p>
         </div>
       </div>
 
@@ -144,8 +172,9 @@
             Use this download when you want to excuse unsubmitted assignments.
           </p>
           <button
+            id="download-current-grades-button"
             data-ng-click="preloadGrades('current')"
-            data-ng-disabled="!selectedPnpCutoffGrade"
+            data-ng-disabled="enablePnpConversion !== 'false' && !selectedPnpCutoffGrade"
             class="bc-canvas-button bc-canvas-button-primary">
             Download Current Grades
           </button>
@@ -160,8 +189,9 @@
             Use this download when you want to include all unsubmitted assignments as part of the grade.
           </p>
           <button
+            id="download-final-grades-button"
             data-ng-click="preloadGrades('final')"
-            data-ng-disabled="!selectedPnpCutoffGrade"
+            data-ng-disabled="enablePnpConversion !== 'false' && !selectedPnpCutoffGrade"
             class="bc-canvas-button bc-canvas-button-primary">
             Download Final Grades
           </button>

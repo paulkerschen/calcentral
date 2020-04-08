@@ -107,6 +107,16 @@ describe CanvasLti::Egrades do
           expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
         end
       end
+
+      context 'P/NP conversion disabled' do
+        let(:pnp_cutoff) { 'ignore' }
+        it 'retains original letter grades' do
+          expect(official_grades_csv[1]['Grade']).to eq 'C'
+          expect(official_grades_csv[1]['Grading Basis']).to eq 'ESU'
+          expect(official_grades_csv[2]['Grade']).to eq 'C'
+          expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
+        end
+      end
     end
 
     context 'final grades' do

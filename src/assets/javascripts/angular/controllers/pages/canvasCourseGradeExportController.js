@@ -87,6 +87,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
 
   var initializePnpCutoffGrades = function() {
     $scope.letterGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
+    $scope.enablePnpConversion = 'true';
     $scope.selectedPnpCutoffGrade = null;
   };
 
@@ -123,6 +124,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
 
   // Triggers auto-download of selected CSV download
   var downloadGrades = function() {
+    var pnpCutoff = $scope.enablePnpConversion === 'false' ? 'ignore' : encodeURIComponent($scope.selectedPnpCutoffGrade);
     var downloadPath = [
       '/api/academics/canvas/egrade_export/download/',
       $scope.canvasCourseId + '.csv?',
@@ -130,7 +132,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseGradeExportCont
       'term_cd=' + $scope.selectedSection.term_cd + '&',
       'term_yr=' + $scope.selectedSection.term_yr + '&',
       'type=' + $scope.selectedType + '&',
-      'pnp_cutoff=' + encodeURIComponent($scope.selectedPnpCutoffGrade)
+      'pnp_cutoff=' + pnpCutoff
     ].join('');
     $window.location.href = downloadPath;
   };

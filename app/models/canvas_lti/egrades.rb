@@ -72,7 +72,7 @@ module CanvasLti
     end
 
     def convert_to_basis(grade, basis, pnp_cutoff)
-      if LETTER_GRADES.include?(grade) && %w(CNC DPN EPN ESU PNP SUS).include?(basis)
+      if LETTER_GRADES.include?(grade) && %w(CNC DPN EPN ESU PNP SUS).include?(basis) && pnp_cutoff != 'ignore'
         passing = LETTER_GRADES.index(grade) <= LETTER_GRADES.index(pnp_cutoff)
         case basis
           when 'CNC' then (passing ? 'C' : 'NC')
