@@ -6,6 +6,10 @@ const path = require('path');
 
 module.exports = webpackMerge(baseConfig, {
   mode: 'production',
+  output: {
+    filename: 'assets/javascripts/application.[chunkhash].js',
+    path: path.resolve(__dirname, '../public/')
+  },
   module: {
     rules: [{
       test: /\.scss$/,
