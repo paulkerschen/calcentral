@@ -4,7 +4,7 @@ cache: bundler
 jdk: openjdk8
 node_js: 10.1.0
 os: linux
-rvm: jruby-9.1.14.0
+rvm: jruby-9.1.17.0
 
 env:
   global:
@@ -21,7 +21,7 @@ env:
 
 before_install:
   - gem uninstall bundler --force -x
-  - gem install bundler -v '1.15.4'
+  - gem install bundler -v '1.17.3'
   - npm config set strict-ssl false
   - npm install --production
   - npm run build
