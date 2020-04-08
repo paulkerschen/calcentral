@@ -43,25 +43,37 @@
           <p data-ng-show="noGradingStandardEnabled" class="bc-page-course-grade-export-download-description">
             Set a grading scheme in <button class="bc-button-link" data-ng-click="goToCourseSettings()">Course Settings</button> and return once completed.
           </p>
+          <p class="bc-page-course-grade-export-download-description">
+            For detailed instructions, see: "<a href="https://community.canvaslms.com/docs/DOC-26521-how-do-i-enable-a-grading-scheme-for-a-course">How do I enable a grading scheme for a course?</a>"
+          </p>
         </div>
       </div>
 
       <div class="row collapse">
         <div class="medium-12 columns">
-          <h2 class="bc-page-course-grade-export-sub-header">2. Post (publish or "unmute") all assignment grades:</h2>
+          <h2 class="bc-page-course-grade-export-sub-header">2. Post all assignment grades:</h2>
           <p class="bc-page-course-grade-export-download-description">
-            To ensure that your E-Grades export matches expectations, all assignment grades must be posted. To confirm that all grades have been posted, go to your gradebook, and look for assignments with a crossed-out eye icon
+            All assignment grades must be posted (published/unmuted) to ensure that your E-Grades export matches what you see in the gradebook. To confirm that all grades have been posted, review all columns in <button class="bc-button-link" data-ng-click="goToGradebook()">your gradebook</button> for any assignments with a crossed-out eye icon
             <span class="cc-nowrap">(<img class="bc-page-course-grade-export-image-inline" src="/canvas/images/crossed_out_eye.png" alt="Crossed-out eye icon">)</span>
-            indicating that an assignment has unposted grades. If you find an assignment with unposted grades, click the three vertical dot menu
-            <span class="cc-nowrap">(<img class="bc-page-course-grade-export-image-inline" src="/canvas/images/three_vertical_dots.png" alt="Three vertical dots">)</span>
-            , and select "post grades." You will be prompted to post grades for everyone, or only students who have been assigned a grade.<br>
+            indicating that an assignment has unposted grades.
           </p>
+          <p class="bc-page-course-grade-export-download-description">
+            To post unposted grades:
+          </p>
+          <ul class="bc-page-course-grade-export-download-list">
+            <li>
+              Click the three vertical dot menu
+              <span class="cc-nowrap">(<img class="bc-page-course-grade-export-image-inline" src="/canvas/images/three_vertical_dots.png" alt="Three vertical dots">)</span>
+            </li>
+            <li>Select "Post grades"</li>
+            <li>Select whether you wish to post grades for "Everyone," or only "Graded" students and click "Post"
+          </ul>
           <p class="bc-page-course-grade-export-download-description">
             For detailed instructions, see:
             "<a href="https://community.canvaslms.com/docs/DOC-17330-41521116619">How do I post grades for an assignment?</a>"
           </p>
           <p class="bc-page-course-grade-export-download-description">
-            In order to avoid errors, we suggest cross-checking final grades in the bCourses gradebook with the output CSV to confirm grades were exported as expected.
+            <strong>In order to avoid errors, we suggest cross-checking final grades in the bCourses gradebook with the output CSV to confirm grades were exported as expected.</strong>
           </p>
         </div>
       </div>
