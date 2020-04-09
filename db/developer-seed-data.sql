@@ -204,5 +204,8 @@ INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_o
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (252, 'CYBER', '', 'MMIMS', true, '2018-09-24 23:15:56.49944', '2018-09-24 23:15:56.49944');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (253, 'UGIS', '189', 'CALTEACH', true, '2019-09-27 21:40:00.542671', '2019-09-27 21:40:00.542671');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (254, 'CALTEACH', '189', 'UGIS', true, '2019-09-30 13:03:07.328247', '2019-09-30 13:03:07.328247');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (255, 'RDEV', '', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (256, 'ARCH', '209', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (257, 'LD ARCH', '254', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
 
-SELECT pg_catalog.setval('oec_course_codes_id_seq', 254, true);
+SELECT pg_catalog.setval('oec_course_codes_id_seq', 257, true);

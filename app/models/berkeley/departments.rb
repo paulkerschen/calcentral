@@ -103,6 +103,8 @@ module Berkeley
         'QIIAS' =>  'International and Area Studies Academic Program',
         'QKCWP' =>  'College Writing Programs',
         'QLROT' =>  'Military Affairs Program',
+        # Officially part of DACED.
+        'REDD' =>  'Real Estate Development and Design',
         'SAAMS' =>  'Department of African American Studies',
         'SBETH' =>  'Department of Ethnic Studies',
         'SDDEM' =>  'Department of Demography',
