@@ -40,7 +40,7 @@ function getDeployProperty {
 source .rvmrc
 
 # Update source tree (from which these scripts run)
-# The calcentral.knob file will be pulled from S3 bucket in AWS
+# The junction.war file will be pulled from S3 bucket in AWS
 git_branch=$(getDeployProperty 'junction.git.branch')
 git_remote=$(getDeployProperty 'junction.git.remote')
 log_info "========================================="

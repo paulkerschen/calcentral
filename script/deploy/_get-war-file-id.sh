@@ -5,7 +5,7 @@
 # Get unique id associated with the latest 'junction.war' in AWS S3.
 # For example, the id of the latest build (master branch) is in s3://rtl-travis-junction/master/latest.txt
 #
-# IMPORTANT: This script can write ONE AND ONLY ONE thing to stdout: ${knob_file_id}
+# IMPORTANT: This script can write ONE AND ONLY ONE thing to stdout: ${war_file_id}
 #            Client that invokes this script is expecting only that value in return.
 #
 ######################################################
@@ -25,15 +25,15 @@ function getDeployProperty {
 }
 
 # We will abort if no update is necessary.
-# I.e., the latest knob file in S3 is identical to what is running in this enviroment.
+# I.e., the latest WAR file in S3 is identical to what is running in this enviroment.
 junction_war_id=$(getDeployProperty 'junction.war.id')
 
-if [ -z "${junction_knob_id}" ]; then
+if [ -z "${junction_war_id}" ]; then
   echo "$(date): [ERROR] The 'junction.war.id' config is blank or missing." > "${LOG}"
   exit 1
 fi
 
-if [ "${junction_knob_id}" == 'latest' ]; then
+if [ "${junction_war_id}" == 'latest' ]; then
 
   aws_access_key_id=$(getDeployProperty 'aws.access.key')
   aws_secret_access_key=$(getDeployProperty 'aws.secret.access')
@@ -53,8 +53,8 @@ if [ "${junction_knob_id}" == 'latest' ]; then
        "https://${aws_s3_bucket}.s3.amazonaws.com/${s3_path}" -o latest.txt > /dev/null
 
   latest_war_file_id=$(head -1 latest.txt)
-  latest_war_file_id=${latest_knob_file_id#"/${git_branch}/"}
-  latest_war_file_id=${latest_knob_file_id%"/junction.war"}
+  latest_war_file_id=${latest_war_file_id#"/${git_branch}/"}
+  latest_war_file_id=${latest_war_file_id%"/junction.war"}
 
   if [ -z "${latest_war_file_id}" ]; then
     echo "$(date): [ERROR] The file s3://${aws_s3_bucket}/${git_branch}/latest.txt has bad data." > "${LOG}"
