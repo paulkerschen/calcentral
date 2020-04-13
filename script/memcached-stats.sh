@@ -23,6 +23,4 @@ export JRUBY_OPTS="--dev"
 echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 
-cd deploy
-
 bundle exec rake memcached:get_stats |& $LOGIT

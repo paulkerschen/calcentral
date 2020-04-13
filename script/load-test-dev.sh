@@ -27,7 +27,7 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to clear cache and cache statisics..." | $LOGIT
 
-cd ~/calcentral/deploy
+cd ~/calcentral
 bundle exec rake memcached:clear |& $LOGIT
 
 echo | $LOGIT

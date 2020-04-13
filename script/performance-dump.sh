@@ -35,8 +35,6 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to dump performance data for later analysis..." | $LOGIT
 
-cd deploy
-
 bundle exec rake memcached:get_stats > "$HOME/perf-$DT-$NODE-memcached.txt"
 jmap -heap $TPID > "$HOME/perf-$DT-$NODE-jmap.txt"
 jstack -l $TPID > "$HOME/perf-$DT-$NODE-jstack-1.txt"

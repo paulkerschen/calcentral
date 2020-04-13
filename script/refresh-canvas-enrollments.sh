@@ -24,6 +24,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the refresh script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake canvas:incremental_refresh |& $LOGIT

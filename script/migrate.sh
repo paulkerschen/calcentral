@@ -14,12 +14,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
 
 if [ -z "${1}" ]; then
   # Default db version is the latest one in our code tree
-  if [ ! -d "deploy/db/migrate" ]
+  if [ ! -d "db/migrate" ]
   then
     echo "$(date): ERROR: No database version specified!" | ${LOGIT}
     exit 1
   fi
-  VERSION=$(/bin/ls deploy/db/migrate/ | awk -F _ '{print $1}' | sort | tail -1)
+  VERSION=$(/bin/ls db/migrate/ | awk -F _ '{print $1}' | sort | tail -1)
 fi
 
 export RAILS_ENV=${RAILS_ENV:-production}
@@ -39,8 +39,6 @@ echo "$(date): Database migration CalCentral on app node: $(hostname -s)" | ${LO
 
 echo | ${LOGIT}
 echo "$(date): rake db:migrate VERSION=${VERSION} RAILS_ENV=${RAILS_ENV} ..." | ${LOGIT}
-
-cd deploy || exit 1
 
 bundle exec rake db:migrate VERSION="${VERSION}" RAILS_ENV="${RAILS_ENV}" |& ${LOGIT}
 
