@@ -25,6 +25,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the LTI application configuration script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake canvas:configure_all_apps_from_current_host |& $LOGIT

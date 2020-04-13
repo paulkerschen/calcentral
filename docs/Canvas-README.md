@@ -2,8 +2,6 @@
 
 ## Canvas maintenance Rake tasks
 
-When on a Torquebox-enabled shared servers, be sure to `cd deploy` before running any Rake or Rails command.
-
 * `RAILS_ENV=production bundle exec rake canvas:full_refresh`
     1. Request Canvas reports for all user accounts, and all course sections for every current term.
     2. Download the reports.

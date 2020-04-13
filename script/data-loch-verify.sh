@@ -23,6 +23,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the Data Loch Verify script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake data_loch:verify |& $LOGIT

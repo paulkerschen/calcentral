@@ -23,6 +23,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the data loch snapshot script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake data_loch:snapshot |& $LOGIT
