@@ -40,7 +40,7 @@ if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
   ./script/migrate.sh
 fi
 
-./script/_start-tomcat.sh
+./script/deploy/_start-tomcat.sh
 
 log_info "Done."
 
