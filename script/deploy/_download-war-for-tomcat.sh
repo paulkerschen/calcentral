@@ -69,14 +69,12 @@ else
    echo "WARNING: Tomcat not running. No shutdown attempted, will proceed with download" | ${LOGIT}
 fi
 
-cd ${TOMCAT_DEPLOY} || exit 1
-
 # Download the proper WAR file
 war_file_id=$(./script/deploy/_get-war-file-id.sh)
 ./script/deploy/_download-war-file.sh "${war_file_id}"
 
 # For now at least, rename junction.war file to ROOT.war (to use default Tomcat ROOT location)
-mv junction.war ROOT.war | ${LOGIT}
+mv junction.war ${TOMCAT_DEPLOY}/ROOT.war | ${LOGIT}
 
 log_info "${HOSTNAME} junction.war download complete."
 
