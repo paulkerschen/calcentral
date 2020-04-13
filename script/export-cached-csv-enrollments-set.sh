@@ -23,6 +23,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the Canvas cached enrollments CSV export script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake canvas:export_enrollments_to_csv_set |& $LOGIT

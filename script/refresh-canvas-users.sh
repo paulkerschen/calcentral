@@ -23,6 +23,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the refresh script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake canvas:user_accounts_refresh |& $LOGIT

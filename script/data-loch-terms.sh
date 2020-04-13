@@ -23,6 +23,4 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the Data Loch Term Definitions script..." | $LOGIT
 
-cd deploy
-
 bundle exec rake data_loch:term_definitions |& $LOGIT
