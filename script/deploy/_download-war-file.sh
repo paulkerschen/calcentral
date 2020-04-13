@@ -2,7 +2,7 @@
 
 ##################################################################
 #
-# Download knob file from AWS S3 bucket.
+# Download WAR file from AWS S3 bucket.
 #
 ##################################################################
 
@@ -14,7 +14,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 # One required argument
 [ $# -eq 0 ] && { echo "$(date): [ERROR] Usage: ${0} \${war_file_id}"; exit 1; }
 
-knob_file_id="${1}"
+war_file_id="${1}"
 
 # Boilerplate logging scheme
 LOG=$(date +"${PWD}/log/junction-deploy_%Y-%m-%d.log")
@@ -37,7 +37,7 @@ function getDeployProperty {
   grep "^${1}=" "${deploy_properties}" | cut -d'=' -f2
 }
 
-# The calcentral.knob file will be pulled from S3 bucket in AWS
+# The junction.war file will be pulled from S3 bucket in AWS
 aws_access_key_id=$(getDeployProperty 'aws.access.key')
 aws_secret_access_key=$(getDeployProperty 'aws.secret.access')
 aws_s3_bucket=$(getDeployProperty 'aws.s3.bucket')
@@ -52,7 +52,7 @@ if [[ -z "${aws_access_key_id}" || -z "${aws_secret_access_key}" || -z "${aws_s3
 fi
 
 content_type="application/x-compressed-tar"
-s3_path="${git_branch}/${knob_file_id}/junction.war"
+s3_path="${git_branch}/${war_file_id}/junction.war"
 signature=$(echo -en "GET\n\n${content_type}\n${date_rfc_2822}\n/${aws_s3_bucket}/${s3_path}" | openssl sha1 -hmac ${aws_secret_access_key} -binary | base64)
 
 # Download from S3
