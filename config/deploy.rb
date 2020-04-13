@@ -12,7 +12,7 @@ set :branch, settings.common.branch
 set :project_root, settings.common.root
 
 # junction_dev is the IST configured server setup we have for junction-dev.berkeley.edu. It
-# currently consists of 1 app server (which also runw memcached) and a shared postgres instance.
+# currently consists of 1 app server (which also runs memcached) and a shared postgres instance.
 
 namespace :deploy_to_all_servers do
   desc "Invoked by S3-backed deploy script. Update and restart the targeted Junction tier."
@@ -32,7 +32,7 @@ namespace :deploy_to_all_servers do
         end
 
         # start it up
-        run "cd #{project_root}; ./script/_start-tomcat.sh", :hosts => server
+        run "cd #{project_root}; ./script/deploy/_start-tomcat.sh", :hosts => server
       end
     end
   end
