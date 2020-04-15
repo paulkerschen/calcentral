@@ -1,16 +1,28 @@
 describe CanvasCsv::Synchronization do
-  before { CanvasCsv::Synchronization.create(last_guest_user_sync: 1.weeks.ago.utc) }
+  before do
+    CanvasCsv::Synchronization.create(
+      last_enrollment_sync: 1.weeks.ago.utc,
+      last_guest_user_sync: 1.weeks.ago.utc,
+      last_instructor_sync: 1.weeks.ago.utc
+    )
+  end
 
   describe '.get' do
     it 'raises exception if more than one record exists' do
-      CanvasCsv::Synchronization.create(last_guest_user_sync: 2.weeks.ago.utc)
+      CanvasCsv::Synchronization.create(
+        last_enrollment_sync: 2.weeks.ago.utc,
+        last_guest_user_sync: 2.weeks.ago.utc,
+        last_instructor_sync: 2.weeks.ago.utc
+      )
       expect { CanvasCsv::Synchronization.get }.to raise_error(RuntimeError, 'Canvas synchronization data has more than one record!')
     end
 
     it 'returns primary synchronization record' do
       result = CanvasCsv::Synchronization.get
       expect(result).to be_an_instance_of CanvasCsv::Synchronization
+      expect(result.last_enrollment_sync).to be_an_instance_of ActiveSupport::TimeWithZone
       expect(result.last_guest_user_sync).to be_an_instance_of ActiveSupport::TimeWithZone
+      expect(result.last_instructor_sync).to be_an_instance_of ActiveSupport::TimeWithZone
     end
 
     it 'initializes the synchronization record if necessary' do
@@ -18,7 +30,9 @@ describe CanvasCsv::Synchronization do
       expect(CanvasCsv::Synchronization.count).to eq 0
       result = CanvasCsv::Synchronization.get
       expect(result).to be_an_instance_of CanvasCsv::Synchronization
+      expect(result.last_enrollment_sync).to be_an_instance_of ActiveSupport::TimeWithZone
       expect(result.last_guest_user_sync).to be_an_instance_of ActiveSupport::TimeWithZone
+      expect(result.last_instructor_sync).to be_an_instance_of ActiveSupport::TimeWithZone
     end
   end
 end

@@ -75,7 +75,11 @@ describe CanvasCsv::TermEnrollments do
     allow(Canvas::SectionEnrollments).to receive(:new).with(:section_id => '22').and_return(section_enrollments_worker_4)
 
     # setup default values for global canvas synchronization settings
-    CanvasCsv::Synchronization.create(:last_guest_user_sync => 1.weeks.ago.utc)
+    CanvasCsv::Synchronization.create(
+      last_enrollment_sync: 1.days.ago.utc,
+      last_guest_user_sync: 1.weeks.ago.utc,
+      last_instructor_sync: 1.days.ago.utc
+    )
     CanvasCsv::Synchronization.get.update(:latest_term_enrollment_csv_set => (Time.now - 1.day))
   end
 

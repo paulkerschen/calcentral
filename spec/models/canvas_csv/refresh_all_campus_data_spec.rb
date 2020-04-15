@@ -1,7 +1,7 @@
 describe CanvasCsv::RefreshAllCampusData do
 
-  context 'incremental refresh mode' do
-    subject { CanvasCsv::RefreshAllCampusData.new 'incremental' }
+  context 'refresh-all mode' do
+    subject { CanvasCsv::RefreshAllCampusData.new 'all' }
     let(:today) { Time.now.strftime '%F' }
     before do
       allow(Canvas::Terms).to receive(:current_sis_term_ids).and_return current_sis_term_ids
@@ -13,13 +13,16 @@ describe CanvasCsv::RefreshAllCampusData do
       end
       let(:current_sis_term_ids) { ['TERM:2013-D', 'TERM:2014-B'] }
       it 'establishes the csv import files' do
-        expect(subject.users_csv_filename).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-users-incremental.csv")
-        expect(subject.term_to_memberships_csv_filename['TERM:2013-D']).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-TERM_2013-D-enrollments-incremental.csv")
-        expect(subject.term_to_memberships_csv_filename['TERM:2014-B']).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-TERM_2014-B-enrollments-incremental.csv")
+        expect(subject.users_csv_filename).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-users-all.csv")
+        expect(subject.term_to_memberships_csv_filename['TERM:2013-D']).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-TERM_2013-D-enrollments-all.csv")
+        expect(subject.term_to_memberships_csv_filename['TERM:2014-B']).to match Regexp.new("tmp/canvas/canvas-#{today}_[0-9]{6}-TERM_2014-B-enrollments-all.csv")
       end
       it 'makes calls to each step of refresh in proper order' do
         expect(subject).to receive(:make_csv_files).ordered.and_return true
         expect(subject).to receive(:import_single_csv_files).ordered.and_return true
+        canvas_sync = double('canvas_synchronization')
+        expect(CanvasCsv::Synchronization).to receive(:get).and_return(canvas_sync)
+        expect(canvas_sync).to receive(:update).and_return(true)
         subject.run
       end
       it 'should send call to populate incremental update csv for users and enrollments' do
@@ -34,6 +37,9 @@ describe CanvasCsv::RefreshAllCampusData do
         it 'makes calls to each step of refresh in proper order' do
           expect(subject).to receive(:make_csv_files).ordered.and_return true
           expect(subject).to receive(:import_zipped_csv_files).ordered.and_return true
+          canvas_sync = double('canvas_synchronization')
+          expect(CanvasCsv::Synchronization).to receive(:get).and_return(canvas_sync)
+          expect(canvas_sync).to receive(:update).and_return(true)
           subject.run
         end
       end
@@ -109,12 +115,14 @@ describe CanvasCsv::RefreshAllCampusData do
           let(:csv) { empty_sections_report_csv }
           it 'does not perform any processing' do
             expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:process)
+            expect(CanvasCsv::Synchronization).to_not receive(:get)
           end
         end
         context 'nil' do
           let(:csv) { nil }
           it 'does not perform any processing' do
             expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:process)
+            expect(CanvasCsv::Synchronization).to_not receive(:get)
           end
         end
       end
@@ -156,6 +164,7 @@ describe CanvasCsv::RefreshAllCampusData do
         expect(files.length).to eq 2
       end
       expect_any_instance_of(Canvas::SisImport).to receive(:import_zipped).once.and_return true
+      expect(CanvasCsv::Synchronization).to_not receive(:get)
       subject.run
     end
     context 'using APIs to change SIS IDs' do

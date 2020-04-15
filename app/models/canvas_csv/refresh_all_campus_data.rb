@@ -24,11 +24,14 @@ module CanvasCsv
     end
 
     def run
+      start_time = Time.now.utc
       make_csv_files
-      if Settings.canvas_proxy.import_zipped_csvs
-        import_zipped_csv_files
-      else
-        import_single_csv_files
+      result = Settings.canvas_proxy.import_zipped_csvs ? import_zipped_csv_files : import_single_csv_files
+      if result && !@accounts_only
+        Synchronization.get.update(
+          last_enrollment_sync: start_time,
+          last_instructor_sync: start_time
+        )
       end
     end
 
@@ -81,6 +84,7 @@ module CanvasCsv
     end
 
     def import_single_csv_files
+      success = true
       import_proxy = Canvas::SisImport.new
       if @sis_ids_csv_filename.present? && import_proxy.import_sis_ids(@sis_ids_csv_filename)
         logger.warn 'SIS IDs import succeeded'
@@ -94,11 +98,13 @@ module CanvasCsv
                 logger.warn "Incremental enrollment import for #{term_id} succeeded"
               else
                 logger.error "Incremental enrollment import for #{term_id} failed"
+                success = false
               end
             end
           end
         end
       end
+      success
     end
 
     def enrollments_import_safe?
@@ -115,7 +121,7 @@ module CanvasCsv
           end
         end
       end
-      return true
+      true
     end
 
     def import_zipped_csv_files
@@ -127,7 +133,7 @@ module CanvasCsv
       import_files.reject! { |f| f.blank? }
       if import_files.blank?
         logger.warn "No CSV files to import"
-        return
+        return false
       end
       import_type = @accounts_only ? 'accounts' : 'all'
       zipped_csv_filename = "#{@export_dir}/canvas-#{DateTime.now.strftime('%F_%H%M%S')}-incremental_#{import_type}.zip"
@@ -136,14 +142,16 @@ module CanvasCsv
       unless @accounts_only
         if !enrollments_import_safe?
           logger.error "Will not automatically import #{zipped_csv_filename}; import manually if desired"
-          return
+          return false
         end
       end
 
       if import_proxy.import_zipped zipped_csv_filename
         logger.warn "Import of #{zipped_csv_filename} succeeded, incorporating #{import_files}"
+        true
       else
         logger.error "Failed import of #{zipped_csv_filename}, incorporating #{import_files}"
+        false
       end
     end
 
