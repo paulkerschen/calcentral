@@ -1,6 +1,5 @@
 language: ruby
 bundler_args: --without development production --deployment --jobs=4 --retry=5
-cache: bundler
 jdk: openjdk8
 node_js: 10.1.0
 os: linux
@@ -51,7 +50,7 @@ jobs:
         - mv ./ojdbc7.jar ./lib
         - git log --pretty=format:'%H' -n 1 > versions/git.txt
         - bundle config --delete without
-        - bundle install --deployment --local --retry 3
+        - bundle install --deployment --force --retry 3
         - bundle package --all
         - bundle exec rake assets:precompile
         - bundle exec rake fix_assets
