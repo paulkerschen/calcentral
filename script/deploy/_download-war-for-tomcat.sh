@@ -29,7 +29,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
 # Local properties file
 deploy_properties="${HOME}/.calcentral_config/junction-deploy.properties"
-deployment_summary_file="${HOME}/.calcentral_config/.junction-deployment-summary"
+deployment_summary_file="${HOME}/.calcentral_config/.deployment-summary-$(hostname -s)"
 
 function getDeployProperty {
   grep "^${1}=" "${deploy_properties}" | cut -d'=' -f2
@@ -73,6 +73,9 @@ war_file_id=$(./script/deploy/_get-war-file-id.sh)
 
 # For now at least, rename junction.war file to ROOT.war (to use default Tomcat ROOT location)
 mv junction.war ${TOMCAT_DEPLOY}/ROOT.war | ${LOGIT}
+
+# Keep a record of what was deployed
+echo "${war_file_id}" > "${deployment_summary_file}"
 
 log_info "${HOSTNAME} junction.war download complete."
 
