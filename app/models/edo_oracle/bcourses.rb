@@ -3,9 +3,6 @@ module EdoOracle
     include ActiveRecordHelper
 
     def self.get_enrolled_students(section_id, term_id)
-      # Late withdrawals are only indicated in primary section enrollments, and do not change
-      # any values in secondary section enrollment rows. The CASE clause implements a
-      # conditional join for secondary sections.
       fallible_query <<-SQL
         SELECT DISTINCT
           enroll.CAMPUS_UID AS ldap_uid,
@@ -14,22 +11,10 @@ module EdoOracle
           enroll.WAITLISTPOSITION AS waitlist_position,
           enroll.UNITS_TAKEN AS units,
           TRIM(enroll.GRADING_BASIS_CODE) AS grading_basis
-        FROM SISEDO.ETS_ENROLLMENTV00_VW enroll 
+        FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
         WHERE enroll.CLASS_SECTION_ID = '#{section_id}'
           AND enroll.TERM_ID = '#{term_id}'
-          AND enroll.STDNT_ENRL_STATUS_CODE != 'D'
-          AND CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
-            SELECT DISTINCT prim_enr.GRADE_MARK
-              FROM SISEDO.CLASSSECTIONALLV01_MVW sec
-            LEFT JOIN SISEDO.ETS_ENROLLMENTV00_VW prim_enr
-              ON  prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
-              AND prim_enr.TERM_ID = enroll.TERM_ID
-              AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
-              AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
-            WHERE sec."id" = enroll.CLASS_SECTION_ID AND sec."term-id" = enroll.TERM_ID
-              AND prim_enr.STUDENT_ID IS NOT NULL
-            )
-            ELSE enroll.GRADE_MARK END != 'W'
+          AND #{omit_drops_and_withdrawals}
           ORDER BY enroll.CAMPUS_UID
       SQL
     end
@@ -163,5 +148,45 @@ module EdoOracle
       SQL
     end
 
+    def self.get_recent_enrollment_updates(since_timestamp, term_ids)
+      term_ids_in = term_ids.map {|term_id| "'#{term_id}'"}.join ','
+      timestamp_in = since_timestamp.utc.strftime('%Y-%m-%d %H:%M:%S')
+      limit_clause = (limit > 0) ? "where rownum <= #{limit}" : ""
+      fallible_query <<-SQL
+        SELECT DISTINCT
+          enroll.CLASS_SECTION_ID as section_id,
+          enroll.TERM_ID as term_id,
+          enroll.CAMPUS_UID AS ldap_uid,
+          enroll.STUDENT_ID AS sis_id,
+          enroll.STDNT_ENRL_STATUS_CODE AS enroll_status
+        FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
+          WHERE enroll.TERM_ID IN (#{term_ids_in})
+          AND #{omit_drops_and_withdrawals}
+          AND enroll.last_updated >= to_timestamp('#{timestamp_in}', 'yyyy-mm-dd hh24:mi:ss')
+          ORDER BY enroll.TERM_ID, enroll.CLASS_SECTION_ID, enroll.CAMPUS_UID
+      SQL
+    end
+
+    def self.omit_drops_and_withdrawals
+      # Late withdrawals are only indicated in primary section enrollments, and do not change
+      # any values in secondary section enrollment rows. The CASE clause implements a
+      # conditional join for secondary sections.
+      <<-SQL
+        enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
+        CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
+        SELECT DISTINCT prim_enr.GRADE_MARK
+          FROM SISEDO.CLASSSECTIONALLV01_MVW sec
+          LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
+            ON prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
+            AND prim_enr.TERM_ID = enroll.TERM_ID
+            AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
+            AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
+          WHERE sec."id" = enroll.CLASS_SECTION_ID
+            AND sec."term-id" = enroll.TERM_ID
+            AND prim_enr.STUDENT_ID IS NOT NULL
+        )
+        ELSE enroll.GRADE_MARK END != 'W'
+      SQL
+    end
   end
 end
