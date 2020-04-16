@@ -13,7 +13,7 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
 if [ ! -w "${PWD}/log" ]; then
-  echo; echo "$(date): [ERROR] '${PWD}/log' directoy does not exist or is not writable"; echo
+  echo; echo "$(date): [ERROR] '${PWD}/log' directory does not exist or is not writable"; echo
   exit 1
 fi
 
@@ -39,8 +39,6 @@ function log_info {
 if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
   ./script/migrate.sh
 fi
-
-./script/deploy/_start-tomcat.sh
 
 log_info "Done."
 
