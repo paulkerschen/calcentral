@@ -94,6 +94,7 @@ gem 'pundit', '~> 0.3.0'
 
 gem 'cancan', '~> 1.6.10'
 gem 'net-ssh', '~>2.9.2' # v3 requires Ruby 2.0
+gem 'net-telnet', '~> 0.2.0'
 
 gem 'icalendar', '~> 2.2.2'
 
