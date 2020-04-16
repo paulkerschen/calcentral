@@ -11,7 +11,7 @@
 # Abort immediately if a command fails
 set -e
 
-deployment_summary_file="${HOME}/.calcentral_config/.junction-deployment-summary"
+deployment_summary_file="${HOME}/.calcentral_config/.deployment-summary-$(hostname -s)"
 
 war_file_id=$(./script/deploy/_get-war-file-id.sh)
 
