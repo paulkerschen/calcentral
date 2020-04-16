@@ -89,7 +89,7 @@ RailsAdmin.config do |config|
   #
 
   config.model 'CanvasCsv::Synchronization' do
-    'Sync Timestamps'
+    label 'Sync Timestamps'
   end
 
   config.model 'MailingLists::Member' do
