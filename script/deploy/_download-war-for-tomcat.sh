@@ -60,12 +60,15 @@ log_info "Stopping Junction..."
 
 tomreturn=$(~/bin/tomcat9-junction.sh status | grep "is running" || echo 1)
 
-if [ $tomreturn -eq 0 ] ; then
+if [[ $tomreturn -eq 0 ]]; then
    echo "$(date): Stopping Tomcat..." | ${LOGIT}
    ~/bin/tomcat9-junction.sh stop | ${LOGIT} 2>&1
 else
    echo "WARNING: Tomcat not running. No shutdown attempted, will proceed with download" | ${LOGIT}
 fi
+
+# Update bundle with any gemfile changes in source tree
+bundle install
 
 # Download the proper WAR file
 war_file_id=$(./script/deploy/_get-war-file-id.sh)
