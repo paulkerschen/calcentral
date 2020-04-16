@@ -58,9 +58,9 @@ echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
 log_info "Stopping Junction..."
 
-tomreturn=$(~/bin/tomcat9-junction.sh status | grep "is running" || echo 1)
+tomreturn=$(~/bin/tomcat9-junction.sh status)
 
-if [[ $tomreturn -eq 0 ]]; then
+if [[ $tomreturn =~ "is running" ]]; then
    echo "$(date): Stopping Tomcat..." | ${LOGIT}
    ~/bin/tomcat9-junction.sh stop | ${LOGIT} 2>&1
 else
