@@ -8,7 +8,7 @@ source "$HOME/.bash_profile"
 
 cd $( dirname "${BASH_SOURCE[0]}" )/..
 
-LOG=`date +"$PWD/log/canvas_refresh_%Y-%m-%d.log"`
+LOG=`date +"$PWD/log/canvas_refresh_hourly_%Y-%m-%d.log"`
 LOGIT="tee -a $LOG"
 
 # Enable rvm and use the correct Ruby version and gem set.
@@ -26,4 +26,4 @@ echo "`date`: About to run the refresh script..." | $LOGIT
 
 cd deploy
 
-bundle exec rake canvas:full_refresh |& $LOGIT
+bundle exec rake canvas:recent_refresh |& $LOGIT

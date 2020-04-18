@@ -125,12 +125,16 @@ module EdoOracle
     def self.get_recent_instructor_updates(since_timestamp, term_ids)
       term_ids_in = term_ids.map {|term_id| "'#{term_id}'"}.join ','
       timestamp_in = since_timestamp.utc.strftime('%Y-%m-%d %H:%M:%S')
-      safe_query <<-SQL
+      sql = <<-SQL
         SELECT DISTINCT
-        up.instr_id AS instructor_csid, up.term_id, up.class_section_id AS section_id,
+        up.instr_id AS sis_id,
+        up.term_id,
+        up.class_section_id AS section_id,
         up.crse_id AS course_id,
-        instr."campus-uid" AS instructor_uid, instr."role-code" AS role_code,
-        sec."primary"
+        instr."campus-uid" AS ldap_uid,
+        instr."role-code" AS role_code,
+        sec."primary",
+        up.last_updated
         FROM SISEDO.CLASS_INSTR_UPDATESV00_VW up
         JOIN SISEDO.ASSIGNEDINSTRUCTORV00_VW instr ON (
           instr."cs-course-id" = up.crse_id AND
@@ -144,49 +148,59 @@ module EdoOracle
         )
         WHERE up.change_type IN ('C', 'U') AND up.term_id  IN (#{term_ids_in}) AND
         up.last_updated >= to_timestamp('#{timestamp_in}', 'yyyy-mm-dd hh24:mi:ss')
-        ORDER BY up.term_id, up.crse_id, up.class_section_id, instr."campus-uid"
+        ORDER BY up.term_id, up.crse_id, up.class_section_id, instr."campus-uid", up.last_updated DESC
       SQL
+      fallible_query(sql, do_not_stringify: true)
     end
 
     def self.get_recent_enrollment_updates(since_timestamp, term_ids)
       term_ids_in = term_ids.map {|term_id| "'#{term_id}'"}.join ','
       timestamp_in = since_timestamp.utc.strftime('%Y-%m-%d %H:%M:%S')
-      limit_clause = (limit > 0) ? "where rownum <= #{limit}" : ""
-      fallible_query <<-SQL
+      sql = <<-SQL
         SELECT DISTINCT
           enroll.CLASS_SECTION_ID as section_id,
           enroll.TERM_ID as term_id,
           enroll.CAMPUS_UID AS ldap_uid,
           enroll.STUDENT_ID AS sis_id,
-          enroll.STDNT_ENRL_STATUS_CODE AS enroll_status
+          enroll.STDNT_ENRL_STATUS_CODE AS enroll_status,
+          enroll.LAST_UPDATED as last_updated
         FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
-          WHERE enroll.TERM_ID IN (#{term_ids_in})
-          AND #{omit_drops_and_withdrawals}
-          AND enroll.last_updated >= to_timestamp('#{timestamp_in}', 'yyyy-mm-dd hh24:mi:ss')
-          ORDER BY enroll.TERM_ID, enroll.CLASS_SECTION_ID, enroll.CAMPUS_UID
+        WHERE enroll.TERM_ID IN (#{term_ids_in})
+        AND #{omit_drops_and_withdrawals}
+        AND enroll.last_updated >= to_timestamp('#{timestamp_in}', 'yyyy-mm-dd hh24:mi:ss')
+        ORDER BY enroll.TERM_ID, enroll.CLASS_SECTION_ID, enroll.CAMPUS_UID, enroll.last_updated DESC
       SQL
+      fallible_query(sql, do_not_stringify: true)
     end
 
     def self.omit_drops_and_withdrawals
+      # Our H2 test db can't handle the fancy CASE join below.
+      if Settings.edodb.adapter == 'h2'
+        <<-SQL
+          enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
+          enroll.GRADE_MARK != 'W'
+        SQL
       # Late withdrawals are only indicated in primary section enrollments, and do not change
       # any values in secondary section enrollment rows. The CASE clause implements a
       # conditional join for secondary sections.
-      <<-SQL
-        enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
-        CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
-        SELECT DISTINCT prim_enr.GRADE_MARK
-          FROM SISEDO.CLASSSECTIONALLV01_MVW sec
-          LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
-            ON prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
-            AND prim_enr.TERM_ID = enroll.TERM_ID
-            AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
-            AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
-          WHERE sec."id" = enroll.CLASS_SECTION_ID
-            AND sec."term-id" = enroll.TERM_ID
-            AND prim_enr.STUDENT_ID IS NOT NULL
-        )
-        ELSE enroll.GRADE_MARK END != 'W'
-      SQL
+      else
+        <<-SQL
+          enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
+          CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
+          SELECT DISTINCT prim_enr.GRADE_MARK
+            FROM SISEDO.CLASSSECTIONALLV01_MVW sec
+            LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
+              ON prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
+              AND prim_enr.TERM_ID = enroll.TERM_ID
+              AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
+              AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
+            WHERE sec."id" = enroll.CLASS_SECTION_ID
+              AND sec."term-id" = enroll.TERM_ID
+              AND prim_enr.STUDENT_ID IS NOT NULL
+          )
+          ELSE enroll.GRADE_MARK END != 'W'
+        SQL
+      end
     end
   end
 end
