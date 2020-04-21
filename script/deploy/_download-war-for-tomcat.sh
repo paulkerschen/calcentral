@@ -58,9 +58,16 @@ echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
 log_info "Stopping Junction..."
 
-tomreturn=$(~/bin/tomcat9-junction.sh status)
+# Override the `set -e` defined at the top of the file.
+set +e
 
-if [[ $tomreturn =~ "is running" ]]; then
+~/bin/tomcat9-junction.sh status | grep "is running"
+tomreturn=$?
+
+# Turn `set -e` back on so future errors halt the script.
+set -e
+
+if [ $tomreturn -eq 0 ] ; then
    echo "$(date): Stopping Tomcat..." | ${LOGIT}
    ~/bin/tomcat9-junction.sh stop | ${LOGIT} 2>&1
 else
