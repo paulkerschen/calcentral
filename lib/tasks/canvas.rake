@@ -27,14 +27,20 @@ namespace :canvas do
   end
 
   desc 'Get all Canvas users and sections for current terms, refresh user accounts, and add new section memberships'
-  task :incremental_refresh => :environment do
-    canvas_worker = CanvasCsv::RefreshAllCampusData.new 'all'
+  task :full_refresh => :environment do
+    canvas_worker = CanvasCsv::RefreshCampusDataAll.new
+    canvas_worker.run
+  end
+
+  desc 'Get recent enrollment updates to Canvas-linked sections for current terms, refresh user accounts, and add new section memberships'
+  task :recent_refresh => :environment do
+    canvas_worker = CanvasCsv::RefreshCampusDataRecent.new
     canvas_worker.run
   end
 
   desc 'Get all Canvas users and refresh user accounts'
   task :user_accounts_refresh => :environment do
-    canvas_worker = CanvasCsv::RefreshAllCampusData.new 'accounts'
+    canvas_worker = CanvasCsv::RefreshCampusDataAccounts.new
     canvas_worker.run
   end
 

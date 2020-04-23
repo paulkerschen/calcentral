@@ -153,19 +153,19 @@ module CanvasCsv
       campus_data_rows.each do |campus_data_row|
         next unless (canvas_api_role = ENROLL_STATUS_TO_CANVAS_API_ROLE[campus_data_row['enroll_status']])
         if campus_data_row['ldap_uid'].present?
-          update_section_enrollment_from_campus(canvas_api_role, section_id, campus_data_row, canvas_section_enrollments)
+          update_section_enrollment_from_campus(canvas_api_role, section_id, campus_data_row['ldap_uid'], canvas_section_enrollments)
         else
           logger.error "Student LDAP UID not present in campus data: #{campus_data_row.inspect}"
         end
       end
     end
 
-    def determine_instructor_role(primary_sections, section, campus_instructor_row)
+    def determine_instructor_role(primary_sections, section, instructor_func)
       if primary_sections.present?
         if primary_sections.include? section
           # Teacher permissions for the course site are generally determined by primary section assignment.
           # Administrative Proxy assignments (instructor role "APRX"/"5") are treated as Lead TAs.
-          if (campus_instructor_row['instructor_func'] == '5')
+          if (instructor_func == '5')
             'Lead TA'
           else
             'TeacherEnrollment'
@@ -189,16 +189,16 @@ module CanvasCsv
       logger.debug "#{campus_data_rows.count} instructor enrollments found for #{section_id}"
       campus_data_rows.each do |campus_data_row|
         if campus_data_row['ldap_uid'].present?
-          canvas_api_role = determine_instructor_role(primary_sections, campus_section, campus_data_row)
-          update_section_enrollment_from_campus(canvas_api_role, section_id, campus_data_row, canvas_section_enrollments)
+          canvas_api_role = determine_instructor_role(primary_sections, campus_section, campus_data_row['instructor_func'])
+          update_section_enrollment_from_campus(canvas_api_role, section_id, campus_data_row['ldap_uid'], canvas_section_enrollments)
         else
           logger.error "Instructor LDAP UID not present in campus data: #{campus_data_row.inspect}"
         end
       end
     end
 
-    def update_section_enrollment_from_campus(canvas_api_role, sis_section_id, campus_data_row, old_canvas_enrollments)
-      login_uid = campus_data_row['ldap_uid'].to_s
+    def update_section_enrollment_from_campus(canvas_api_role, sis_section_id, ldap_uid, old_canvas_enrollments)
+      login_uid = ldap_uid.to_s
       # Note: old_canvas_enrollments may originate from CanvasCsv::TermEnrollments
       # Make sure to update this class to include fields this logic depends on from the Canvas Enrollments API
       if (user_enrollments = old_canvas_enrollments[login_uid])
@@ -219,7 +219,10 @@ module CanvasCsv
       logger.debug "Adding UID #{login_uid} to SIS Section: #{sis_section_id} as role: #{canvas_api_role}"
 
       sis_user_id = get_sis_user_id(login_uid)
-      append_enrollment_update(sis_section_id, canvas_api_role, sis_user_id) if sis_user_id
+      if sis_user_id
+        append_enrollment_update(sis_section_id, canvas_api_role, sis_user_id)
+        return true
+      end
     end
 
     def handle_missing_enrollments(uid, section_id, remaining_enrollments)

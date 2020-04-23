@@ -1,7 +1,7 @@
 module CanvasCsv
   # Updates users currently present within Canvas.
-  # Used by CanvasCsv::RefreshAllCampusData to maintain officially enrolled students/faculty
-  # See CanvasCsv::AddNewUsers for maintenance of new active CalNet users within Canvas
+  # Used by CanvasCsv::RefreshCampusDataAll and CanvasCsv::RefreshCampusDataRecent to maintain officially enrolled students/faculty.
+  # See CanvasCsv::AddNewUsers for maintenance of new active CalNet users within Canvas.
   class MaintainUsers < Base
     include ClassLogger
     attr_accessor :sis_user_id_changes, :user_email_deletions
@@ -55,11 +55,12 @@ module CanvasCsv
       }
     end
 
-    def initialize(known_users, sis_user_import_csv, sis_ids_import_csv=nil)
+    def initialize(known_users, sis_user_import_csv, sis_ids_import_csv=nil, opts={})
       super()
       @known_users = known_users
       @user_import_csv = sis_user_import_csv
       @sis_ids_import_csv = sis_ids_import_csv
+      @cached = opts[:cached]
       @sis_user_id_changes = {}
       @user_email_deletions = []
     end
@@ -71,8 +72,8 @@ module CanvasCsv
     # Appends account changes to the given CSV.
     # Appends all known user IDs to the input array.
     # Makes any necessary changes to SIS user IDs.
-    def refresh_existing_user_accounts
-      check_all_user_accounts
+    def refresh_existing_user_accounts(uid_filter=nil)
+      check_all_user_accounts(uid_filter)
       if Settings.canvas_proxy.import_zipped_csvs.present?
         change_sis_user_ids_by_csv
       else
@@ -85,13 +86,19 @@ module CanvasCsv
       end
     end
 
-    def check_all_user_accounts
-      users_csv_file = "#{Settings.canvas_proxy.export_directory}/provisioned-users-#{DateTime.now.strftime('%F-%H-%M')}.csv"
-      users_csv_file = Canvas::Report::Users.new(download_to_file: users_csv_file).get_csv
+    def check_all_user_accounts(uid_filter)
+      if @cached
+        users_csv_file = Dir.glob("#{Settings.canvas_proxy.export_directory}/provisioned-users-#{DateTime.now.strftime('%F')}*.csv").last
+      else
+        users_csv_file = "#{Settings.canvas_proxy.export_directory}/provisioned-users-#{DateTime.now.strftime('%F-%H-%M')}.csv"
+        users_csv_file = Canvas::Report::Users.new(download_to_file: users_csv_file).get_csv
+      end
       if users_csv_file.present?
         accounts_batch = []
         CSV.foreach(users_csv_file, headers: true) do |account_row|
-          accounts_batch << account_row
+          if !uid_filter || uid_filter.include?(sanitize_login_id account_row['login_id'])
+            accounts_batch << account_row
+          end
           if accounts_batch.length == 1000
             compare_to_campus(accounts_batch)
             accounts_batch = []
@@ -213,13 +220,14 @@ module CanvasCsv
     end
 
     def compare_to_campus(accounts_batch)
-      campus_user_rows = User::BasicAttributes.attributes_for_uids(accounts_batch.collect do |r|
-          r['login_id'].to_s.gsub(/^inactive-/, '')
-        end
-      )
+      campus_user_rows = User::BasicAttributes.attributes_for_uids(accounts_batch.collect { |r| sanitize_login_id r['login_id'] })
       accounts_batch.each do |existing_account|
         categorize_user_account(existing_account, campus_user_rows)
       end
+    end
+
+    def sanitize_login_id(login_id)
+      login_id.to_s.gsub(/^inactive-/, '')
     end
 
   end
