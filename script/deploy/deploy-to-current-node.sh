@@ -32,7 +32,11 @@ function log_info {
   echo "$(date): [INFO] ${1}" | ${LOGIT}
 }
 
-./script/init.d/calcentral maint
+touch "${DOC_ROOT}/calcentral-in-maintenance"
+
+if [ ! -f "${DOC_ROOT}/index.html" ]; then
+  cp -p "${DOC_ROOT}/index_maintenance.html" "${DOC_ROOT}/index.html"
+fi
 
 ./script/deploy/_download-war-for-tomcat.sh || { log_error "download-war-for-tomcat failed"; exit 1; }
 
