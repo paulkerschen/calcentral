@@ -8,11 +8,14 @@ module CanvasCsv
       super
       initialize_user_csvs
       initialize_term_enrollment_csvs
+
+      @canvas_sections = {}
       @enrollment_updates = {}
       @instructor_updates = {}
-      @known_users = {}
       @membership_updates_total = 0
+      @primary_sections_to_update = {}
       @sis_user_id_changes = {}
+      @uids_for_updates = Set.new
     end
 
     def import_type
@@ -20,8 +23,8 @@ module CanvasCsv
     end
 
     def generate_csv_files
-      uids_for_updates = fetch_recent_updates
-      generate_users_csv(uids_for_updates, cached: true) do |users_csv|
+      fetch_recent_updates
+      generate_users_csv(@uids_for_updates, cached: true) do |users_csv|
         enrollment_term_csvs.each do |term_id, csv_filename|
           term_csv_count = 0
           if @instructor_updates[term_id] || @enrollment_updates[term_id]
@@ -41,44 +44,37 @@ module CanvasCsv
       # that can be easily cross-referenced with our cached Canvas enrollment data.
       last_sync = Synchronization.get
       term_ids = Canvas::Terms.current_terms.map &:campus_solutions_id
-      uids_for_updates = Set.new
 
       instructor_results = EdoOracle::Bcourses.get_recent_instructor_updates(last_sync.last_instructor_sync, term_ids)
-      instructor_results.group_by{ |r| r['term_id'].to_s }.each do |term_id, rows|
-        canvas_term_id = 'TERM:' + Berkeley::TermCodes.edo_id_to_code(term_id)
-        @instructor_updates[canvas_term_id] = {}
-        rows.group_by { |r| r['section_id'].to_i.to_s }.each do |section_id, rows|
-          @instructor_updates[canvas_term_id][section_id] = {}
-          rows.group_by { |r| r['ldap_uid'].to_s }.each do |ldap_uid, rows|
-            uids_for_updates.add ldap_uid
-            EdoOracle::Adapters::Common.adapt_instructor_func rows[0]
-            @instructor_updates[canvas_term_id][section_id][ldap_uid] = rows[0]['instructor_func']
-          end
-        end
+      collect_updates(instructor_results, @instructor_updates) do |row|
+        EdoOracle::Adapters::Common.adapt_instructor_func row
+        row['instructor_func']
       end
-
       enrollment_results = EdoOracle::Bcourses.get_recent_enrollment_updates(last_sync.last_enrollment_sync, term_ids)
-      enrollment_results.group_by{ |r| r['term_id'].to_s }.each do |term_id, rows|
+      collect_updates(enrollment_results, @enrollment_updates) do |row|
+        row['enroll_status']
+      end
+    end
+
+    def collect_updates(edo_results, update_collector, &parse_status)
+      edo_results.group_by{ |r| r['term_id'].to_s }.each do |term_id, rows|
         canvas_term_id = 'TERM:' + Berkeley::TermCodes.edo_id_to_code(term_id)
-        @enrollment_updates[canvas_term_id] = {}
+        update_collector[canvas_term_id] = {}
         rows.group_by { |r| r['section_id'].to_i.to_s }.each do |section_id, rows|
-          @enrollment_updates[canvas_term_id][section_id] = {}
+          update_collector[canvas_term_id][section_id] = {}
           rows.group_by { |r| r['ldap_uid'].to_s }.each do |ldap_uid, rows|
-            uids_for_updates.add ldap_uid
-            @enrollment_updates[canvas_term_id][section_id][ldap_uid] = rows[0]['enroll_status']
+            next unless ldap_uid.present?
+            @uids_for_updates.add ldap_uid
+            update_collector[canvas_term_id][section_id][ldap_uid] = parse_status.call(rows[0])
           end
         end
       end
-
-      uids_for_updates
     end
 
     def refresh_term_enrollments(term_id, enrollments_csv, users_csv)
       # Download a Canvas sections report for the term and build our required data structure for section-to-course-site
-      # associations. Instructor updates require some extra information on all primary sections associated with the course site.
-      canvas_sections_by_ccn = {}
-      primary_sections_for_instructor_updates = {}
-      collect_section_data(term_id, canvas_sections_by_ccn, primary_sections_for_instructor_updates)
+      # associations.
+      collect_section_data(term_id)
 
       # Loop through our cached term enrollments and collect any existing student enrollments or instructor assignments
       # affected by our update.
@@ -86,52 +82,30 @@ module CanvasCsv
       existing_instructor_assignments = {}
       collect_cached_enrollments(term_id, existing_enrollments, existing_instructor_assignments)
 
-      # TODO Having looped through those cached term enrollments, we'll also need a subsequent loop through our more
-      # recent exports.
-
-      # Compare instructor updates to existing enrollments and write changes to CSV.
-      @instructor_updates.fetch(term_id, {}).each do |ccn, instructor_func_by_uid|
-        next unless canvas_sections_by_ccn[ccn]
-        instructor_func_by_uid.each do |ldap_uid, instructor_func|
-          if @membership_updates_total > Settings.canvas_proxy.max_recent_membership_updates
-            logger.warn "Hit threshold of #{@total_updates} updates; aborting further updates."
-            return
-          end
-
-          canvas_sections_by_ccn[ccn].each do |row|
-            maintainer = CanvasCsv::SiteMembershipsMaintainer.new(
-              row['course_id'], [row['section_id']], enrollments_csv, users_csv, @known_users, @sis_user_id_changes
-            )
-            campus_section = Canvas::Terms.sis_section_id_to_ccn_and_term(row['section_id'])
-            canvas_api_role = maintainer.determine_instructor_role(
-              primary_sections_for_instructor_updates[row['course_id']], campus_section, instructor_func
-            )
-            previous_assignments = existing_instructor_assignments.fetch(ccn, {})
-            if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, previous_assignments)
-              # Remove any conflicting membership with a different role.
-              maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_assignments.fetch(ldap_uid, []))
-              @membership_updates_total += 1
-            end
-          end
-        end
+      populate_update_csv(term_id, @instructor_updates, existing_instructor_assignments, enrollments_csv, users_csv) do |maintainer, row, status|
+        campus_section = Canvas::Terms.sis_section_id_to_ccn_and_term(row['section_id'])
+        maintainer.determine_instructor_role(@primary_sections_to_update[term_id][row['course_id']], campus_section, status)
       end
 
-      # Compare enrollment updates to existing enrollments and write changes to CSV.
-      # TODO Is there an easy way to order CCNs by priority (undergrad over grad)?
-      @enrollment_updates.fetch(term_id, {}).each do |ccn, enroll_status_by_uid|
-        next unless canvas_sections_by_ccn[ccn]
-        enroll_status_by_uid.each do |ldap_uid, enroll_status|
-          next unless (canvas_api_role = CanvasCsv::SiteMembershipsMaintainer::ENROLL_STATUS_TO_CANVAS_API_ROLE[enroll_status])
+      populate_update_csv(term_id, @enrollment_updates, existing_enrollments, enrollments_csv, users_csv) do |maintainer, row, status|
+        CanvasCsv::SiteMembershipsMaintainer::ENROLL_STATUS_TO_CANVAS_API_ROLE[status]
+      end
+    end
+
+    def populate_update_csv(term_id, updates, existing_enrollments, enrollments_csv, users_csv, &determine_canvas_role)
+      updates.fetch(term_id, {}).each do |ccn, status_by_uid|
+        next unless @canvas_sections[term_id][ccn]
+        status_by_uid.each do |ldap_uid, status|
           if @membership_updates_total > Settings.canvas_proxy.max_recent_membership_updates
             logger.warn "Hit threshold of #{@total_updates} updates; aborting further updates."
             return
           end
-
-          canvas_sections_by_ccn[ccn].each do |row|
+          @canvas_sections[term_id][ccn].each do |row|
             maintainer = CanvasCsv::SiteMembershipsMaintainer.new(
               row['course_id'], [row['section_id']], enrollments_csv, users_csv, @known_users, @sis_user_id_changes
             )
             previous_enrollments = existing_enrollments.fetch(ccn, {})
+            next unless (canvas_api_role = determine_canvas_role.call(maintainer, row, status))
             if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, previous_enrollments)
               # Remove any conflicting membership with a different role.
               maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_enrollments.fetch(ldap_uid, []))
@@ -142,9 +116,10 @@ module CanvasCsv
       end
     end
 
-    def collect_section_data(term_id, canvas_sections_by_ccn, primary_sections_for_instructor_updates)
+    def collect_section_data(term_id)
+      @canvas_sections[term_id] = {}
       campus_sections_for_instructor_updates = {}
-      ccns_with_updates = (@instructor_updates[term_id] || []).keys.to_set | (@enrollment_updates[term_id] || []).keys.to_set
+      ccns_with_updates = (@instructor_updates[term_id] || {}).keys.to_set | (@enrollment_updates[term_id] || {}).keys.to_set
 
       if (canvas_sections_csv = Canvas::Report::Sections.new.get_csv(term_id))
         course_id_to_csv_rows = canvas_sections_csv.group_by {|row| row['course_id']}
@@ -156,8 +131,8 @@ module CanvasCsv
             section_term_id = Canvas::Terms.term_to_sis_id(campus_section[:term_yr], campus_section[:term_cd])
             campus_sections_for_course << campus_section
             if section_term_id == term_id && ccns_with_updates.include?(campus_section[:ccn])
-              canvas_sections_by_ccn[campus_section[:ccn]] ||= []
-              canvas_sections_by_ccn[campus_section[:ccn]] << row
+              @canvas_sections[term_id][campus_section[:ccn]] ||= []
+              @canvas_sections[term_id][campus_section[:ccn]] << row
               if @instructor_updates[term_id].has_key?(campus_section[:ccn])
                 course_id_has_instructor_updates = true
               end
@@ -171,16 +146,17 @@ module CanvasCsv
         # In order to determine proper instructor roles, we need a dictionary of all primary campus sections associated with
         # course sites where an instructor update has taken place. See SiteMembershipsMaintainer#site_primary_sections for
         # parallel logic.
-        primary_sections = Set.new
+        all_primary_sections = Set.new
+        @primary_sections_to_update[term_id] = {}
         campus_sections_for_instructor_updates.values.flatten.group_by {|sec| sec.slice(:term_yr, :term_cd)}.each do |term, sections|
           ccns = sections.collect { |sec| sec[:ccn] }
           section_rows = CanvasLti::SisAdapter.get_sections_by_ids(ccns, term[:term_yr], term[:term_cd])
           section_rows.select! { |row| row['primary_secondary_cd'] == 'P' }
           section_rows.map! { |row| term.merge(ccn: row['course_cntl_num']) }
-          primary_sections.merge section_rows
+          all_primary_sections.merge section_rows
         end
         campus_sections_for_instructor_updates.each do |course_id, sections|
-          primary_sections_for_instructor_updates[course_id] = sections.select { |s| primary_sections.include? s }
+          @primary_sections_to_update[term_id][course_id] = sections.select { |s| all_primary_sections.include? s }
         end
       end
     end
@@ -203,6 +179,46 @@ module CanvasCsv
             existing_enrollments[campus_section[:ccn]] ||= {}
             existing_enrollments[campus_section[:ccn]][uid] ||= []
             existing_enrollments[campus_section[:ccn]][uid] << api_formatted_enrollment
+          end
+        end
+      end
+
+      # Having looped through those cached term enrollments, we'll also need a subsequent loop through our more
+      # recent exports.
+      users_by_sis_id = accumulate_user_data(@uids_for_updates).index_by { |u| u['user_id'] }
+      last_sync_timestamp = last_sync.latest_term_enrollment_csv_set.strftime('%Y%m%d%H%M%S')
+      Dir.glob("#{@export_dir}/canvas-*-#{file_safe(term_id)}-enrollments-*.csv").sort.each do |enrollment_csv_path|
+        next unless timestamp_from_filepath(enrollment_csv_path) > last_sync_timestamp
+        logger.debug "Reading earlier update results from #{enrollment_csv_path}"
+        CSV.foreach(enrollment_csv_path, headers: true) do |row|
+          next unless row['status'] == 'active'
+          next unless (campus_section = Canvas::Terms.sis_section_id_to_ccn_and_term(row['section_id']))
+          if Canvas::Terms.term_to_sis_id(campus_section[:term_yr], campus_section[:term_cd]) == term_id
+            logger.debug "Term matches, ccn #{campus_section[:ccn]}"
+            existing_memberships = case row['role']
+              when 'teacher', 'ta', 'Lead TA'
+                existing_instructor_assignments
+              when 'student', 'Waitlist Student'
+                existing_enrollments
+              else
+                next
+            end
+            next unless (uid = users_by_sis_id.fetch(row['user_id'], {})['login_id'])
+            logger.debug "UID #{uid}"
+            existing_memberships[campus_section[:ccn]] ||= {}
+            existing_memberships[campus_section[:ccn]][uid] ||= []
+            translated_role = CanvasCsv::SiteMembershipsMaintainer::CANVAS_API_ROLE_TO_CANVAS_SIS_ROLE.invert[row['role']] || row['role']
+            unless existing_memberships[campus_section[:ccn]][uid].find { |m| m['role'] == translated_role }
+              # If we've found a membership for one of our updated UIDs that was already added in a previous job, add the bare minimum
+              # required to tell downstream logic in SiteMembershipsMaintainer that it shouldn't try to add the membership again. Since
+              # we're looking at a CSV that was created immediately before upload to Instructure, we don't know the SIS import ID (or
+              # even that the SIS import succeeded), but a placeholder string indicates that there should have been such an import.
+              existing_memberships[campus_section[:ccn]][uid] << {
+                'role' => translated_role,
+                'sis_import_id' => 'Cached on Junction'
+              }
+              logger.debug("Adding role #{translated_role}")
+            end
           end
         end
       end

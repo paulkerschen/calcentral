@@ -58,6 +58,7 @@ module CanvasCsv
     def initialize(known_users, sis_user_import_csv, sis_ids_import_csv=nil, opts={})
       super()
       @known_users = known_users
+      @known_sis_id_updates = {}
       @user_import_csv = sis_user_import_csv
       @sis_ids_import_csv = sis_ids_import_csv
       @cached = opts[:cached]
@@ -88,9 +89,29 @@ module CanvasCsv
 
     def check_all_user_accounts(uid_filter)
       if @cached
-        users_csv_file = Dir.glob("#{Settings.canvas_proxy.export_directory}/provisioned-users-#{DateTime.now.strftime('%F')}*.csv").last
+        # If we've been asked to use a cached file, grab the most recent stashed users CSV we have on disk. Also, grab any CSV updates we've
+        # generated in the meantime and note the UIDs, so we don't attempt to redo whatever user changes were already made.
+        users_csv_file = Dir.glob("#{@export_dir}/provisioned-users-*.csv").sort.last
+        logger.debug "Loading cached user report from #{users_csv_file}"
+        timestamp_string = timestamp_from_filepath(users_csv_file)
+        Dir.glob("#{@export_dir}/canvas*-users-*.csv").sort.each do |user_update_csv|
+          logger.debug "Loading user update CSV from #{user_update_csv}"
+          if timestamp_from_filepath(user_update_csv) > timestamp_string
+            CSV.foreach(user_update_csv, headers: true) do |row|
+              @known_users[row['login_id'].to_s] = row['user_id'].to_s
+            end
+          end
+        end
+        Dir.glob("#{@export_dir}/canvas*-sis-ids.csv").sort.each do |sis_id_update_csv|
+          logger.debug "Loading SIS id update CSV from #{sis_id_update_csv}"
+          if timestamp_from_filepath(sis_id_update_csv) > timestamp_string
+            CSV.foreach(sis_id_update_csv, headers: true) do |row|
+              @known_sis_id_updates[row['old_id'].to_s] = row['new_id'].to_s
+            end
+          end
+        end
       else
-        users_csv_file = "#{Settings.canvas_proxy.export_directory}/provisioned-users-#{DateTime.now.strftime('%F-%H-%M')}.csv"
+        users_csv_file = "#{@export_dir}/provisioned-users-#{DateTime.now.strftime('%F-%H-%M')}.csv"
         users_csv_file = Canvas::Report::Users.new(download_to_file: users_csv_file).get_csv
       end
       if users_csv_file.present?
@@ -180,6 +201,10 @@ module CanvasCsv
       inactive_account = parsed_login_id[:inactive_account]
       whitelisted = whitelisted_uids.include?(ldap_uid.to_s)
       if ldap_uid
+        if @known_users[ldap_uid.to_s].present?
+          logger.debug "User account for UID #{ldap_uid} already processed, will not attempt to re-process."
+          return
+        end
         campus_user = campus_user_attributes.select { |r| (r[:ldap_uid].to_i == ldap_uid) }.first
         if campus_user.present? && (!campus_user[:roles][:expiredAccount] || whitelisted)
           logger.warn "Reactivating account for LDAP UID #{ldap_uid}" if inactive_account
@@ -206,11 +231,15 @@ module CanvasCsv
           end
         end
         if old_account_data['user_id'] != new_account_data['user_id']
-          logger.warn "Will change SIS ID for user sis_login_id:#{old_account_data['login_id']} from #{old_account_data['user_id']} to #{new_account_data['user_id']}"
-          @sis_user_id_changes["sis_login_id:#{old_account_data['login_id']}"] = {
-            'old_id' => old_account_data['user_id'],
-            'new_id' => new_account_data['user_id']
-          }
+          if @known_sis_id_updates[old_account_data['user_id']].present?
+            logger.debug "SIS ID change from #{old_account_data['user_id']} to #{new_account_data['user_id']} already processed, will not attempt to re-process."
+          else
+            logger.warn "Will change SIS ID for user sis_login_id:#{old_account_data['login_id']} from #{old_account_data['user_id']} to #{new_account_data['user_id']}"
+            @sis_user_id_changes["sis_login_id:#{old_account_data['login_id']}"] = {
+              'old_id' => old_account_data['user_id'],
+              'new_id' => new_account_data['user_id']
+            }
+          end
         end
         @known_users[ldap_uid.to_s] = new_account_data['user_id']
         unless self.class.provisioned_account_eq_sis_account?(old_account_data, new_account_data)

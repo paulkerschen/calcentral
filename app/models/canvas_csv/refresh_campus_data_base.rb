@@ -43,8 +43,6 @@ module CanvasCsv
       end
     end
 
-    # TODO The 'recent' job needs not only to look at cached MaintainUsers output for the day, but also to loop through results for any
-    # recent incremental user exports (or SIS ID changes).
     def generate_users_csv(uid_filter=nil, opts={})
       users_csv = make_users_csv(@users_csv_filename)
       sis_ids_csv = make_sis_ids_csv(@sis_ids_csv_filename) if @sis_ids_csv_filename
