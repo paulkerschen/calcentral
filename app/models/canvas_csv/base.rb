@@ -114,5 +114,9 @@ module CanvasCsv
         nil
     end
 
+    def timestamp_from_filepath(filepath)
+      filepath.gsub(@export_dir, '').gsub(/\D/, '')
+    end
+
   end
 end
