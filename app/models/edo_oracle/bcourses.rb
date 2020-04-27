@@ -124,7 +124,7 @@ module EdoOracle
 
     def self.get_recent_instructor_updates(since_timestamp, term_ids)
       term_ids_in = term_ids.map {|term_id| "'#{term_id}'"}.join ','
-      timestamp_in = since_timestamp.utc.strftime('%Y-%m-%d %H:%M:%S')
+      timestamp_in = since_timestamp.strftime('%Y-%m-%d %H:%M:%S')
       sql = <<-SQL
         SELECT DISTINCT
         up.instr_id AS sis_id,
@@ -155,7 +155,7 @@ module EdoOracle
 
     def self.get_recent_enrollment_updates(since_timestamp, term_ids)
       term_ids_in = term_ids.map {|term_id| "'#{term_id}'"}.join ','
-      timestamp_in = since_timestamp.utc.strftime('%Y-%m-%d %H:%M:%S')
+      timestamp_in = since_timestamp.strftime('%Y-%m-%d %H:%M:%S')
       sql = <<-SQL
         SELECT DISTINCT
           enroll.CLASS_SECTION_ID as section_id,
@@ -163,12 +163,23 @@ module EdoOracle
           enroll.CAMPUS_UID AS ldap_uid,
           enroll.STUDENT_ID AS sis_id,
           enroll.STDNT_ENRL_STATUS_CODE AS enroll_status,
+          enroll.COURSE_CAREER AS course_career,
           enroll.LAST_UPDATED as last_updated
         FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
         WHERE enroll.TERM_ID IN (#{term_ids_in})
         AND #{omit_drops_and_withdrawals}
         AND enroll.last_updated >= to_timestamp('#{timestamp_in}', 'yyyy-mm-dd hh24:mi:ss')
-        ORDER BY enroll.TERM_ID, enroll.CLASS_SECTION_ID, enroll.CAMPUS_UID, enroll.last_updated DESC
+        ORDER BY enroll.TERM_ID,
+          -- In case the number of results exceeds our processing cutoff, set priority within terms by the academic
+          -- career type for the course.
+          CASE
+            WHEN enroll.course_career = 'UGRD' THEN 1
+            WHEN enroll.course_career = 'GRAD' THEN 2
+            WHEN enroll.course_career = 'LAW' THEN 3
+            WHEN enroll.course_career = 'UCBX' THEN 4
+            ELSE 5
+          END,
+          enroll.CLASS_SECTION_ID, enroll.CAMPUS_UID, enroll.last_updated DESC
       SQL
       fallible_query(sql, do_not_stringify: true)
     end
