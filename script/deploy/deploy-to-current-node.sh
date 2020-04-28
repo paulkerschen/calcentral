@@ -22,6 +22,8 @@ mkdir -p "${PWD}/log"
 LOG=$(date +"${PWD}/log/junction-deploy_%Y-%m-%d.log")
 LOGIT="tee -a ${LOG}"
 
+DOC_ROOT="/var/www/html/junction"
+
 function log_error {
   echo | ${LOGIT}
   echo "$(date): [ERROR] ${1}" | ${LOGIT}
