@@ -63,33 +63,39 @@ shared_examples 'Canvas data refresh' do |import_type|
 end
 
 
+shared_context '2014-D Canvas sections report' do
+  let(:current_sis_term_ids) { ['TERM:2014-D'] }
+  let(:sections_report_csv_header_string) { 'canvas_section_id,section_id,canvas_course_id,course_id,name,status,start_date,end_date,canvas_account_id,account_id' }
+  let(:sections_report_csv_string) do
+    [
+      sections_report_csv_header_string,
+      '20,SEC:2014-D-25123,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 001,active,,,36,ACCT:COMPSCI',
+      '19,SEC:2014-D-25124,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 002,active,,,36,ACCT:COMPSCI',
+      '21,SEC:2014-D-25125,24,,COMPSCI 9D SLF 003,active,,,36,ACCT:COMPSCI',
+      '22,,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 003,active,,,36,ACCT:COMPSCI',
+    ].join("\n")
+  end
+  let(:sections_report_csv) { CSV.parse(sections_report_csv_string, :headers => :first_row) }
+  let(:empty_sections_report_csv) { CSV.parse(sections_report_csv_header_string + "\n", :headers => :first_row) }
+  let(:cached_enrollments_provider) { CanvasCsv::TermEnrollments.new }
+
+  let(:users_csv) { subject.instance_eval { make_users_csv(@users_csv_filename) } }
+  let(:term) { subject.instance_eval { enrollment_term_csvs.keys[0] } }
+  let(:enrollments_csv) { subject.instance_eval { enrollment_term_csvs.values[0] } }
+end
+
+
 describe CanvasCsv::RefreshCampusDataAll do
   subject { CanvasCsv::RefreshCampusDataAll.new }
 
   include_examples 'Canvas data refresh', 'all'
 
   describe '#refresh_existing_term_sections' do
-    let(:current_sis_term_ids) { ['TERM:2014-D'] }
-    let(:sections_report_csv_header_string) { 'canvas_section_id,section_id,canvas_course_id,course_id,name,status,start_date,end_date,canvas_account_id,account_id' }
-    let(:sections_report_csv_string) do
-      [
-        sections_report_csv_header_string,
-        '20,SEC:2014-D-25123,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 001,active,,,36,ACCT:COMPSCI',
-        '19,SEC:2014-D-25124,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 002,active,,,36,ACCT:COMPSCI',
-        '21,SEC:2014-D-25125,24,,COMPSCI 9D SLF 003,active,,,36,ACCT:COMPSCI',
-        '22,,24,CRS:COMPSCI-9D-2014-D,COMPSCI 9D SLF 003,active,,,36,ACCT:COMPSCI',
-      ].join("\n")
-    end
-    let(:sections_report_csv) { CSV.parse(sections_report_csv_string, :headers => :first_row) }
-    let(:empty_sections_report_csv) { CSV.parse(sections_report_csv_header_string + "\n", :headers => :first_row) }
-    let(:cached_enrollments_provider) { CanvasCsv::TermEnrollments.new }
+    include_context '2014-D Canvas sections report'
 
     context 'when canvas sections csv is present' do
       before { allow_any_instance_of(Canvas::Report::Sections).to receive(:get_csv).and_return(sections_report_csv) }
       it 'passes only sections with course_id and section_id to site membership maintainer process for each course' do
-        users_csv = subject.instance_eval { make_users_csv(@users_csv_filename) }
-        term = subject.instance_eval { enrollment_term_csvs.keys[0] }
-        enrollments_csv = subject.instance_eval { enrollment_term_csvs.values[0] }
         expected_course_id = 'CRS:COMPSCI-9D-2014-D'
         expected_sis_section_ids = ['SEC:2014-D-25123', 'SEC:2014-D-25124']
         known_users, sis_user_id_changes = subject.instance_eval do
@@ -109,6 +115,7 @@ describe CanvasCsv::RefreshCampusDataAll do
         it 'does not perform any processing' do
           expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:process)
           expect(CanvasCsv::Synchronization).to_not receive(:get)
+          subject.refresh_existing_term_sections(term, enrollments_csv, users_csv, cached_enrollments_provider)
         end
       end
       context 'nil' do
@@ -116,6 +123,7 @@ describe CanvasCsv::RefreshCampusDataAll do
         it 'does not perform any processing' do
           expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:process)
           expect(CanvasCsv::Synchronization).to_not receive(:get)
+          subject.refresh_existing_term_sections(term, enrollments_csv, users_csv, cached_enrollments_provider)
         end
       end
     end
@@ -171,6 +179,135 @@ describe CanvasCsv::RefreshCampusDataRecent do
   subject { CanvasCsv::RefreshCampusDataRecent.new }
 
   include_examples 'Canvas data refresh', 'recent'
+
+  before do
+    allow(CanvasCsv::Synchronization).to receive(:get).and_return double(
+      last_enrollment_sync: 1.weeks.ago.utc,
+      last_guest_user_sync: 1.weeks.ago.utc,
+      last_instructor_sync: 1.weeks.ago.utc,
+      latest_term_enrollment_csv_set: 1.weeks.ago.utc
+    )
+
+    allow(EdoOracle::Bcourses).to receive(:get_recent_instructor_updates).and_return [
+      {
+        'section_id' => '25122',
+        'term_id' => '2148',
+        'ldap_uid' => '67890',
+        'sis_id' => '678912345',
+        'role_code' => 'PI',
+        'primary' => false,
+        'last_updated' => 1.day.ago
+      },
+      {
+        'section_id' => '25123',
+        'term_id' => '2148',
+        'ldap_uid' => '67890',
+        'sis_id' => '678912345',
+        'role_code' => 'PI',
+        'primary' => true,
+        'last_updated' => 1.day.ago
+      },
+    ]
+
+    allow(EdoOracle::Bcourses).to receive(:get_recent_enrollment_updates).and_return [
+      {
+        'section_id' => '12345',
+        'term_id' => '2142',
+        'ldap_uid' => '12345',
+        'sis_id' => '1234567',
+        'role_code' => 'PI',
+        'enroll_status' => 'E',
+        'course_career' => 'UGRD',
+        'last_updated' => 1.day.ago
+      },
+      {
+        'section_id' => '25123',
+        'term_id' => '2148',
+        'ldap_uid' => '12345',
+        'sis_id' => '1234567',
+        'enroll_status' => 'E',
+        'course_career' => 'UGRD',
+        'last_updated' => 1.day.ago
+      },
+      {
+        'section_id' => '25124',
+        'term_id' => '2148',
+        'ldap_uid' => '12345',
+        'sis_id' => '1234567',
+        'enroll_status' => 'E',
+        'course_career' => 'UGRD',
+        'last_updated' => 1.day.ago
+      },
+    ]
+  end
+
+  describe '#refresh_term_enrollments' do
+    include_context '2014-D Canvas sections report'
+
+    let(:term_enrollments_csv_filepath) do
+      provider = CanvasCsv::TermEnrollments.new
+      CanvasCsv::TermEnrollments.new.enrollment_csv_filepath(provider.latest_term_enrollment_set_date, current_sis_term_ids.first)
+    end
+
+    before do
+      export_csv = CanvasCsv::TermEnrollments.new.make_enrollment_export_csv(term_enrollments_csv_filepath)
+      export_csv.close
+    end
+
+    after do
+      delete_files_if_exists([term_enrollments_csv_filepath])
+    end
+
+    context 'when canvas sections csv is present' do
+      let(:maintainer) do
+        CanvasCsv::SiteMembershipsMaintainer.new('Dummy course ID', ['Dummy section ID'], enrollments_csv, users_csv, {})
+      end
+      before do
+        expect(CanvasCsv::SiteMembershipsMaintainer).to receive(:new).at_least(:once).and_return(maintainer)
+        allow_any_instance_of(Canvas::Report::Sections).to receive(:get_csv).and_return(sections_report_csv)
+      end
+
+      it 'calls membership maintainer where SISEDO updates overlap with sections csv' do
+        expect(maintainer).to receive(:update_section_enrollment_from_campus)
+          .with('TeacherEnrollment', 'SEC:2014-D-25123', '67890', {})
+        expect(maintainer).to receive(:update_section_enrollment_from_campus)
+          .with('StudentEnrollment', 'SEC:2014-D-25123', '12345', {})
+        expect(maintainer).to receive(:update_section_enrollment_from_campus)
+          .with('StudentEnrollment', 'SEC:2014-D-25124', '12345', {})
+        subject.generate_csv_files
+      end
+    end
+
+    context 'when canvas sections csv is empty' do
+      before { allow_any_instance_of(Canvas::Report::Sections).to receive(:get_csv).and_return csv }
+      context 'empty' do
+        let(:csv) { empty_sections_report_csv }
+        it 'does not perform any processing' do
+          expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:update_section_enrollment_from_campus)
+          subject.generate_csv_files
+        end
+      end
+      context 'nil' do
+        let(:csv) { nil }
+        it 'does not perform any processing' do
+          expect(CanvasCsv::SiteMembershipsMaintainer).to_not receive(:update_section_enrollment_from_campus)
+          subject.generate_csv_files
+        end
+      end
+    end
+  end
+
+  context 'with multiple terms' do
+    let(:current_sis_term_ids) { ['TERM:2014-B', 'TERM:2014-D'] }
+    before do
+      allow(Settings.canvas_proxy).to receive(:import_zipped_csvs).and_return false
+    end
+    it 'should send call to populate incremental update csv for users and enrollments' do
+      expect_any_instance_of(CanvasCsv::MaintainUsers).to receive(:refresh_existing_user_accounts).once.and_return nil
+      expect_any_instance_of(CanvasCsv::RefreshCampusDataRecent).to receive(:refresh_term_enrollments).twice.and_return nil
+      subject.generate_csv_files
+    end
+  end
 end
 
 describe CanvasCsv::RefreshCampusDataAccounts do
