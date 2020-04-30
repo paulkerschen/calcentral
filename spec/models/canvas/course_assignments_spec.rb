@@ -27,41 +27,4 @@ describe Canvas::CourseAssignments do
     let(:response) { subject.assignments_response }
     it_should_behave_like 'a paged Canvas proxy handling request failure'
   end
-
-  context 'when providing muted assignments' do
-    let(:fake_assignments) do
-      [
-        {'id' => 1, 'name' => 'Assignment 1', 'muted' => false},
-        {'id' => 2, 'name' => 'Assignment 2', 'muted' => true},
-        {'id' => 3, 'name' => 'Assignment 3', 'muted' => false},
-      ]
-    end
-
-    it 'provides muted course assignments' do
-      allow(subject).to receive(:course_assignments).and_return(fake_assignments)
-      muted_assignments = subject.muted_assignments
-      expect(muted_assignments.count).to eq 1
-      expect(muted_assignments[0]['id']).to eq 2
-      expect(muted_assignments[0]['name']).to eq 'Assignment 2'
-    end
-
-    it 'serves uncached records' do
-      expect(subject).to receive(:course_assignments).and_return(fake_assignments)
-      subject.muted_assignments
-    end
-  end
-
-  context 'unmuting assignments' do
-    it 'unmutes assignments' do
-      result = subject.unmute_assignment(11)
-      expect(result[:body]['id']).to eq 11
-      expect(result[:body]['muted']).to eq false
-    end
-
-    context 'on request failure' do
-      let(:failing_request) { {method: :put} }
-      let(:response) { subject.unmute_assignment(11) }
-      it_should_behave_like 'an unpaged Canvas proxy handling request failure'
-    end
-  end
 end

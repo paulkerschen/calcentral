@@ -15,8 +15,12 @@ gem 'activeresource', '~>4.0.0'
 gem 'protected_attributes', '~> 1.0.8'
 gem 'rails-observers', '~>0.1.2'
 gem 'rails-perftest', '~>0.0.5'
-gem 'rails_same_site_cookie', '~>0.1.5'
 gem 'responders', '~> 2.0'
+
+gem 'rake', '~> 12.3.3'
+
+# ETS is temporarily maintaining its own fork of Rack to support the SameSite=None cookie property.
+gem 'rack', '~> 1.6.13', git: 'https://github.com/ets-berkeley-edu/rack.git', branch: 'ets-1-6-samesite'
 
 gem 'activerecord-jdbc-adapter', '~> 1.3.16'
 
@@ -50,7 +54,7 @@ gem 'google-api-client', '~> 0.8.6'
 gem 'google_drive', '~> 1.0.6'
 
 # LTI support
-gem 'ims-lti', :git => 'https://github.com/instructure/ims-lti.git'
+gem 'ims-lti', '~> 1.1.8', :git => 'https://github.com/instructure/ims-lti.git'
 
 # for memcached connection
 gem 'dalli', '~> 2.7.2'
@@ -69,12 +73,8 @@ gem 'jruby-activemq', '~> 5.13.0', git: 'https://github.com/ets-berkeley-edu/jru
 # Track progress at https://github.com/jruby/jruby-openssl/issues/86 and SISRP-18781.
 gem 'jruby-openssl', '0.9.19'
 
-# Addressable is a replacement for the URI implementation that is part of Ruby's standard library.
-# https://github.com/sporkmonger/addressable
-gem 'addressable', '~> 2.3.4'
-
 # for parsing formatted html
-gem 'nokogiri', '~> 1.10.4', platforms: :jruby
+gem 'nokogiri', '~> 1.10.8', :platforms => :jruby
 
 # for parsing paged feeds
 gem 'link_header', '~> 0.0.7'
@@ -143,7 +143,7 @@ group :development, :test do
   # Capybara is an integration testing tool for rack based web applications.
   # It simulates how a user would interact with a website
   # https://rubygems.org/gems/capybara
-  gem 'capybara', '~> 2.4.4'
+  gem 'capybara', '~> 2.7.1'
 
   # Headless is a Ruby interface for Xvfb. It allows you to create a headless display straight
   # from Ruby code, hiding some low-level action.
