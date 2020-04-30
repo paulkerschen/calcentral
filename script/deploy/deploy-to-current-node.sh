@@ -13,7 +13,7 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")/../.." || exit 1
 
 if [ ! -w "${PWD}/log" ]; then
-  echo; echo "$(date): [ERROR] '${PWD}/log' directoy does not exist or is not writable"; echo
+  echo; echo "$(date): [ERROR] '${PWD}/log' directory does not exist or is not writable"; echo
   exit 1
 fi
 
@@ -21,6 +21,8 @@ fi
 mkdir -p "${PWD}/log"
 LOG=$(date +"${PWD}/log/junction-deploy_%Y-%m-%d.log")
 LOGIT="tee -a ${LOG}"
+
+DOC_ROOT="/var/www/html/junction"
 
 function log_error {
   echo | ${LOGIT}
@@ -32,9 +34,13 @@ function log_info {
   echo "$(date): [INFO] ${1}" | ${LOGIT}
 }
 
-./script/init.d/calcentral maint
+touch "${DOC_ROOT}/calcentral-in-maintenance"
 
-./script/deploy/_download-knob-for-torquebox.sh || { log_error "download-knob-for-torquebox failed"; exit 1; }
+if [ ! -f "${DOC_ROOT}/index.html" ]; then
+  cp -p "${DOC_ROOT}/index_maintenance.html" "${DOC_ROOT}/index.html"
+fi
+
+./script/deploy/_download-war-for-tomcat.sh || { log_error "download-war-for-tomcat failed"; exit 1; }
 
 if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
   ./script/migrate.sh

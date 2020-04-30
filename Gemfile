@@ -52,7 +52,7 @@ gem 'google-api-client', '~> 0.8.6'
 gem 'google_drive', '~> 1.0.6'
 
 # LTI support
-gem 'ims-lti', '~> 1.1.8', :git => 'https://github.com/instructure/ims-lti.git'
+gem 'ims-lti', :git => 'https://github.com/instructure/ims-lti.git'
 
 # for memcached connection
 gem 'dalli', '~> 2.7.2'
@@ -72,27 +72,17 @@ gem 'jruby-activemq', '~> 5.13.0', git: 'https://github.com/ets-berkeley-edu/jru
 gem 'jruby-openssl', '0.9.19'
 
 # for parsing formatted html
-gem 'nokogiri', '~> 1.10.8', :platforms => :jruby
+gem 'nokogiri', '~> 1.10.8', platforms: :jruby
 
 # for parsing paged feeds
 gem 'link_header', '~> 0.0.7'
 
-# for simplified relational data management
-gem 'rails_admin', '1.3.0'
-
-gem 'bootstrap-sass', '~> 3.4.1'
-
-# Background jobs without TorqueBox
+# Background jobs
 gem 'concurrent-ruby', '~> 1.0.5'
 
-# TorqueBox app server
-gem 'torquebox', '~> 3.2.0'
-gem 'torquebox-server', '~> 3.2.0'
-gem 'torquebox-messaging', '~> 3.2.0'
-gem 'jmx', '~> 1.0'
-
 # for building a WAR to deploy on Tomcat
-gem 'warbler', '~> 2.0.4'
+gem 'warbler', '~> 2.0.5'
+gem 'jruby-jars', '9.2.0.0'
 
 # for trying, and trying again, and then giving up.
 gem 'retriable', '~> 1.4'
@@ -102,6 +92,7 @@ gem 'pundit', '~> 0.3.0'
 
 gem 'cancan', '~> 1.6.10'
 gem 'net-ssh', '~>2.9.2' # v3 requires Ruby 2.0
+gem 'net-telnet', '~> 0.2.0'
 
 gem 'icalendar', '~> 2.2.2'
 
@@ -110,14 +101,15 @@ gem 'rubyzip', '~> 1.3.0'
 # Data Loch integration
 gem 'aws-sdk-s3', '~> 1.8.2'
 
-##################################
-# Front-end Gems for Rails Admin #
-##################################
-
+# for simplified relational data management
+gem 'rails_admin', '1.3.0'
 
 # Closure Compiler Gem for JS compression
 # https://github.com/documentcloud/closure-compiler
 gem 'closure-compiler', '~> 1.1.11'
+
+# for rails_admin styling - development only, since production assets are precompiled
+gem 'bootstrap-sass', '~> 3.4.1', group: :development
 
 # Oracle adapter
 # Purposely excluding this for test environments since folks have to install ojdbc6

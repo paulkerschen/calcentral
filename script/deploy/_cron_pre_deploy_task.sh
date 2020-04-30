@@ -3,7 +3,7 @@
 ##################################################################
 #
 # In dev/qa environments, a deploy-junction cron job will run
-# every N minutes. Before deploying the requested knob file we
+# every N minutes. Before deploying the requested WAR file we
 # must checkout the latest deploy scripts, in case the scripts
 # in the environment are buggy.
 #

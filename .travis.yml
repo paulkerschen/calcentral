@@ -1,16 +1,15 @@
 language: ruby
 bundler_args: --without development production --deployment --jobs=4 --retry=5
-cache: bundler
 jdk: openjdk8
 node_js: 10.1.0
 os: linux
-rvm: jruby-9.1.14.0
+rvm: jruby-9.1.17.0
 
 env:
   global:
     # Travis CI makes encrypted variables available ONLY to pull requests coming from the same repository. Read more:
     # https://docs.travis-ci.com/user/pull-requests/#pull-requests-and-security-restrictions
-    - ARTIFACTS_PATHS="./calcentral.knob"
+    - ARTIFACTS_PATHS="./junction.war"
     - AWS_ACCESS_KEY_ID=${ARTIFACTS_KEY}
     - AWS_SECRET_ACCESS_KEY=${ARTIFACTS_SECRET}
     - DISPLAY=:99.0
@@ -21,7 +20,7 @@ env:
 
 before_install:
   - gem uninstall bundler --force -x
-  - gem install bundler -v '1.15.4'
+  - gem install bundler -v '1.17.3'
   - npm config set strict-ssl false
   - npm install --production
   - npm run build
@@ -43,19 +42,20 @@ jobs:
       script:
         - RAILS_ENV=test bundle exec rspec
     - stage: Deploy
-      if: type = push OR env(DEPLOY_CALCENTRAL_KNOB) = true
+      if: type = push OR env(DEPLOY_JUNCTION_WAR) = true
       script:
         - pip install --user awscli
         - aws configure list
         - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc7.jar .
         - mv ./ojdbc7.jar ./lib
         - git log --pretty=format:'%H' -n 1 > versions/git.txt
-        - bundle install --deployment --local --retry 3
+        - bundle config --delete without
+        - bundle install --deployment --retry 3
         - bundle package --all
         - bundle exec rake assets:precompile
         - bundle exec rake fix_assets
-        - bundle exec rake torquebox:archive NAME=calcentral 2>&1 1>/dev/null
-        - echo -n "${S3_PATH}/calcentral.knob" > latest.txt
+        - bundle exec warble NAME=junction 2>&1 1>/dev/null
+        - echo -n "${S3_PATH}/junction.war" > latest.txt
         - aws s3 cp latest.txt "s3://${ARTIFACTS_BUCKET}/${TRAVIS_BRANCH}/"
 
 # Note: the artifacts add-on does not run on pull request builds. Read https://docs.travis-ci.com/user/uploading-artifacts/

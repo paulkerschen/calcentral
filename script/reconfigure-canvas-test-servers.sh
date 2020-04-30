@@ -21,8 +21,6 @@ export LOGGER_STDOUT=only
 export LOGGER_LEVEL=INFO
 export JRUBY_OPTS="--dev"
 
-cd deploy
-
 echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the CAS Authentication reconfiguration script..." | $LOGIT
