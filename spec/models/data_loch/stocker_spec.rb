@@ -197,7 +197,7 @@ describe DataLoch::Stocker do
 
       advisor_note_csv = unzipped('advisor-note-permissions')
       expect(advisor_note_csv).to have(3).items
-      expect(advisor_note_csv[0]).to eq '123456,303123456,UC_CS_AA_CURRICULAR_ADVISOR,0'
+      expect(advisor_note_csv[0]).to eq '123456,303123456,UC_CS_AA_CURRICULAR_ADVISOR'
 
       plan_owners_csv = unzipped('academic-plan-owners')
       expect(plan_owners_csv).to have(2).items

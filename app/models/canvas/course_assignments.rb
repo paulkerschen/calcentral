@@ -18,14 +18,6 @@ module Canvas
       end
     end
 
-    def unmute_assignment(canvas_assignment_id)
-      wrapped_put "#{request_path}/#{canvas_assignment_id}", {
-        'assignment' => {
-          'muted' => false
-        }
-      }
-    end
-
     def assignments_response
       paged_get request_path
     end
@@ -35,9 +27,6 @@ module Canvas
     def mock_interactions
       on_request(uri_matching: "#{api_root}/#{request_path}", method: :get)
         .respond_with_file('fixtures', 'json', "canvas_course_assignments_#{@course_id}.json")
-
-      on_request(uri_matching: "#{api_root}/#{request_path}/", method: :put)
-        .respond_with_file('fixtures', 'json', 'canvas_course_assignment_unmute.json')
     end
 
     def request_path

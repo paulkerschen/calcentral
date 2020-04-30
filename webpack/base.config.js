@@ -73,13 +73,13 @@ module.exports = {
     new cleanWebpackPlugin(pathsToClean, { root: path.resolve(__dirname, '../public/') }),
     new htmlWebpackPlugin({
       filename: paths.public.templates.bCoursesEmbedded,
-      inject: false,
+      inject: true,
       injectedHtml: paths.source.templates.bCoursesEmbedded,
       template: paths.source.templates.base
     }),
     new htmlWebpackPlugin({
       filename: paths.public.templates.indexJunction,
-      inject: false,
+      inject: true,
       injectedHtml: paths.source.templates.indexJunction,
       template: paths.source.templates.base
     })

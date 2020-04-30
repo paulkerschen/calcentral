@@ -21,12 +21,6 @@ class CanvasCourseGradeExportController < ApplicationController
     render json: { jobRequestStatus: 'Success', jobId: egrades.background_job_id }.to_json
   end
 
-  # POST /api/academics/canvas/egrade_export/resolve/:canvas_course_id.json?enableGradingScheme=1&unmuteAssignments=0
-  def resolve_issues
-    egrades.resolve_issues(!!params['enableGradingScheme'], !!params['unmuteAssignments'])
-    render json: { status: 'Resolved' }
-  end
-
   # GET /api/academics/canvas/egrade_export/status/:canvas_course_id.json?jobId=Canvas::BackgroundJob.1383330151057-67f4b934525501cb
   def job_status
     background_job = BackgroundJob.find(params['jobId'])
@@ -36,9 +30,10 @@ class CanvasCourseGradeExportController < ApplicationController
 
   # GET /api/academics/canvas/egrade_export/download/:canvas_course_id.csv
   def download_egrades_csv
-    %w(term_cd term_yr ccn type).each { |field| raise Errors::BadRequestError, "#{field} required" unless params[field] }
+    %w(term_cd term_yr ccn type pnp_cutoff).each { |field| raise Errors::BadRequestError, "#{field} required" unless params[field] }
     raise Errors::BadRequestError, "invalid value for 'type' parameter" unless CanvasLti::Egrades::GRADE_TYPES.include?(params['type'])
-    official_student_grades = egrades.official_student_grades_csv(params['term_cd'], params['term_yr'], params['ccn'], params['type'])
+    raise Errors::BadRequestError, "invalid value for 'pnp_cutoff' parameter" unless (CanvasLti::Egrades::LETTER_GRADES + %w(ignore)).include?(params['pnp_cutoff'])
+    official_student_grades = egrades.official_student_grades_csv(params['term_cd'], params['term_yr'], params['ccn'], params['type'], params['pnp_cutoff'])
     term_season = {
       'B' => 'Spring',
       'C' => 'Summer',
