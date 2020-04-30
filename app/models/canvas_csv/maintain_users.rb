@@ -88,10 +88,9 @@ module CanvasCsv
     end
 
     def check_all_user_accounts(uid_filter)
-      if @cached
-        # If we've been asked to use a cached file, grab the most recent stashed users CSV we have on disk. Also, grab any CSV updates we've
-        # generated in the meantime and note the UIDs, so we don't attempt to redo whatever user changes were already made.
-        users_csv_file = Dir.glob("#{@export_dir}/provisioned-users-*.csv").sort.last
+      # If we've been asked to use a cached file, grab the most recent stashed users CSV we have on disk. Also, grab any CSV updates we've
+      # generated in the meantime and note the UIDs, so we don't attempt to redo whatever user changes were already made.
+      if @cached and (users_csv_file = Dir.glob("#{@export_dir}/provisioned-users-*.csv").sort.last)
         logger.debug "Loading cached user report from #{users_csv_file}"
         timestamp_string = timestamp_from_filepath(users_csv_file)
         Dir.glob("#{@export_dir}/canvas*-users-*.csv").sort.each do |user_update_csv|

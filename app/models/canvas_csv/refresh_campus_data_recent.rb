@@ -119,7 +119,7 @@ module CanvasCsv
     def collect_section_data(term_id)
       @canvas_sections[term_id] = {}
       campus_sections_for_instructor_updates = {}
-      ccns_with_updates = (@instructor_updates[term_id] || {}).keys.to_set | (@enrollment_updates[term_id] || {}).keys.to_set
+      ccns_with_updates = @instructor_updates.fetch(term_id, {}).keys.to_set | @enrollment_updates.fetch(term_id, {}).keys.to_set
 
       if (canvas_sections_csv = Canvas::Report::Sections.new.get_csv(term_id))
         course_id_to_csv_rows = canvas_sections_csv.group_by {|row| row['course_id']}
@@ -133,7 +133,7 @@ module CanvasCsv
             if section_term_id == term_id && ccns_with_updates.include?(campus_section[:ccn])
               @canvas_sections[term_id][campus_section[:ccn]] ||= []
               @canvas_sections[term_id][campus_section[:ccn]] << row
-              if @instructor_updates[term_id].has_key?(campus_section[:ccn])
+              if @instructor_updates.fetch(term_id, {}).has_key?(campus_section[:ccn])
                 course_id_has_instructor_updates = true
               end
             end
@@ -194,7 +194,6 @@ module CanvasCsv
           next unless row['status'] == 'active'
           next unless (campus_section = Canvas::Terms.sis_section_id_to_ccn_and_term(row['section_id']))
           if Canvas::Terms.term_to_sis_id(campus_section[:term_yr], campus_section[:term_cd]) == term_id
-            logger.debug "Term matches, ccn #{campus_section[:ccn]}"
             existing_memberships = case row['role']
               when 'teacher', 'ta', 'Lead TA'
                 existing_instructor_assignments
@@ -204,7 +203,6 @@ module CanvasCsv
                 next
             end
             next unless (uid = users_by_sis_id.fetch(row['user_id'], {})['login_id'])
-            logger.debug "UID #{uid}"
             existing_memberships[campus_section[:ccn]] ||= {}
             existing_memberships[campus_section[:ccn]][uid] ||= []
             translated_role = CanvasCsv::SiteMembershipsMaintainer::CANVAS_API_ROLE_TO_CANVAS_SIS_ROLE.invert[row['role']] || row['role']
