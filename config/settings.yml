@@ -156,6 +156,7 @@ mailgun_proxy:
   base_url: 'https://api.mailgun.net/v3'
   domain: 'bcourses-mail.berkeley.edu'
   api_key: 'secret'
+  max_retries: 4
 
 hub_term_proxy:
   fake: false
