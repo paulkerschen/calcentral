@@ -111,6 +111,20 @@ describe MailingLists::IncomingMessage do
         include_examples 'successful forwarding'
         include_examples 'proxy failure handling'
 
+        context 'Mailgun failure' do
+          let(:proxy_1) { Mailgun::SendMessage.new }
+          let(:proxy_2) { Mailgun::SendMessage.new }
+          let(:expected_bounce_message) { 'The following message could not be delivered at this time. Please try resending later.' }
+          it 'attempts to send, then gives up and attempts a bounce' do
+            expect(Mailgun::SendMessage).to receive(:new).exactly(2).times.and_return proxy_1, proxy_2
+            expect(proxy_1).to receive(:post).and_return(response: nil, exception: 'A confounding error')
+            expect(proxy_2).to receive(:post).with(bounce_matcher).and_return(
+              response: {sending: true}
+            )
+            expect(subject.relay).to be_falsey
+          end
+        end
+
         context 'recipient with environment-specific suffix' do
           before { recipient.sub! '@', '-cc-sis-dev@' }
           include_examples 'successful forwarding'
