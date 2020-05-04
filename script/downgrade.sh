@@ -17,7 +17,7 @@ echo | ${LOGIT}
 echo "------------------------------------------" | ${LOGIT}
 echo "$(date): Downgrading CalCentral to ${LAST_VERSION} on app node: $(hostname -s)" | ${LOGIT}
 
-~/bin/tomcat9-junction.sh stop
+sudo systemctl stop tomcat9@junction
 
 ./script/migrate.sh ${LAST_VERSION}
 
