@@ -35,7 +35,7 @@ echo "------------------------------------------" | ${LOGIT}
 cd ${TOMCAT_DEPLOY} || exit 1
 
 # Start Tomcat, deploying WAR contents in the process
-sudo systemctl start tomcat9@junction | ${LOGIT}
+~/bin/tomcat9-junction.sh start | ${LOGIT}
 
 # Wait 20 seconds before deploy
 sleep 20

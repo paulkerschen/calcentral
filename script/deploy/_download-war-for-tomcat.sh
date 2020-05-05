@@ -69,7 +69,7 @@ set -e
 
 if [ $tomreturn -eq 0 ] ; then
    echo "$(date): Stopping Tomcat..." | ${LOGIT}
-   sudo systemctl stop tomcat9@junction | ${LOGIT} 2>&1
+   ~/bin/tomcat9-junction.sh stop | ${LOGIT} 2>&1
 else
    echo "WARNING: Tomcat not running. No shutdown attempted, will proceed with download" | ${LOGIT}
 fi
