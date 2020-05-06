@@ -271,11 +271,11 @@ describe CanvasCsv::RefreshCampusDataRecent do
 
       it 'calls membership maintainer where SISEDO updates overlap with sections csv' do
         expect(maintainer).to receive(:update_section_enrollment_from_campus)
-          .with('TeacherEnrollment', 'SEC:2014-D-25123', '67890', {})
+          .with('TeacherEnrollment', 'SEC:2014-D-25123', '67890', {'67890' => []})
         expect(maintainer).to receive(:update_section_enrollment_from_campus)
-          .with('StudentEnrollment', 'SEC:2014-D-25123', '12345', {})
+          .with('StudentEnrollment', 'SEC:2014-D-25123', '12345', {'12345' => []})
         expect(maintainer).to receive(:update_section_enrollment_from_campus)
-          .with('StudentEnrollment', 'SEC:2014-D-25124', '12345', {})
+          .with('StudentEnrollment', 'SEC:2014-D-25124', '12345', {'12345' => []})
         subject.generate_csv_files
       end
     end
