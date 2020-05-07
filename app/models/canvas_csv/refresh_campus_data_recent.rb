@@ -104,11 +104,12 @@ module CanvasCsv
             maintainer = CanvasCsv::SiteMembershipsMaintainer.new(
               row['course_id'], [row['section_id']], enrollments_csv, users_csv, @known_users, @sis_user_id_changes
             )
-            previous_enrollments = existing_enrollments.fetch(ccn, {}).select { |e| e['sis_section_id'] == row['section_id'] }
+            previous_enrollments = existing_enrollments.fetch(ccn, {}).fetch(ldap_uid, []).select { |e| e['sis_section_id'] == row['section_id'] }
             next unless (canvas_api_role = determine_canvas_role.call(maintainer, row, status))
-            if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, previous_enrollments)
+            # We set up this odd argument format for parity with internal calls in SiteMembershipsMaintainer.
+            if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, {ldap_uid => previous_enrollments})
               # Remove any conflicting membership with a different role.
-              maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_enrollments.fetch(ldap_uid, []))
+              maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_enrollments)
               @membership_updates_total += 1
             end
           end
