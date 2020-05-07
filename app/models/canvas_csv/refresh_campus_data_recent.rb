@@ -104,11 +104,12 @@ module CanvasCsv
             maintainer = CanvasCsv::SiteMembershipsMaintainer.new(
               row['course_id'], [row['section_id']], enrollments_csv, users_csv, @known_users, @sis_user_id_changes
             )
-            previous_enrollments = existing_enrollments.fetch(ccn, {})
+            previous_enrollments = existing_enrollments.fetch(ccn, {}).fetch(ldap_uid, []).select { |e| e['sis_section_id'] == row['section_id'] }
             next unless (canvas_api_role = determine_canvas_role.call(maintainer, row, status))
-            if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, previous_enrollments)
+            # We set up this odd argument format for parity with internal calls in SiteMembershipsMaintainer.
+            if maintainer.update_section_enrollment_from_campus(canvas_api_role, row['section_id'], ldap_uid, {ldap_uid => previous_enrollments})
               # Remove any conflicting membership with a different role.
-              maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_enrollments.fetch(ldap_uid, []))
+              maintainer.handle_missing_enrollments(ldap_uid, row['section_id'], previous_enrollments)
               @membership_updates_total += 1
             end
           end
@@ -206,14 +207,15 @@ module CanvasCsv
             existing_memberships[campus_section[:ccn]] ||= {}
             existing_memberships[campus_section[:ccn]][uid] ||= []
             translated_role = CanvasCsv::SiteMembershipsMaintainer::CANVAS_API_ROLE_TO_CANVAS_SIS_ROLE.invert[row['role']] || row['role']
-            unless existing_memberships[campus_section[:ccn]][uid].find { |m| m['role'] == translated_role }
+            unless existing_memberships[campus_section[:ccn]][uid].find { |m| m['role'] == translated_role && m['sis_section_id'] == row['section_id']}
               # If we've found a membership for one of our updated UIDs that was already added in a previous job, add the bare minimum
               # required to tell downstream logic in SiteMembershipsMaintainer that it shouldn't try to add the membership again. Since
               # we're looking at a CSV that was created immediately before upload to Instructure, we don't know the SIS import ID (or
               # even that the SIS import succeeded), but a placeholder string indicates that there should have been such an import.
               existing_memberships[campus_section[:ccn]][uid] << {
                 'role' => translated_role,
-                'sis_import_id' => 'Cached on Junction'
+                'sis_import_id' => 'Cached on Junction',
+                'sis_section_id' => row['section_id']
               }
               logger.debug("Adding role #{translated_role}")
             end
