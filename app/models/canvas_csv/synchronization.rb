@@ -5,7 +5,9 @@ module CanvasCsv
     include ClassLogger
 
     self.table_name = 'canvas_synchronization'
+    attr_accessible :last_enrollment_sync
     attr_accessible :last_guest_user_sync
+    attr_accessible :last_instructor_sync
     attr_accessible :latest_term_enrollment_csv_set
 
     # Returns single record used to store synchronization timestamp(s)
@@ -13,7 +15,11 @@ module CanvasCsv
       count = self.count
       if count == 0
         logger.warn 'Creating initial Canvas synchronization record'
-        self.create(:last_guest_user_sync => 1.days.ago.utc)
+        self.create(
+          last_enrollment_sync: 1.days.ago.utc,
+          last_guest_user_sync: 1.days.ago.utc,
+          last_instructor_sync: 1.days.ago.utc,
+        )
       elsif count > 1
         raise RuntimeError, 'Canvas synchronization data has more than one record!'
       end

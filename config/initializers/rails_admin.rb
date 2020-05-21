@@ -11,6 +11,7 @@ class Ability
       can :dashboard, :all
       if user.policy.can_administrate?
         can :manage, [
+          CanvasCsv::Synchronization,
           MailingLists::Member,
           MailingLists::SiteMailingList,
           Oec::CourseCode,
@@ -64,6 +65,7 @@ RailsAdmin.config do |config|
 
   # Include specific models (exclude the others):
   config.included_models = %w(
+    CanvasCsv::Synchronization
     MailingLists::Member MailingLists::SiteMailingList
     Oec::CourseCode
     User::Auth
@@ -85,6 +87,18 @@ RailsAdmin.config do |config|
   #   - This initializer is loaded once at startup (modifications will show up when restarting the application) but all RailsAdmin configuration would stay in one place.
   #   - Models are reloaded at each request in development mode (when modified), which may smooth your RailsAdmin development workflow.
   #
+
+  config.model 'CanvasCsv::Synchronization' do
+    label 'Sync Timestamps'
+  end
+
+  config.model 'MailingLists::Member' do
+    label 'Mailing List Memberships'
+  end
+
+  config.model 'MailingLists::SiteMailingList' do
+    label 'Mailing Lists'
+  end
 
   config.model 'User::Auth' do
     label 'User Authorizations'
@@ -111,14 +125,6 @@ RailsAdmin.config do |config|
         column_width 130
       end
     end
-  end
-
-  config.model 'MailingLists::Member' do
-    label 'Mailing List Memberships'
-  end
-
-  config.model 'MailingLists::SiteMailingList' do
-    label 'Mailing Lists'
   end
 
   config.navigation_static_label = 'Tools'

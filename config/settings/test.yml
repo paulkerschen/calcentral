@@ -34,6 +34,7 @@ cal1card_proxy:
 
 mailgun_proxy:
   fake: true
+  max_retries: 1
 
 webcast_proxy:
   fake: true

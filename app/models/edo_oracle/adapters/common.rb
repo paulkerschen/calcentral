@@ -2,6 +2,7 @@ module EdoOracle
   module Adapters
     module Common
       include ClassLogger
+      extend self
 
       def adapt_course_cntl_num(row)
         row['course_cntl_num'] = row['section_id'].to_s

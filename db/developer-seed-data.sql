@@ -207,5 +207,6 @@ INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_o
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (255, 'RDEV', '', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (256, 'ARCH', '209', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (257, 'LD ARCH', '254', 'REDD', true, '2020-04-09 13:03:07.328247', '2020-04-09 13:03:07.328247');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (258, 'INDONES', '', 'HVSSA', true, '2020-04-28 13:03:07.328247', '2020-04-28 13:03:07.328247');
 
 SELECT pg_catalog.setval('oec_course_codes_id_seq', 257, true);

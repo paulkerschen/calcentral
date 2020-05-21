@@ -22,7 +22,12 @@ module MailingLists
       elsif !member.can_send
         bounce_unauthorized_to_send
       else
-        send_message(member, mailing_list)
+        if send_message(member, mailing_list)
+          true
+        else
+          bounce_failed_to_send
+          false
+        end
       end
     end
 
@@ -40,6 +45,13 @@ module MailingLists
       if @sender_address
         mailing_list.members.find_by email_address: @sender_address.address
       end
+    end
+
+    def bounce_failed_to_send
+      logger.warn "Bouncing undelivered message from #{@sender_address} to mailing list #{@recipient_address}:\n#{@opts}"
+      bounce <<-REASON
+        The following message could not be delivered at this time. Please try resending later.
+      REASON
     end
 
     def bounce_nonexistent
