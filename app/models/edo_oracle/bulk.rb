@@ -150,7 +150,18 @@ module EdoOracle
       safe_query(full_sql, do_not_stringify: true)
     end
 
-    def self.get_intended_majors()
+    def self.get_basic_student_attributes
+      sql = <<-SQL
+        SELECT
+          pi.ldap_uid, TRIM(pi.first_name) AS first_name, TRIM(pi.last_name) as last_name, 
+          pi.email_address, pi.student_id, pi.affiliations, pi.person_type
+        FROM SISEDO.CALCENTRAL_PERSON_INFO_VW pi
+        WHERE pi.affiliations LIKE '%STUDENT%'
+      SQL
+      safe_query(sql, do_not_stringify: true)
+    end
+
+    def self.get_intended_majors
       sql = <<-SQL
         SELECT
           bimv.EMPLID AS sid,
