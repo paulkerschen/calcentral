@@ -126,6 +126,8 @@ module DataLoch
                   # The EDO intended majors view is already narrowed down to active undergraduates and needs no additional
                   # per-SID scoping.
                   EdoOracle::Bulk.get_intended_majors
+                when 'basic_student_attributes'
+                  EdoOracle::Bulk.get_basic_student_attributes                  
                 when 'edw_demographics'
                   EdwOracle::Queries.get_student_ethnicities sids
                 when 'socio_econ'
