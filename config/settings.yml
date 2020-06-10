@@ -318,4 +318,3 @@ features:
   prevent_acting_as_users_from_posting: true
   reauthentication: true
   videos: false
-  webcast_sign_up_on_calcentral: false

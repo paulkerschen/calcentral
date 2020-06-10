@@ -123,43 +123,7 @@ describe Webcast::Merged do
             ]
           }
         ]
-        webcast_eligible = [
-          {
-            classes: [
-              {
-                dept: 'BIO',
-                courseCatalog: '1B',
-                sections: [
-                  {
-                    ccn: '07620',
-                    section_number: '312',
-                    instruction_format: 'LAB',
-                    instructors: [
-                      {
-                        name: 'Paul Duguid',
-                        uid: '18938',
-                        instructor_func: '1'
-                      },
-                      {
-                        name: 'Geoffrey Nunberg',
-                        uid: ldap_uid,
-                        instructor_func: '5'
-                      },
-                      {
-                        name: 'Nikolai Smith',
-                        uid: '1016717',
-                        instructor_func: '4'
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
         expect_any_instance_of(Berkeley::Teaching).to receive(:courses_list_from_ccns).with(2014, 'B', [87432, 76207]).and_return sections_with_recordings
-        expect_any_instance_of(Berkeley::Teaching).to receive(:courses_list_from_ccns).with(2014, 'B', [7620]).and_return webcast_eligible
-        expect_any_instance_of(AuthenticationStatePolicy).to receive(:can_view_webcast_sign_up?).once.and_return true
       end
 
       it 'returns course media' do
@@ -172,29 +136,10 @@ describe Webcast::Merged do
         expect(stat_131[:videos]).to have(31).items
         expect(stat_131[:instructionFormat]).to eq 'LEC'
         expect(stat_131[:sectionNumber]).to eq '101'
-        expect(stat_131[:eligibleForSignUp]).to be_nil
         expect(pb_health_241[:ccn]).to eq '76207'
         expect(pb_health_241[:youTubePlaylist]).to eq '-XXv-cvA_iBacs-uhTVhDhip4sGWoq2C'
         expect(pb_health_241[:videos]).to have(35).items
         expect(feed[:videos]).to match_array(pb_health_241[:videos] + stat_131[:videos])
-
-        # Instructors that can sign up for Webcast
-        eligible_for_sign_up = feed[:eligibleForSignUp]
-        expect(eligible_for_sign_up).to have(1).item
-        expect(eligible_for_sign_up[0][:userCanSignUp]).to be true
-        bio_lab = eligible_for_sign_up[0]
-        expect(bio_lab[:ccn]).to eq '07620'
-        expect(bio_lab[:deptName]).to eq 'BIO'
-        expect(bio_lab[:catalogId]).to eq '1B'
-        expect(bio_lab[:sectionNumber]).to eq '312'
-        expect(bio_lab[:instructionFormat]).to eq 'LAB'
-        sign_up_url = bio_lab[:signUpURL]
-        expect(sign_up_url).to be_url
-        expect(sign_up_url).to include('http://', 'signUp', '2014B7620')
-        instructors = bio_lab[:webcastAuthorizedInstructors]
-        expect(instructors).to have(2).items
-        expect(instructors[0][:name]).to eq 'Paul Duguid'
-        expect(instructors[1][:name]).to eq 'Geoffrey Nunberg'
       end
     end
 
@@ -216,7 +161,6 @@ describe Webcast::Merged do
           }
         ]
         expect_any_instance_of(Berkeley::Teaching).to receive(:courses_list_from_ccns).with(2015, 'B', [51990, 5915]).and_return sections_with_recordings
-        expect_any_instance_of(AuthenticationStatePolicy).to receive(:can_view_webcast_sign_up?).once.and_return false
       end
       it 'returns course media' do
         expect(feed[:videoErrorMessage]).to be_nil
@@ -225,8 +169,6 @@ describe Webcast::Merged do
         section_101 = media[0][:videos]
         expect(section_101).to have(28).items
         expect(section_101).to match_array media[1][:videos]
-        # There are CCNs not yet signed up but this user is NOT authorized to see that information
-        expect(feed[:eligibleForSignUp]).to be_empty
       end
     end
   end
