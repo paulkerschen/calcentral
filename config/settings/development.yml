@@ -26,9 +26,6 @@ mailgun_proxy:
 cal1card_proxy:
   fake: true
 
-webcast_proxy:
-  fake: true
-
 postgres:
   database: <%= ENV['DB_ENV_POSTGRESQL_DB'] || 'calcentral_development' %>
   username: <%= ENV['DB_ENV_POSTGRESQL_USER'] || 'calcentral_development' %>
