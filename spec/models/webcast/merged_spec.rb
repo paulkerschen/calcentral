@@ -15,10 +15,6 @@ describe Webcast::Merged do
         expect_any_instance_of(Berkeley::Teaching).not_to receive :new
       end
       it 'returns system status when authenticated' do
-        expect(feed[:system_status][:isSignUpActive]).to be true
-        # TODO: Bring 'rooms' back in the feed as needed by front-end
-        # expect(feed[:rooms]).to have(26).items
-        # expect(feed[:rooms]['VALLEY LSB']).to contain_exactly('2040', '2050', '2060')
         expect(feed[:media]).to be_nil
         # Verify backwards compatibility
         expect(feed[:videos]).to be_nil
