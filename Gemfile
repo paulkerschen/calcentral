@@ -78,6 +78,7 @@ gem 'link_header', '~> 0.0.7'
 
 # for simplified relational data management
 gem 'rails_admin', '1.3.0'
+gem 'kaminari', '~> 1.2.1'
 
 gem 'bootstrap-sass', '~> 3.4.1'
 
@@ -166,7 +167,7 @@ end
 
 group :development do
   # A better development webserver than WEBrick, especially on JRuby
-  gem 'puma', '~> 3.12.2'
+  gem 'puma', '~> 3.12.6'
 
   # Automatically reloads your browser when 'view' files are modified.
   # https://github.com/guard/guard-livereload
