@@ -164,12 +164,6 @@ hub_term_proxy:
   app_key: ''
   base_url: 'https://apis.berkeley.edu/uat/sis/v1/terms'
 
-webcast_proxy:
-  fake: false
-  base_url: 'https://webcast-cc-staging.ets.berkeley.edu'
-  username: ''
-  password: ''
-
 cal1card_proxy:
   fake: false
   base_url: 'https://webstage.housing.berkeley.edu/c1c/dyn'
@@ -317,5 +311,3 @@ features:
   manage_site_mailing_lists: false
   prevent_acting_as_users_from_posting: true
   reauthentication: true
-  videos: false
-  webcast_sign_up_on_calcentral: false

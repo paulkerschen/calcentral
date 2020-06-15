@@ -290,7 +290,6 @@ describe Canvas::CoursePolicy do
     context 'if canvas user does exist' do
       it 'returns true' do
         expect(subject.is_canvas_course_user?).to be true
-        expect(subject.can_view_webcast_sign_up?).to be false
       end
     end
   end
@@ -324,7 +323,6 @@ describe Canvas::CoursePolicy do
       it 'returns true' do
         allow(Canvas::CourseUser).to receive(:is_course_teacher?).and_return(true)
         expect(subject.is_canvas_course_teacher_or_assistant?).to be true
-        expect(subject.can_view_webcast_sign_up?).to be true
       end
     end
 
@@ -332,7 +330,6 @@ describe Canvas::CoursePolicy do
       it 'returns true' do
         allow(Canvas::CourseUser).to receive(:is_course_teachers_assistant?).and_return(true)
         expect(subject.is_canvas_course_teacher_or_assistant?).to be true
-        expect(subject.can_view_webcast_sign_up?).to be true
       end
     end
 
@@ -361,7 +358,6 @@ describe Canvas::CoursePolicy do
       it 'returns false' do
         allow(Canvas::CourseUser).to receive(:is_course_teacher?).and_return(false)
         expect(subject.is_canvas_course_teacher?).to be false
-        expect(subject.can_view_webcast_sign_up?).to be false
       end
     end
   end
@@ -392,7 +388,6 @@ describe Canvas::CoursePolicy do
       allow(canvas_admins).to receive(:admin_user?).and_return(true)
       allow(Canvas::Admins).to receive(:new).and_return(canvas_admins)
       expect(subject.is_canvas_account_admin?).to be true
-      expect(subject.can_view_webcast_sign_up?).to be true
     end
 
     it 'returns false when user is not a canvas root account administrator' do
@@ -406,14 +401,12 @@ describe Canvas::CoursePolicy do
       before { allow_any_instance_of(Canvas::CourseUser).to receive(:course_user).and_return(nil) }
       it 'returns false' do
         expect(subject.is_canvas_course_user?).to be false
-        expect(subject.can_view_webcast_sign_up?).to be false
       end
     end
 
     context 'if user is a member of the course' do
       it 'returns true' do
         expect(subject.is_canvas_course_user?).to be true
-        expect(subject.can_view_webcast_sign_up?).to be false
       end
     end
   end

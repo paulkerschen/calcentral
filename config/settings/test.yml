@@ -36,9 +36,6 @@ mailgun_proxy:
   fake: true
   max_retries: 1
 
-webcast_proxy:
-  fake: true
-
 # To avoid "Illegal key size" errors on systems which we can't modify (e.g., Travis),
 # lower the security of the encryption algorithm.
 oauth2:
@@ -57,4 +54,3 @@ features:
   cal1card: true
   hub_term_api: true
   videos: true
-  webcast_sign_up_on_calcentral: true

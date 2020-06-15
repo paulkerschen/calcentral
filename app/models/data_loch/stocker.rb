@@ -119,6 +119,10 @@ module DataLoch
               job_paths[job] = DataLoch::Zipper.zip_query_sliced_matches(job, sids) do |subset|
                 EdoOracle::Bulk.get_latest_academic_standing subset
               end
+            elsif job == 'basic_student_attributes'
+              job_paths[job] = DataLoch::Zipper.zip_query_with_batched_results 'basic_student_attributes' do |batch, size|
+                EdoOracle::Bulk.get_batch_basic_student_attributes(batch, size)
+              end
             else
               job_paths[job] = DataLoch::Zipper.zip_query job do
                 case job

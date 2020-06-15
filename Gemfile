@@ -9,7 +9,6 @@ gem 'actionpack-page_caching', '~>1.1.1'
 gem 'actionpack-xml_parser', '~>1.0.1'
 gem 'actionview-encoded_mail_to', '~>1.0.5'
 gem 'activerecord-session_store', '~>1.1.0'
-gem 'activeresource', '~>4.0.0'
 gem 'protected_attributes', '~> 1.0.8'
 gem 'rails-observers', '~>0.1.2'
 gem 'rails-perftest', '~>0.0.5'
@@ -103,6 +102,7 @@ gem 'aws-sdk-s3', '~> 1.8.2'
 
 # for simplified relational data management
 gem 'rails_admin', '1.3.0'
+gem 'kaminari', '~> 1.2.1'
 
 # Closure Compiler Gem for JS compression
 # https://github.com/documentcloud/closure-compiler
@@ -159,7 +159,7 @@ end
 
 group :development do
   # A better development webserver than WEBrick, especially on JRuby
-  gem 'puma', '~> 3.12.2'
+  gem 'puma', '~> 3.12.6'
 
   # Automatically reloads your browser when 'view' files are modified.
   # https://github.com/guard/guard-livereload
