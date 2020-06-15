@@ -1,11 +1,15 @@
 module Webcast
-  class Recordings < Proxy
+  class Recordings
 
-    def get_json_path
-      'warehouse/webcast.json'
+    include CalcentralConfig, ClassLogger, SafeJsonParser
+
+    attr_accessor :fake
+
+    def initialize(fake = false)
+      @fake = fake
     end
 
-    def request_internal
+    def get
       return {} unless Settings.features.videos
 
       recordings = {
@@ -29,5 +33,18 @@ module Webcast
       recordings
     end
 
+    def get_json_data
+      relative_path = 'course_capture/legacy_recordings.json'
+      path = Rails.root.join(@fake ? 'fixtures' : local_dir, relative_path).to_s
+      logger.info "Course Capture legacy JSON file: #{path} (Fake = #{@fake})"
+
+      json_data = safe_json File.read(path)
+
+      if json_data && (json_data.is_a? Hash)
+        json_data
+      else
+        raise Errors::ProxyError.new('Failed to load Course Capture legacy JSON')
+      end
+    end
   end
 end

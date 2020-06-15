@@ -23,4 +23,8 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the refresh script..." | $LOGIT
 
-bundle exec rake canvas:user_accounts_refresh |& $LOGIT
+set -o pipefail
+/usr/bin/flock -n /tmp/canvas-refresh.lock bundle exec rake canvas:user_accounts_refresh |& $LOGIT
+if [[ $? != 0 ]]; then
+  echo "Found a /tmp/canvas-refresh.lock file from another refresh in progress; will not run." |& $LOGIT
+fi

@@ -38,7 +38,6 @@ describe CanvasLti::WebcastRecordings do
 
       it 'contains two sets of recordings' do
         feed = subject.get_feed
-        expect(feed[:system_status][:isSignUpActive]).to be true
         media_by_ccn = feed[:media]
         expect(media_by_ccn).to have(2).items
 
@@ -59,7 +58,6 @@ describe CanvasLti::WebcastRecordings do
       end
       it 'is empty' do
         feed = subject.get_feed
-        expect(feed[:system_status][:isSignUpActive]).to be true
         expect(feed[:media]).to be_nil
       end
     end
