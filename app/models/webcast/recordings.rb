@@ -5,8 +5,8 @@ module Webcast
 
     attr_accessor :fake
 
-    def initialize(fake = false)
-      @fake = fake
+    def initialize(options={})
+      @fake = options[:fake]
     end
 
     def get
