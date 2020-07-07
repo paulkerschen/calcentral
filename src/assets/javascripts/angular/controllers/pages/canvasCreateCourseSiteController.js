@@ -130,7 +130,7 @@ angular.module('calcentral.controllers').controller('CanvasCreateCourseSiteContr
     $scope.confirmFocus = true;
     var firstSection = $scope.selectedSectionsList[0];
     $scope.siteName = firstSection.courseTitle + ' (' + $scope.currentSemesterName + ')';
-    $scope.siteAbbreviation = firstSection.courseCode + ' - ' + firstSection.instruction_format + ' ' + firstSection.section_num;
+    $scope.siteAbbreviation = firstSection.courseCode + ' - ' + firstSection.instruction_format + ' ' + firstSection.section_number;
     apiService.util.iframeScrollToTop();
   };
 
