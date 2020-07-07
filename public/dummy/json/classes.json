@@ -172,7 +172,7 @@
           "ccn": "27606",
           "courseCode": "BIOLOGY 123A",
           "instruction_format": "LEC",
-          "section_label": "LEC 002",
+          "section_label": "LEC 002 (In Person)",
           "section_number": "002",
           "is_primary_section": true,
           "schedules": {
@@ -197,7 +197,7 @@
           "ccn": "27619",
           "courseCode": "BIOLOGY 123A",
           "instruction_format": "LAB",
-          "section_label": "LAB 201",
+          "section_label": "LAB 201 (In Person)",
           "section_number": "201",
           "is_primary_section": false,
           "instructors": [
@@ -219,7 +219,7 @@
           }
         },
         {
-          "section_label": "DIS 008",
+          "section_label": "DIS 008 (In Person)",
           "ccn": "49713",
           "courseCode": "BIOLOGY 123A",
           "instruction_format": "DIS",
@@ -243,7 +243,7 @@
           "ccn": "37606",
           "courseCode": "INTEGBI 183A",
           "instruction_format": "LEC",
-          "section_label": "LEC 002",
+          "section_label": "LEC 002 (In Person)",
           "section_number": "002",
           "scheduledWithCcn": "27606",
           "is_primary_section": true,
@@ -269,7 +269,7 @@
           "ccn": "37619",
           "courseCode": "INTEGBI 183A",
           "instruction_format": "LAB",
-          "section_label": "LAB 201",
+          "section_label": "LAB 201 (In Person)",
           "section_number": "201",
           "scheduledWithCcn": "29713",
           "is_primary_section": false,
@@ -292,7 +292,7 @@
           }
         },
         {
-          "section_label": "DIS 008",
+          "section_label": "DIS 008 (In Person)",
           "ccn": "59713",
           "courseCode": "INTEGBI 183A",
           "instruction_format": "DIS",

@@ -151,8 +151,8 @@ module EdoOracle
         section_data = {
           ccn: row['section_id'].to_s,
           instruction_format: row['instruction_format'],
+          instruction_mode: row['instruction_mode'],
           is_primary_section: to_boolean(row['primary']),
-          section_label: "#{row['instruction_format']} #{row['section_num']}",
           section_number: row['section_num'],
           topic_description: row['topic_description'],
         }
@@ -164,6 +164,16 @@ module EdoOracle
         else
           section_data[:associated_primary_id] = row['primary_associated_section_id']
         end
+
+        instruction_mode_description = case row['instruction_mode']
+          when 'EF' then 'Flexible'
+          when 'EH' then 'Hybrid'
+          when 'ER' then 'Remote'
+          when 'P' then 'In Person'
+          when 'W' then 'Online'
+          else row['instruction_mode']
+        end
+        section_data[:section_label] = "#{row['instruction_format']} #{row['section_num']} (#{instruction_mode_description})"
 
         if row.include? 'enroll_status'
           # Grading and waitlist data relevant to students.

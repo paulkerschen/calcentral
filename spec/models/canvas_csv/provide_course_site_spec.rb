@@ -242,9 +242,9 @@ describe CanvasCsv::ProvideCourseSite do
           :title=>'The Beauty and Joy of Computing',
           :role=>'Instructor',
           :sections=>[
-            {:ccn=>'21136', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 102', :section_number=>'102', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 8:00A-9:00A'}]},
+            {:ccn=>'21136', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 102 (In Person)', :section_number=>'102', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 8:00A-9:00A'}]},
               :instructors=>[{:name=>'Seth Mark Beckley', :uid=>'937403'}]},
-            {:ccn=>'21204', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 109', :section_number=>'109', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 12:00P-1:00P'}]},
+            {:ccn=>'21204', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 109 (In Person)', :section_number=>'109', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 12:00P-1:00P'}]},
               :instructors=>[{:name=>'Seth Mark Beckley', :uid=>'937403'}]}
           ]
         }
@@ -333,7 +333,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Supervised Independent Group Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => rand(99999).to_s, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015', :section_number => '015' }
+            { :ccn => rand(99999).to_s, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015 (Hybrid)', :section_number => '015' }
           ]
         }
       ]
@@ -410,12 +410,12 @@ describe CanvasCsv::ProvideCourseSite do
             instruction_format: 'GRP',
             instructors: [{uid: uid, role: 'PI'}],
             is_primary_section: true,
-            section_label: 'GRP 015',
+            section_label: 'GRP 015 (Hybrid)',
             section_number: '015'
           }]
         }
       ]
-      section_definitions = [{'name' => 'MEC ENG 98 GRP 015', 'course_id' => 'CRS:MEC_ENG-98-2013-D', 'section_id' => 'SEC:2013-D-12345', 'status' => 'active'}]
+      section_definitions = [{'name' => 'MEC ENG 98 GRP 015 (Hybrid)', 'course_id' => 'CRS:MEC_ENG-98-2013-D', 'section_id' => 'SEC:2013-D-12345', 'status' => 'active'}]
       allow(subject).to receive(:generate_section_definitions).and_return(section_definitions)
     end
 
@@ -439,7 +439,7 @@ describe CanvasCsv::ProvideCourseSite do
       section_definitions = subject.section_definitions
       expect(section_definitions).to be_an_instance_of Array
       expect(section_definitions[0]['status']).to eq 'active'
-      expect(section_definitions[0]['name']).to eq 'MEC ENG 98 GRP 015'
+      expect(section_definitions[0]['name']).to eq 'MEC ENG 98 GRP 015 (Hybrid)'
       expect(section_definitions[0]['course_id']).to eq 'CRS:MEC_ENG-98-2013-D'
       expect(section_definitions[0]['section_id']).to eq 'SEC:2013-D-12345'
     end
@@ -484,8 +484,8 @@ describe CanvasCsv::ProvideCourseSite do
     let(:canvas_sis_import_proxy) { double }
     before do
       @section_rows = [
-        {'section_id'=>'SEC:2013-D-26178', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47A SLF 001', 'status'=>'active'},
-        {'section_id'=>'SEC:2013-D-26181', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47B SLF 001', 'status'=>'active'}
+        {'section_id'=>'SEC:2013-D-26178', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47A SLF 001 (Remote)', 'status'=>'active'},
+        {'section_id'=>'SEC:2013-D-26181', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47B SLF 001 (Remote)', 'status'=>'active'}
       ]
       allow(canvas_sis_import_proxy).to receive(:import_sections).and_return(true)
       allow(subject).to receive(:make_sections_csv).and_return('/csv/filepath')
@@ -754,8 +754,8 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Introduction to Computer Programming for Scientists and Engineers',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 002', :section_number => '002' },
-            { :ccn => @selected_ccns[2], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102', :section_number => '102' }
+            { :ccn => random_ccn, :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 002 (In Person)', :section_number => '002' },
+            { :ccn => @selected_ccns[2], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102 (In Person)', :section_number => '102' }
           ]
         },
         {
@@ -765,7 +765,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Supervised Independent Group Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015', :section_number => '015' }
+            { :ccn => random_ccn, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015 (Hybrid)', :section_number => '015' }
           ]
         },
         {
@@ -775,7 +775,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Honors Undergraduate Research',
           :role => 'Instructor',
           :sections => [
-            { :ccn => @selected_ccns[1], :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 015', :section_number => '015' }
+            { :ccn => @selected_ccns[1], :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 015 (In Person)', :section_number => '015' }
           ]
         },
         {
@@ -785,7 +785,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Engineering Field Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 024', :section_number => '024' }
+            { :ccn => random_ccn, :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 024 (In Person)', :section_number => '024' }
           ]
         }
       ]
@@ -812,11 +812,11 @@ describe CanvasCsv::ProvideCourseSite do
         expect(filtered[0][:course_code]).to eq 'ENGIN 7'
         expect(filtered[0][:dept]).to eq 'COMPSCI'
         expect(filtered[0][:sections].length).to eq 1
-        expect(filtered[0][:sections][0][:section_label]).to eq 'DIS 102'
+        expect(filtered[0][:sections][0][:section_label]).to eq 'DIS 102 (In Person)'
         expect(filtered[1][:course_code]).to eq 'MEC ENG H194'
         expect(filtered[1][:dept]).to eq 'MEC ENG'
         expect(filtered[1][:sections].length).to eq 1
-        expect(filtered[1][:sections][0][:section_label]).to eq 'IND 015'
+        expect(filtered[1][:sections][0][:section_label]).to eq 'IND 015 (In Person)'
       end
     end
 
@@ -911,7 +911,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: lecture_instructor_id, role: 'PI'}
           ],
           is_primary_section: true,
-          section_label: 'LEC 002',
+          section_label: 'LEC 002 (In Person)',
           section_number: '002'
         },
         {
@@ -923,7 +923,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: discussion_instructor_2_id, role: 'PI'}
           ],
           is_primary_section: false,
-          section_label: 'DIS 102',
+          section_label: 'DIS 102 (In Person)',
           section_number: '102'
         }]
       },
@@ -940,7 +940,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: group_instructor_id, role: 'PI'}
           ],
           is_primary_section: true,
-          section_label: 'GRP 015',
+          section_label: 'GRP 015 (Hybrid)',
           section_number: '015'
         }]
       },
@@ -958,7 +958,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: administrative_proxy_id, role: 'APRX'}
           ],
           is_primary_section: true,
-          section_label: 'IND 015',
+          section_label: 'IND 015 (In Person)',
           section_number: '015'
         }]
       }]
@@ -989,10 +989,10 @@ describe CanvasCsv::ProvideCourseSite do
         expect(campus_section[:term_cd]).to eq term_cd
         expect(ccns.include?(campus_section[:ccn])).to be_truthy
       end
-      expect(canvas_sections_list[0]['name']).to eq 'ENGIN 7 LEC 002'
-      expect(canvas_sections_list[1]['name']).to eq 'ENGIN 7 DIS 102'
-      expect(canvas_sections_list[2]['name']).to eq 'MEC ENG 98 GRP 015'
-      expect(canvas_sections_list[3]['name']).to eq 'CHEM 196 IND 015'
+      expect(canvas_sections_list[0]['name']).to eq 'ENGIN 7 LEC 002 (In Person)'
+      expect(canvas_sections_list[1]['name']).to eq 'ENGIN 7 DIS 102 (In Person)'
+      expect(canvas_sections_list[2]['name']).to eq 'MEC ENG 98 GRP 015 (Hybrid)'
+      expect(canvas_sections_list[3]['name']).to eq 'CHEM 196 IND 015 (In Person)'
     end
 
     context 'site creator is explicit instructor for multiple sections' do
@@ -1025,7 +1025,7 @@ describe CanvasCsv::ProvideCourseSite do
                  :instructors => [{uid: uid, role: 'PI'}],
                  :instruction_format => 'DIS',
                  :is_primary_section => false,
-                 :section_label => 'DIS 102',
+                 :section_label => 'DIS 102 (In Person)',
                  :section_number => '102'}]}
       ]
       sis_course_id = 'CRS:ENGIN-7-2013-D-8383'
@@ -1067,7 +1067,7 @@ describe CanvasCsv::ProvideCourseSite do
         expect(explicitly_instructed).to have(1).item
         expect(explicitly_instructed.first).to include({
           'course_id' => sis_course_id,
-          'name' => 'ENGIN 7 DIS 102',
+          'name' => 'ENGIN 7 DIS 102 (In Person)',
           'status' => 'active'
         })
       end

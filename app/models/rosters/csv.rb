@@ -21,9 +21,8 @@ module Rosters
 
     def section_label
       section_label = nil
-      if @section_id.present?
-        matching_section = @sections.find {|sec| sec.try(:[], :ccn) == @section_id }
-        section_label = matching_section.try(:[], :section_label).to_s.gsub(/\s+/, '-')
+      if @section_id.present? && (matching_section = @sections.find {|sec| sec.try(:[], :ccn) == @section_id })
+        section_label = [matching_section[:instruction_format], matching_section[:section_number]].join '-'
       end
       section_label
     end
