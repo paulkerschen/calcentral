@@ -13,7 +13,7 @@ describe Rosters::Csv do
         ccn: '24291',
         course_name: 'ECON 100B',
         name: 'ECON 100B LEC 001',
-        section_label: primary_section_label,
+        section_label: 'LEC 001 (In Person)',
         section_number: '001',
         instruction_format: 'LEC',
         locations: ['1 Pimentel'],
@@ -25,7 +25,7 @@ describe Rosters::Csv do
         ccn: '22050',
         course_name: 'MATH 100B',
         name: 'MATH 100B LEC 001',
-        section_label: primary_section_label,
+        section_label: 'LEC 001 (Remote)',
         section_number: '001',
         instruction_format: 'LEC',
         locations: ['1 Pimentel'],
@@ -37,7 +37,7 @@ describe Rosters::Csv do
         ccn: '24292',
         course_name: 'ECON 100B',
         name: 'ECON 100B DIS 110',
-        section_label: 'DIS 110',
+        section_label: 'DIS 110 (In Person)',
         section_number: '110',
         instruction_format: 'DIS',
         locations: ['289 Cory'],
@@ -49,7 +49,7 @@ describe Rosters::Csv do
         ccn: '26893',
         course_name: 'MATH 100B',
         name: 'MATH 100B DIS 115',
-        section_label: 'DIS 115',
+        section_label: 'DIS 115 (Remote)',
         section_number: '115',
         instruction_format: 'DIS',
         locations: ['B56 Hildebrand'],
@@ -81,7 +81,7 @@ describe Rosters::Csv do
             ccn: '24291',
             course_name: 'ECON 100B',
             name: 'ECON 100B LEC 001',
-            section_label: primary_section_label,
+            section_label: 'LEC 001 (In Person)',
             section_number: '001',
             instruction_format: 'LEC',
             locations: ['1 Pimentel'],
@@ -93,7 +93,7 @@ describe Rosters::Csv do
             ccn: '24292',
             course_name: 'ECON 100B',
             name: 'ECON 100B DIS 110',
-            section_label: 'DIS 110',
+            section_label: 'DIS 110 (In Person)',
             section_number: '110',
             instruction_format: 'DIS',
             locations: ['289 Cory'],
@@ -136,7 +136,7 @@ describe Rosters::Csv do
             ccn: '22050',
             course_name: 'MATH 100B',
             name: 'MATH 100B LEC 001',
-            section_label: primary_section_label,
+            section_label: 'LEC 001 (Remote)',
             section_number: '001',
             instruction_format: 'LEC',
             locations: ['1 Pimentel'],
@@ -148,7 +148,7 @@ describe Rosters::Csv do
             ccn: '26893',
             course_name: 'MATH 100B',
             name: 'MATH 100B DIS 115',
-            section_label: 'DIS 115',
+            section_label: 'DIS 115 (Remote)',
             section_number: '115',
             instruction_format: 'DIS',
             locations: ['B56 Hildebrand'],
@@ -173,7 +173,6 @@ describe Rosters::Csv do
       }
     ]
   end
-  let(:primary_section_label) { 'LEC 001' }
   let(:campus_course_id) { 'econ-100b-2019-B' }
   let(:section_id) { nil }
   let(:enroll_option) { 'all' }
@@ -190,14 +189,8 @@ describe Rosters::Csv do
     let(:filename) { subject.get_filename }
     context 'when section id is present' do
       let(:section_id) { '22050' }
-      it 'returns filename with section label' do
+      it 'returns filename with instruction format and section number' do
         expect(filename).to eq 'econ-100b-2019-B_LEC-001_rosters'
-      end
-      context 'when section label contains multiple spaces' do
-        let(:primary_section_label) { 'LEC   001' }
-        it 'returns filename with underscores in section label' do
-          expect(filename).to eq 'econ-100b-2019-B_LEC-001_rosters'
-        end
       end
     end
 
