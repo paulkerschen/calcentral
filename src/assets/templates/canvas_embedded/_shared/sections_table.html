@@ -42,7 +42,27 @@
         <td class="bc-template-sections-table-cell-section-action-option" data-ng-if="listMode !== 'createCourseForm' && listMode !== 'preview'">
           <!-- Current Staging Actions -->
           <div data-ng-if="listMode === 'currentStaging' && section.isCourseSection">
-            <button class="bc-canvas-button bc-template-sections-table-button bc-canvas-no-decoration" data-ng-click="stageDeleteAction({section: section})" aria-label="Include '{{section.courseCode}} {{section.section_label}}' in the list of sections to be deleted from course site">Delete</button>
+            <button
+              data-ng-if="section.nameDiscrepancy && section.stagedState !== 'update'"
+              class="bc-canvas-button bc-template-sections-table-button bc-canvas-no-decoration"
+              data-ng-click="stageUpdateAction({section: section})"
+              aria-label="Include '{{section.courseCode}} {{section.section_label}}' in the list of sections to be updated">
+              Update
+            </button>
+            <button
+              data-ng-if="section.stagedState === 'update'"
+              class="bc-canvas-button bc-template-sections-table-button bc-template-sections-table-button-undo-delete bc-canvas-no-decoration"
+              data-ng-click="unstageAction({section: section})"
+              aria-label="Remove '{{section.courseCode}} {{section.section_label}}' from list of sections to be updated from course site">
+              Undo Update
+            </button>
+            <button
+              data-ng-if="section.stagedState !== 'update'"
+              class="bc-canvas-button bc-template-sections-table-button bc-canvas-no-decoration"
+              data-ng-click="stageDeleteAction({section: section})"
+              aria-label="Include '{{section.courseCode}} {{section.section_label}}' in the list of sections to be deleted from course site">
+              Delete
+            </button>
           </div>
 
           <div data-ng-if="listMode === 'currentStaging' && !section.isCourseSection">
@@ -62,6 +82,14 @@
             <button class="bc-canvas-button bc-canvas-button-primary bc-template-sections-table-button bc-canvas-no-decoration" data-ng-class="{'bc-template-sections-table-button-undo-add':(section.stagedState === 'add')}" data-ng-click="stageAddAction({section: section})" aria-label="Include '{{section.courseCode}} {{section.section_label}}' in the list of sections to be added to course site">
               Add
             </button>
+          </div>
+        </td>
+      </tr>
+      <tr data-ng-if="listMode === 'currentStaging' && section.nameDiscrepancy && section.stagedState !== 'update'" data-ng-class="rowClassLogic({listMode: listMode, section: section})">
+        <td colspan="7" class="bc-template-sections-table-sites-cell">
+          <div class="bc-template-sections-table-sites-container">
+            <i class="fa fa-info-circle bc-template-sections-table-sited-icon"></i>
+            The section name in bCourses no longer matches the Student Information System. Use the "Update" button to update your bCourses section name to match SIS.
           </div>
         </td>
       </tr>
