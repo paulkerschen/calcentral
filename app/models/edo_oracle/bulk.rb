@@ -59,7 +59,8 @@ module EdoOracle
           mtg."startDate" AS meeting_start_date,
           mtg."endDate" AS meeting_end_date,
           TRIM(crs."title") AS course_title,
-          cls."allowedUnitsMaximum" AS allowed_units
+          cls."allowedUnitsMaximum" AS allowed_units,
+          sec."instructionMode-code" AS instruction_mode
         FROM
           SISEDO.CLASSSECTIONALLV01_MVW sec
         JOIN SISEDO.EXTENDED_TERM_MVW term1 ON (

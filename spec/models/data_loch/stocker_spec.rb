@@ -15,12 +15,13 @@ describe DataLoch::Stocker do
     let(:courses_edo_oracle_columns) do
       %w(section_id term_id print_in_schedule_of_classes primary instruction_format section_num course_display_name
          enrollment_count instructor_uid instructor_name instructor_role_code location
-         meeting_days meeting_start_time meeting_end_time meeting_start_date meeting_end_date)
+         meeting_days meeting_start_time meeting_end_time meeting_start_date meeting_end_date
+         course_title allowed_units instruction_mode)
     end
     let(:courses_edo_oracle_rows) do
       [
-        ['65536', 2182, 'Y', true, 'LEC', '001', 'SCANDIN 60', 40.0, 234567, 'Snorri Sturluson', 'PI', 'Dwinelle 109', 'MOWEFR', '13:00', '13:59', '2018-01-16 00:00:00 UTC', '2018-05-04 00:00:00 UTC', 'Battling with Blubber'],
-        ['65537', 2182, 'Y', true, 'LEC', '001', 'SLAVIC 46', 13.0, 345678, 'Vladimir Propp', 'PI', 'Dwinelle 242', 'MOWEFR', '10:00', '10:59', '2018-01-16 00:00:00 UTC', '2018-05-04 00:00:00 UTC', 'The Gogolian Slap']
+        ['65536', 2182, 'Y', true, 'LEC', '001', 'SCANDIN 60', 40.0, 234567, 'Snorri Sturluson', 'PI', 'Dwinelle 109', 'MOWEFR', '13:00', '13:59', '2018-01-16 00:00:00 UTC', '2018-05-04 00:00:00 UTC', 'Battling with Blubber', 5.0, 'EH'],
+        ['65537', 2182, 'Y', true, 'LEC', '001', 'SLAVIC 46', 13.0, 345678, 'Vladimir Propp', 'PI', 'Dwinelle 242', 'MOWEFR', '10:00', '10:59', '2018-01-16 00:00:00 UTC', '2018-05-04 00:00:00 UTC', 'The Gogolian Slap', 3.0, 'P']
       ]
     end
     let(:enrollments_edo_oracle_columns) do
@@ -53,8 +54,8 @@ describe DataLoch::Stocker do
         subject.upload_term_data([term_code], ['s3_test'], is_historical)
         csv_rows = unzipped("courses-#{term_code}")
         expect(csv_rows).to have(2).items
-        expect(csv_rows[0]).to eq '65536,2182,Y,true,LEC,001,SCANDIN 60,40.0,234567,Snorri Sturluson,PI,Dwinelle 109,MOWEFR,13:00,13:59,2018-01-16 00:00:00 UTC,2018-05-04 00:00:00 UTC,Battling with Blubber'
-        expect(csv_rows[1]).to eq '65537,2182,Y,true,LEC,001,SLAVIC 46,13.0,345678,Vladimir Propp,PI,Dwinelle 242,MOWEFR,10:00,10:59,2018-01-16 00:00:00 UTC,2018-05-04 00:00:00 UTC,The Gogolian Slap'
+        expect(csv_rows[0]).to eq '65536,2182,Y,true,LEC,001,SCANDIN 60,40.0,234567,Snorri Sturluson,PI,Dwinelle 109,MOWEFR,13:00,13:59,2018-01-16 00:00:00 UTC,2018-05-04 00:00:00 UTC,Battling with Blubber,5.0,EH'
+        expect(csv_rows[1]).to eq '65537,2182,Y,true,LEC,001,SLAVIC 46,13.0,345678,Vladimir Propp,PI,Dwinelle 242,MOWEFR,10:00,10:59,2018-01-16 00:00:00 UTC,2018-05-04 00:00:00 UTC,The Gogolian Slap,3.0,P'
         csv_rows = unzipped("enrollments-#{term_code}")
         expect(csv_rows).to have(4).items
         expect(csv_rows[0]).to eq '65536,2182,1234567,87654321,E,,4.0,A-,14.8,GRD,'
