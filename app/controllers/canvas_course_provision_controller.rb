@@ -49,10 +49,10 @@ class CanvasCourseProvisionController < ApplicationController
     render json: feed.to_json
   end
 
-  # POST /api/academics/canvas/course_provision/edit_sections/:canvas_course_id?ccns_to_add=:ccns_to_add&ccns_to_remove=:ccns_to_remove
+  # POST /api/academics/canvas/course_provision/edit_sections/:canvas_course_id?ccns_to_add=:ccns_to_add&ccns_to_remove=:ccns_to_remove&ccns_to_update=:ccns_to_update
   def edit_sections
     worker = CanvasLti::CourseProvision.new(session['user_id'], canvas_course_id: canvas_course_id)
-    job_id = worker.edit_sections(params['ccns_to_remove'], params['ccns_to_add'])
+    job_id = worker.edit_sections(params['ccns_to_remove'], params['ccns_to_add'], params['ccns_to_update'])
     render json: { job_request_status: 'Success', job_id: job_id}.to_json
   end
 

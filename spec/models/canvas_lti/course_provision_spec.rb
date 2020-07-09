@@ -222,6 +222,7 @@ describe CanvasLti::CourseProvision do
   describe '#edit_sections' do
     let(:ccns_to_remove) { [random_ccn] }
     let(:ccns_to_add) { [random_ccn] }
+    let(:ccns_to_update) { [random_ccn] }
     subject { CanvasLti::CourseProvision.new(instructor_id, canvas_course_id: canvas_course_id) }
     context 'when user is authorized' do
       let(:cpcs) { instance_double CanvasCsv::ProvideCourseSite }
@@ -234,7 +235,7 @@ describe CanvasLti::CourseProvision do
         expect(cpcs).to receive(:background_job_id).ordered.and_return(background_job_id)
       end
       it 'saves the state of the job' do
-        expect(subject.edit_sections(ccns_to_remove, ccns_to_add)).to eq background_job_id
+        expect(subject.edit_sections(ccns_to_remove, ccns_to_add, ccns_to_update)).to eq background_job_id
       end
     end
   end
