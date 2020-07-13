@@ -55,28 +55,34 @@ module CanvasCsv
       raise error
     end
 
-    def bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+    def bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
       total_steps = 3 # Section CSV import, clearing course site cache
-      total_steps += 2 if ccns_to_add.present?
+      total_steps += 1 if ccns_to_add.present? || ccns_to_update.present?
+      total_steps += 1 if ccns_to_add.present?
       total_steps += 1 if ccns_to_remove.present?
       background_job_initialize(job_type: 'edit_sections', total_steps: total_steps)
-      background.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+      background.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
     end
 
-    def edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+    def edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
       logger.warn "Edit course site sections job started. Job state updated in cache key #{background_job_id}"
       canvas_course_id = canvas_course_info[:canvasCourseId]
       @import_data['sis_course_id'] = canvas_course_info[:sisCourseId]
       @import_data['term'] = find_term(yr: canvas_course_info[:term][:term_yr], cd: canvas_course_info[:term][:term_cd])
       raise RuntimeError, "Course site #{canvas_course_id} does not match a current term" if @import_data['term'].nil?
       @import_data['term_slug'] = @import_data['term'][:slug]
-      @import_data['ccns'] = ccns_to_add
-      if ccns_to_add.present?
+      @import_data['ccns'] = ((ccns_to_add || []) + (ccns_to_update || [])).uniq
+      if @import_data['ccns'].present?
         prepare_users_courses_list
-        prepare_section_definitions
+      end
+      if ccns_to_add.present? 
+        prepare_section_definitions(ccns_to_add)
       end
       if ccns_to_remove.present?
         prepare_section_deletions(canvas_course_info, ccns_to_remove)
+      end
+      if ccns_to_update.present?
+        prepare_section_updates(canvas_course_info, ccns_to_update)
       end
       raise RuntimeError, 'No changes to sections requested' if section_definitions.blank?
       import_sections(section_definitions)
@@ -110,6 +116,30 @@ module CanvasCsv
             'name' => s['name'],
             'status' => 'deleted'
           }
+        end
+      end
+    end
+
+    def prepare_section_updates(course_info, ccns_to_update)
+      sis_course_id = course_info[:sisCourseId]
+      sections_to_update = course_info[:officialSections].select do |section|
+        (section[:term_yr] == course_info[:term][:term_yr]) &&
+          (section[:term_cd] == course_info[:term][:term_cd]) &&
+          ccns_to_update.include?(section[:ccn])
+      end
+      if sections_to_update.present?
+        @import_data['courses'].each do |campus_course|
+          campus_course[:sections].each do |campus_section|
+            canvas_section = sections_to_update.find { |s| s[:ccn] == campus_section[:ccn] }
+            if canvas_section
+              @section_definitions << {
+                'section_id' => canvas_section['sis_section_id'],
+                'course_id' => canvas_section['sis_course_id'],
+                'name' => "#{campus_section[:courseCode]} #{campus_section[:section_label]}",
+                'status' => 'active'
+              }
+            end
+          end
         end
       end
     end
@@ -163,14 +193,14 @@ module CanvasCsv
       background_job_complete_step 'Prepared course site definition'
     end
 
-    def prepare_section_definitions
+    def prepare_section_definitions(ccn_whitelist = nil)
       raise RuntimeError, 'Unable to prepare section definitions. Term data is not present.' if @import_data['term'].blank?
       raise RuntimeError, 'Unable to prepare section definitions. SIS Course ID is not present.' if @import_data['sis_course_id'].blank?
       raise RuntimeError, 'Unable to prepare section definitions. Courses list is not present.' if @import_data['courses'].blank?
 
       # Add Canvas course sections to match the source sections.
       # We could use the "Create course section" API, but to reduce API usage we instead use CSV import.
-      @section_definitions = generate_section_definitions(@import_data['term'][:yr], @import_data['term'][:cd], @import_data['sis_course_id'], @import_data['courses'])
+      @section_definitions = generate_section_definitions(@import_data['term'][:yr], @import_data['term'][:cd], @import_data['sis_course_id'], @import_data['courses'], ccn_whitelist)
       background_job_complete_step 'Prepared section definitions'
     end
 
@@ -364,7 +394,7 @@ module CanvasCsv
       end
     end
 
-    def generate_section_definitions(term_yr, term_cd, sis_course_id, campus_section_data)
+    def generate_section_definitions(term_yr, term_cd, sis_course_id, campus_section_data, ccn_whitelist)
       raise ArgumentError, "'campus_section_data' argument is empty" if campus_section_data.empty?
       existence_proxy = Canvas::ExistenceCheck.new
       section_definitions = []
@@ -372,6 +402,7 @@ module CanvasCsv
       @import_data['section_roles'] = {}
       campus_section_data.each do |course|
         course[:sections].each do |section|
+          next unless ccn_whitelist.nil? || ccn_whitelist.include?(section[:ccn])
           if (sis_section_id = generate_unique_sis_section_id(existence_proxy, section[:ccn], term_yr, term_cd))
             section_definition = {
               'section_id' => sis_section_id,

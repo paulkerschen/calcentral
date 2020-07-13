@@ -43,6 +43,7 @@ describe EdoOracle::UserCourses::Base do
             'grade' => 'B',
             'grading_basis' => 'GRD',
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'primary_associated_section_id' => '44203',
             'section_id' => '44203',
@@ -56,6 +57,7 @@ describe EdoOracle::UserCourses::Base do
             'grade' => nil,
             'grading_basis' => 'PNP',
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'primary_associated_section_id' => '44206',
             'section_id' => '44206',
@@ -69,6 +71,7 @@ describe EdoOracle::UserCourses::Base do
             'grade' => nil,
             'grading_basis' => nil,
             'instruction_format' => 'DIS',
+            'instruction_mode' => 'P',
             'primary' => 'false',
             'primary_associated_section_id' => '44201',
             'section_id' => '44214',
@@ -82,6 +85,7 @@ describe EdoOracle::UserCourses::Base do
             'grade' => nil,
             'grading_basis' => nil,
             'instruction_format' => 'DIS',
+            'instruction_mode' => 'P',
             'primary' => 'false',
             'primary_associated_section_id' => '44203',
             'section_id' => '44214',
@@ -136,7 +140,7 @@ describe EdoOracle::UserCourses::Base do
         [course[:sections], enrollment_query_results[0..2]].transpose.each do |section, enrollment|
           expect(section[:ccn]).to eq enrollment['section_id']
           expect(section[:instruction_format]).to eq enrollment['instruction_format']
-          expect(section[:section_label]).to eq "#{enrollment['instruction_format']} #{enrollment['section_num']}"
+          expect(section[:section_label]).to eq "#{enrollment['instruction_format']} #{enrollment['section_num']} (In Person)"
           expect(section[:section_number]).to eq enrollment['section_num']
           if (enrollment['primary'] == 'true')
             expect(section[:grading][:gradingBasis]).to eq enrollment['grading_basis']
@@ -199,6 +203,7 @@ describe EdoOracle::UserCourses::Base do
             'dept_code' => 'MUSIC',
             'enroll_limit' => 40,
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'section_display_name' => 'MUSIC 99C',
             'section_id' => '44807',
@@ -218,6 +223,7 @@ describe EdoOracle::UserCourses::Base do
             'dept_code' => 'MUSIC',
             'enroll_limit' => 35,
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'section_display_name' => 'MUSIC C105',
             'section_id' => '45807',
@@ -237,6 +243,7 @@ describe EdoOracle::UserCourses::Base do
             'dept_code' => 'MECENG',
             'enroll_limit' => 35,
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'section_display_name' => 'MECENG C112',
             'section_id' => '54807',
@@ -247,6 +254,7 @@ describe EdoOracle::UserCourses::Base do
             'cs_course_id' => '10001',
             'enroll_limit' => 23,
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'section_id' => '44206',
             'section_num' => '001',
@@ -256,6 +264,7 @@ describe EdoOracle::UserCourses::Base do
             'cs_course_id' => '10001',
             'enroll_limit' => 24,
             'instruction_format' => 'LEC',
+            'instruction_mode' => 'P',
             'primary' => 'true',
             'section_id' => '44207',
             'section_num' => '002',
@@ -269,6 +278,7 @@ describe EdoOracle::UserCourses::Base do
             'cs_course_id' => '10001',
             'enroll_limit' => 20,
             'instruction_format' => 'DIS',
+            'instruction_mode' => 'P',
             'primary' => 'false',
             'section_id' => '44210',
             'section_num' => '201',
@@ -278,6 +288,7 @@ describe EdoOracle::UserCourses::Base do
             'cs_course_id' => '10001',
             'enroll_limit' => 20,
             'instruction_format' => 'DIS',
+            'instruction_mode' => 'P',
             'primary' => 'false',
             'section_id' => '44211',
             'section_num' => '202',
@@ -287,6 +298,7 @@ describe EdoOracle::UserCourses::Base do
             'cs_course_id' => '10001',
             'enroll_limit' => 20,
             'instruction_format' => 'DIS',
+            'instruction_mode' => 'P',
             'primary' => 'false',
             'section_id' => '44211',
             'section_num' => '202',

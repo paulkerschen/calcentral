@@ -7,7 +7,7 @@ describe CanvasLti::CourseProvision do
   let(:teaching_ccn) { random_ccn }
   let(:official_sections) { [{:term_yr=>'2013', :term_cd=>'D', :ccn=>teaching_ccn}] }
   let(:superuser_id) { rand(99999).to_s }
-  let(:teaching_section) { { :ccn => teaching_ccn, :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102', :section_number => '102' } }
+  let(:teaching_section) { { :ccn => teaching_ccn, :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102 (Flexible)', :section_number => '102' } }
   let(:teaching_class) do
     {
       :slug => 'engin-7',
@@ -56,8 +56,8 @@ describe CanvasLti::CourseProvision do
             :slug => 'engin-7',
             :title => 'Introduction to Computer Programming for Scientists and Engineers',
             :sections => [
-              { :ccn => by_ccns[0], :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 003', :section_number => '003' },
-              { :ccn => by_ccns[1], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 103', :section_number => '103' }
+              { :ccn => by_ccns[0], :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 003 (Flexible)', :section_number => '003' },
+              { :ccn => by_ccns[1], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 103 (Flexible)', :section_number => '103' }
             ]
           }
         ]
@@ -222,6 +222,7 @@ describe CanvasLti::CourseProvision do
   describe '#edit_sections' do
     let(:ccns_to_remove) { [random_ccn] }
     let(:ccns_to_add) { [random_ccn] }
+    let(:ccns_to_update) { [random_ccn] }
     subject { CanvasLti::CourseProvision.new(instructor_id, canvas_course_id: canvas_course_id) }
     context 'when user is authorized' do
       let(:cpcs) { instance_double CanvasCsv::ProvideCourseSite }
@@ -234,7 +235,7 @@ describe CanvasLti::CourseProvision do
         expect(cpcs).to receive(:background_job_id).ordered.and_return(background_job_id)
       end
       it 'saves the state of the job' do
-        expect(subject.edit_sections(ccns_to_remove, ccns_to_add)).to eq background_job_id
+        expect(subject.edit_sections(ccns_to_remove, ccns_to_add, ccns_to_update)).to eq background_job_id
       end
     end
   end
@@ -296,12 +297,12 @@ describe CanvasLti::CourseProvision do
 
     context 'non-teaching section in existing course' do
       let(:non_teaching_sections_list) {[
-        {ccn: random_ccn, is_primary_section: true, section_label: 'LEC 001'},
-        {ccn: random_ccn, is_primary_section: true, section_label: 'LEC 002'},
-        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 101'},
-        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 103'},
-        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 201'},
-        {ccn: random_ccn, is_primary_section: false, section_label: 'LAB 100'},
+        {ccn: random_ccn, is_primary_section: true, section_label: 'LEC 001 (Flexible)'},
+        {ccn: random_ccn, is_primary_section: true, section_label: 'LEC 002 (Remote)'},
+        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 101 (Flexible)'},
+        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 103 (Flexible)'},
+        {ccn: random_ccn, is_primary_section: false, section_label: 'DIS 201 (Remote)'},
+        {ccn: random_ccn, is_primary_section: false, section_label: 'LAB 100 (Flexible)'},
       ]}
 
       let(:non_teaching_sections) do
