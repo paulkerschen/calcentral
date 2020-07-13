@@ -273,10 +273,18 @@ describe CanvasCourseProvisionController do
     end
 
     describe '#edit_sections' do
-      let(:ccns_to_remove) { ['16171', '16109', '10287'] }
+      let(:ccns_to_remove) { ['16171', '16109'] }
       let(:ccns_to_add) { ['16167', '16168', '16169'] }
+      let(:ccns_to_update) { ['10287'] }
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { post :edit_sections, canvas_course_id: canvas_course_id, ccns_to_remove: ccns_to_remove, ccns_to_add:  ccns_to_add }
+        let(:make_request) do
+          post :edit_sections, {
+            canvas_course_id: canvas_course_id,
+            ccns_to_remove: ccns_to_remove,
+            ccns_to_add: ccns_to_add,
+            ccns_to_update: ccns_to_update
+          }
+        end
       end
       context 'when user authenticated' do
         let(:fake_course_provision) { instance_double(CanvasLti::CourseProvision, edit_sections: 'canvas.courseprovision.12345.1383330151057') }
@@ -286,7 +294,12 @@ describe CanvasCourseProvisionController do
         context 'allowed to edit official sections' do
           let(:fake_can_edit) { true }
           it 'responds with success when section removal job is created' do
-            post :edit_sections, canvas_course_id: canvas_course_id, ccns_to_remove: ccns_to_remove, ccns_to_add:  ccns_to_add
+            post :edit_sections, {
+              canvas_course_id: canvas_course_id,
+              ccns_to_remove: ccns_to_remove,
+              ccns_to_add: ccns_to_add,
+              ccns_to_update: ccns_to_update
+            }
             assert_response :success
             json_response = JSON.parse(response.body)
             json_response['job_request_status'].should == 'Success'
@@ -294,7 +307,14 @@ describe CanvasCourseProvisionController do
           end
           it_should_behave_like 'an api endpoint' do
             before { allow(fake_course_provision).to receive(:edit_sections).and_raise(RuntimeError, "Something went wrong") }
-            let(:make_request) { post :edit_sections, canvas_course_id: canvas_course_id, ccns_to_remove: ccns_to_remove, ccns_to_add:  ccns_to_add }
+            let(:make_request) do
+              post :edit_sections, {
+                canvas_course_id: canvas_course_id,
+                ccns_to_remove: ccns_to_remove,
+                ccns_to_add: ccns_to_add,
+                ccns_to_update: ccns_to_update
+              }
+            end
           end
           context 'in LTI context' do
             before do
@@ -312,7 +332,12 @@ describe CanvasCourseProvisionController do
         context 'not allowed to edit official sections' do
           let(:fake_can_edit) {false}
           it 'responds with empty 403' do
-            post :edit_sections, canvas_course_id: canvas_course_id, ccns_to_remove: ccns_to_remove, ccns_to_add:  ccns_to_add
+            post :edit_sections, {
+              canvas_course_id: canvas_course_id,
+              ccns_to_remove: ccns_to_remove,
+              ccns_to_add: ccns_to_add,
+              ccns_to_update: ccns_to_update
+            }
             assert_response 403
             expect(response.body).to be_blank
           end

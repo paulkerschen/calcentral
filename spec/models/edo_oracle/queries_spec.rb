@@ -101,7 +101,7 @@ describe EdoOracle::Queries do
 
     it 'returns the expected result' do
       expect(subject.count).to eq 3
-      expect(subject.first.count).to eq 29
+      expect(subject.first.count).to eq 30
       expect(subject.first['section_id']).to eq '12392'
       expect(subject.first['term_id']).to eq '2178'
       expect(subject.first['session_id']).to eq '1'
@@ -113,6 +113,7 @@ describe EdoOracle::Queries do
       expect(subject.first['primary']).to eq 'TRUE'
       expect(subject.first['section_num']).to eq '3'
       expect(subject.first['instruction_format']).to eq 'SEM'
+      expect(subject.first['instruction_mode']).to eq 'P'
       expect(subject.first['primary_associated_section_id']).to eq '12392'
       expect(subject.first['section_display_name']).to eq 'AMERSTD 191'
       expect(subject.first['topic_description']).to be nil

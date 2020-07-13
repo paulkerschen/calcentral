@@ -90,7 +90,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'LEC',
                 is_primary_section: true,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'LEC 003',
+                section_label: 'LEC 003 (In Person)',
                 section_number: '003',
                 waitlist_limit: 10
               },
@@ -100,7 +100,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'DIS',
                 is_primary_section: false,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'DIS 201',
+                section_label: 'DIS 201 (In Person)',
                 section_number: '201',
                 waitlist_limit: 5
               },
@@ -110,7 +110,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'DIS',
                 is_primary_section: false,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'DIS 202',
+                section_label: 'DIS 202 (In Person)',
                 section_number: '202',
                 waitlist_limit: 5
               }
@@ -139,7 +139,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'LEC',
                 is_primary_section: true,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'LEC 001',
+                section_label: 'LEC 001 (In Person)',
                 section_number: '001',
                 waitlist_limit: 0,
                 cross_listing_hash: '2138-12345-LEC-001'
@@ -168,7 +168,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'LEC',
                 is_primary_section: true,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'LEC 001',
+                section_label: 'LEC 001 (In Person)',
                 section_number: '001',
                 enroll_limit: 30,
                 waitlist_limit: 0,
@@ -201,7 +201,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'DIS',
                 is_primary_section: false,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'DIS 201',
+                section_label: 'DIS 201 (In Person)',
                 section_number: '201',
                 waitlist_limit: 5,
               }
@@ -227,7 +227,7 @@ describe Berkeley::Teaching do
                 instruction_format: 'LEC',
                 is_primary_section: true,
                 schedules: {oneTime: [], recurring: []},
-                section_label: 'LEC 001',
+                section_label: 'LEC 001 (In Person)',
                 section_number: '001',
                 enroll_limit: 30,
                 waitlist_limit: 0
@@ -276,7 +276,7 @@ describe Berkeley::Teaching do
         sections = bio_class[:sections]
         expect(sections.length).to eq 2
         expect(sections[0][:ccn].to_i).to eq 7309
-        expect(sections[0][:section_label]).to eq 'LEC 003'
+        expect(sections[0][:section_label]).to eq 'LEC 003 (In Person)'
         expect(sections[0][:is_primary_section]).to be_truthy
         expect(sections[1][:ccn].to_i).to eq 7366
         expect(sections[1][:is_primary_section]).to be_falsey
@@ -315,7 +315,7 @@ describe Berkeley::Teaching do
                   instruction_format: 'LEC',
                   is_primary_section: true,
                   schedules: {oneTime: [], recurring: []},
-                  section_label: 'LEC 003',
+                  section_label: 'LEC 003 (In Person)',
                   section_number: '003'
                 },
                 {
@@ -347,7 +347,7 @@ describe Berkeley::Teaching do
                   instruction_format: 'LEC',
                   is_primary_section: true,
                   schedules: {oneTime: [], recurring: []},
-                  section_label: 'LEC 001',
+                  section_label: 'LEC 001 (In Person)',
                   section_number: '001'
                 }
               ],

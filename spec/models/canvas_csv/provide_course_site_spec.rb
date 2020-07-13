@@ -114,6 +114,9 @@ describe CanvasCsv::ProvideCourseSite do
 
   describe '#edit_sections' do
     let(:course_site_term) { {term_yr: '2015', term_cd: 'B'} }
+    let(:ccns_to_remove) { [random_ccn] }
+    let(:ccns_to_add) { [random_ccn] }
+    let(:ccns_to_update) { [random_ccn] }
     let(:canvas_course_info) do
       {
         canvasCourseId: canvas_course_id,
@@ -121,12 +124,11 @@ describe CanvasCsv::ProvideCourseSite do
         'sis_course_id' => random_id
       }
     end
-    let(:ccns_to_remove) { [random_ccn] }
-    let(:ccns_to_add) { [random_ccn] }
     let(:task_steps){ [
       :prepare_users_courses_list,
       :prepare_section_definitions,
       :prepare_section_deletions,
+      :prepare_section_updates,
       :import_sections,
       :refresh_sections_cache,
       :import_enrollments_in_background
@@ -147,51 +149,83 @@ describe CanvasCsv::ProvideCourseSite do
         end
       end
       it 'sets job type to edit_sections' do
-        subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+        subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
         cached_object = BackgroundJob.find(subject.background_job_id)
         expect(cached_object.background_job_report[:jobType]).to eq 'edit_sections'
       end
       context 'when adding sections to course site' do
         let(:ccns_to_remove) { [] }
+        let(:ccns_to_update) { [] }
         before do
           task_steps.delete(:prepare_section_deletions)
+          task_steps.delete(:prepare_section_updates)
         end
         it 'executes all steps in order' do
           task_steps.each {|step| expect(subject).to receive(step).ordered}
           expect(subject).to_not receive(:prepare_section_deletions)
-          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          expect(subject).to_not receive(:prepare_section_updates)
+          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
         end
         it 'calculates 5 total steps to completion' do
-          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
           expect(subject.instance_eval { @background_job_total_steps }).to eq 5
         end
       end
       context 'when removing sections from course site' do
         let(:ccns_to_add) { [] }
+        let(:ccns_to_update) { [] }
         before do
           allow(subject).to receive(:section_definitions).and_return(ccns_to_remove)
           task_steps.delete(:prepare_users_courses_list)
           task_steps.delete(:prepare_section_definitions)
+          task_steps.delete(:prepare_section_updates)
         end
         it 'executes all steps in order' do
           task_steps.each {|step| expect(subject).to receive(step).ordered}
           expect(subject).to_not receive(:prepare_users_courses_list)
           expect(subject).to_not receive(:prepare_section_definitions)
-          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          expect(subject).to_not receive(:prepare_section_updates)
+          puts 'CAVNVAS COURSE INFO HA'
+          puts canvas_course_info
+          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
         end
         it 'calculates 4 total steps to completion' do
-          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
           expect(subject.instance_eval { @background_job_total_steps }).to eq 4
         end
       end
       context 'when adding and removing sections from course site' do
+        let(:ccns_to_update) { [] }
+        before do
+          task_steps.delete(:prepare_section_updates)
+        end
         it 'executes all steps in order' do
           task_steps.each {|step| expect(subject).to receive(step).ordered}
-          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          expect(subject).to_not receive(:prepare_section_updates)
+          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
         end
         it 'calculates 6 total steps to completion' do
-          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add)
+          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
           expect(subject.instance_eval { @background_job_total_steps }).to eq 6
+        end
+      end
+      context 'when updating sections in course site' do
+        let(:ccns_to_add) { [] }
+        let(:ccns_to_remove) { [] }
+        before do
+          allow(subject).to receive(:section_definitions).and_return(ccns_to_update)
+          task_steps.delete(:prepare_section_definitions)
+          task_steps.delete(:prepare_section_deletions)
+        end
+        it 'executes all steps in order' do
+          task_steps.each {|step| expect(subject).to receive(step).ordered}
+          expect(subject).to_not receive(:prepare_section_definitions)
+          expect(subject).to_not receive(:prepare_section_deletions)
+          subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
+        end
+        it 'calculates 4 total steps to completion' do
+          subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
+          expect(subject.instance_eval { @background_job_total_steps }).to eq 4
         end
       end
     end
@@ -200,7 +234,7 @@ describe CanvasCsv::ProvideCourseSite do
         allow(subject).to receive(:prepare_section_deletions).and_raise(RuntimeError, 'Unable to remove memberships')
       end
       it 'returns a proper message' do
-        expect {subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add) }.to raise_error(RuntimeError, 'Unable to remove memberships')
+        expect {subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update) }.to raise_error(RuntimeError, 'Unable to remove memberships')
         cached_object = BackgroundJob.find(subject.background_job_id)
         expect(cached_object.background_job_report[:jobType]).to eq 'edit_sections'
         expect(cached_object.background_job_report[:jobStatus]).to eq 'Error'
@@ -212,7 +246,7 @@ describe CanvasCsv::ProvideCourseSite do
         allow(subject).to receive(:section_definitions).and_return([])
       end
       it 'reports an error' do
-        expect {subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add) }.to raise_error(RuntimeError, 'No changes to sections requested')
+        expect {subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update) }.to raise_error(RuntimeError, 'No changes to sections requested')
         cached_object = BackgroundJob.find(subject.background_job_id)
         expect(cached_object.background_job_report[:jobStatus]).to eq 'Error'
       end
@@ -220,7 +254,7 @@ describe CanvasCsv::ProvideCourseSite do
     context 'if the course site is not in a current term' do
       let(:course_site_term) { {term_yr: '2014', term_cd: 'B'} }
       it 'reports an error' do
-        expect {subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add) }.to raise_error(RuntimeError, "Course site #{canvas_course_id} does not match a current term")
+        expect {subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update) }.to raise_error(RuntimeError, "Course site #{canvas_course_id} does not match a current term")
         cached_object = BackgroundJob.find(subject.background_job_id)
         expect(cached_object.background_job_report[:jobStatus]).to eq 'Error'
       end
@@ -242,9 +276,9 @@ describe CanvasCsv::ProvideCourseSite do
           :title=>'The Beauty and Joy of Computing',
           :role=>'Instructor',
           :sections=>[
-            {:ccn=>'21136', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 102', :section_number=>'102', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 8:00A-9:00A'}]},
+            {:ccn=>'21136', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 102 (In Person)', :section_number=>'102', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 8:00A-9:00A'}]},
               :instructors=>[{:name=>'Seth Mark Beckley', :uid=>'937403'}]},
-            {:ccn=>'21204', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 109', :section_number=>'109', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 12:00P-1:00P'}]},
+            {:ccn=>'21204', :instruction_format=>'DIS', :is_primary_section=>false, :section_label=>'DIS 109 (In Person)', :section_number=>'109', :schedules=>{oneTime: [], recurring: [{:buildingName=>'SODA', :room_number=>'0320', :schedule=>'M 12:00P-1:00P'}]},
               :instructors=>[{:name=>'Seth Mark Beckley', :uid=>'937403'}]}
           ]
         }
@@ -333,7 +367,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Supervised Independent Group Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => rand(99999).to_s, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015', :section_number => '015' }
+            { :ccn => rand(99999).to_s, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015 (Hybrid)', :section_number => '015' }
           ]
         }
       ]
@@ -410,12 +444,12 @@ describe CanvasCsv::ProvideCourseSite do
             instruction_format: 'GRP',
             instructors: [{uid: uid, role: 'PI'}],
             is_primary_section: true,
-            section_label: 'GRP 015',
+            section_label: 'GRP 015 (Hybrid)',
             section_number: '015'
           }]
         }
       ]
-      section_definitions = [{'name' => 'MEC ENG 98 GRP 015', 'course_id' => 'CRS:MEC_ENG-98-2013-D', 'section_id' => 'SEC:2013-D-12345', 'status' => 'active'}]
+      section_definitions = [{'name' => 'MEC ENG 98 GRP 015 (Hybrid)', 'course_id' => 'CRS:MEC_ENG-98-2013-D', 'section_id' => 'SEC:2013-D-12345', 'status' => 'active'}]
       allow(subject).to receive(:generate_section_definitions).and_return(section_definitions)
     end
 
@@ -439,7 +473,7 @@ describe CanvasCsv::ProvideCourseSite do
       section_definitions = subject.section_definitions
       expect(section_definitions).to be_an_instance_of Array
       expect(section_definitions[0]['status']).to eq 'active'
-      expect(section_definitions[0]['name']).to eq 'MEC ENG 98 GRP 015'
+      expect(section_definitions[0]['name']).to eq 'MEC ENG 98 GRP 015 (Hybrid)'
       expect(section_definitions[0]['course_id']).to eq 'CRS:MEC_ENG-98-2013-D'
       expect(section_definitions[0]['section_id']).to eq 'SEC:2013-D-12345'
     end
@@ -484,8 +518,8 @@ describe CanvasCsv::ProvideCourseSite do
     let(:canvas_sis_import_proxy) { double }
     before do
       @section_rows = [
-        {'section_id'=>'SEC:2013-D-26178', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47A SLF 001', 'status'=>'active'},
-        {'section_id'=>'SEC:2013-D-26181', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47B SLF 001', 'status'=>'active'}
+        {'section_id'=>'SEC:2013-D-26178', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47A SLF 001 (Remote)', 'status'=>'active'},
+        {'section_id'=>'SEC:2013-D-26181', 'course_id'=>'CRS:COMPSCI-47A-2013-D', 'name'=>'COMPSCI 47B SLF 001 (Remote)', 'status'=>'active'}
       ]
       allow(canvas_sis_import_proxy).to receive(:import_sections).and_return(true)
       allow(subject).to receive(:make_sections_csv).and_return('/csv/filepath')
@@ -754,8 +788,8 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Introduction to Computer Programming for Scientists and Engineers',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 002', :section_number => '002' },
-            { :ccn => @selected_ccns[2], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102', :section_number => '102' }
+            { :ccn => random_ccn, :instruction_format => 'LEC', :is_primary_section => true, :section_label => 'LEC 002 (In Person)', :section_number => '002' },
+            { :ccn => @selected_ccns[2], :instruction_format => 'DIS', :is_primary_section => false, :section_label => 'DIS 102 (In Person)', :section_number => '102' }
           ]
         },
         {
@@ -765,7 +799,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Supervised Independent Group Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015', :section_number => '015' }
+            { :ccn => random_ccn, :instruction_format => 'GRP', :is_primary_section => true, :section_label => 'GRP 015 (Hybrid)', :section_number => '015' }
           ]
         },
         {
@@ -775,7 +809,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Honors Undergraduate Research',
           :role => 'Instructor',
           :sections => [
-            { :ccn => @selected_ccns[1], :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 015', :section_number => '015' }
+            { :ccn => @selected_ccns[1], :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 015 (In Person)', :section_number => '015' }
           ]
         },
         {
@@ -785,7 +819,7 @@ describe CanvasCsv::ProvideCourseSite do
           :title => 'Engineering Field Studies',
           :role => 'Instructor',
           :sections => [
-            { :ccn => random_ccn, :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 024', :section_number => '024' }
+            { :ccn => random_ccn, :instruction_format => 'IND', :is_primary_section => true, :section_label => 'IND 024 (In Person)', :section_number => '024' }
           ]
         }
       ]
@@ -812,11 +846,11 @@ describe CanvasCsv::ProvideCourseSite do
         expect(filtered[0][:course_code]).to eq 'ENGIN 7'
         expect(filtered[0][:dept]).to eq 'COMPSCI'
         expect(filtered[0][:sections].length).to eq 1
-        expect(filtered[0][:sections][0][:section_label]).to eq 'DIS 102'
+        expect(filtered[0][:sections][0][:section_label]).to eq 'DIS 102 (In Person)'
         expect(filtered[1][:course_code]).to eq 'MEC ENG H194'
         expect(filtered[1][:dept]).to eq 'MEC ENG'
         expect(filtered[1][:sections].length).to eq 1
-        expect(filtered[1][:sections][0][:section_label]).to eq 'IND 015'
+        expect(filtered[1][:sections][0][:section_label]).to eq 'IND 015 (In Person)'
       end
     end
 
@@ -911,7 +945,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: lecture_instructor_id, role: 'PI'}
           ],
           is_primary_section: true,
-          section_label: 'LEC 002',
+          section_label: 'LEC 002 (In Person)',
           section_number: '002'
         },
         {
@@ -923,7 +957,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: discussion_instructor_2_id, role: 'PI'}
           ],
           is_primary_section: false,
-          section_label: 'DIS 102',
+          section_label: 'DIS 102 (In Person)',
           section_number: '102'
         }]
       },
@@ -940,7 +974,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: group_instructor_id, role: 'PI'}
           ],
           is_primary_section: true,
-          section_label: 'GRP 015',
+          section_label: 'GRP 015 (Hybrid)',
           section_number: '015'
         }]
       },
@@ -958,7 +992,7 @@ describe CanvasCsv::ProvideCourseSite do
             {uid: administrative_proxy_id, role: 'APRX'}
           ],
           is_primary_section: true,
-          section_label: 'IND 015',
+          section_label: 'IND 015 (In Person)',
           section_number: '015'
         }]
       }]
@@ -974,12 +1008,12 @@ describe CanvasCsv::ProvideCourseSite do
 
     it 'should raise exception if campus_section_data argument is empty' do
       expect do
-        subject.generate_section_definitions('2013', 'D', 'CRS:ENGIN-7-2013-D', [])
+        subject.generate_section_definitions('2013', 'D', 'CRS:ENGIN-7-2013-D', [], nil)
       end.to raise_error(ArgumentError, '\'campus_section_data\' argument is empty')
     end
 
     it 'should generate Canvas Section import CSV rows for the selected courses' do
-      canvas_sections_list = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)
+      canvas_sections_list = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)
       expect(canvas_sections_list.length).to eq 4
       canvas_sections_list.each do |row|
         expect(row['course_id']).to eq sis_course_id
@@ -989,10 +1023,10 @@ describe CanvasCsv::ProvideCourseSite do
         expect(campus_section[:term_cd]).to eq term_cd
         expect(ccns.include?(campus_section[:ccn])).to be_truthy
       end
-      expect(canvas_sections_list[0]['name']).to eq 'ENGIN 7 LEC 002'
-      expect(canvas_sections_list[1]['name']).to eq 'ENGIN 7 DIS 102'
-      expect(canvas_sections_list[2]['name']).to eq 'MEC ENG 98 GRP 015'
-      expect(canvas_sections_list[3]['name']).to eq 'CHEM 196 IND 015'
+      expect(canvas_sections_list[0]['name']).to eq 'ENGIN 7 LEC 002 (In Person)'
+      expect(canvas_sections_list[1]['name']).to eq 'ENGIN 7 DIS 102 (In Person)'
+      expect(canvas_sections_list[2]['name']).to eq 'MEC ENG 98 GRP 015 (Hybrid)'
+      expect(canvas_sections_list[3]['name']).to eq 'CHEM 196 IND 015 (In Person)'
     end
 
     context 'site creator is explicit instructor for multiple sections' do
@@ -1000,7 +1034,7 @@ describe CanvasCsv::ProvideCourseSite do
         let(id) { uid }
       end
       it 'remembers section membership roles for later use' do
-        canvas_sections_list = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)
+        canvas_sections_list = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)
         teaching_section_id = canvas_sections_list[0]['section_id']
         proxying_section_id = canvas_sections_list[3]['section_id']
         section_roles_hash = subject.import_data['section_roles']
@@ -1025,7 +1059,7 @@ describe CanvasCsv::ProvideCourseSite do
                  :instructors => [{uid: uid, role: 'PI'}],
                  :instruction_format => 'DIS',
                  :is_primary_section => false,
-                 :section_label => 'DIS 102',
+                 :section_label => 'DIS 102 (In Person)',
                  :section_number => '102'}]}
       ]
       sis_course_id = 'CRS:ENGIN-7-2013-D-8383'
@@ -1035,14 +1069,14 @@ describe CanvasCsv::ProvideCourseSite do
       expect(stub_existence_check).to receive(:section_defined?).and_return(false)
       allow(Canvas::ExistenceCheck).to receive(:new).and_return(stub_existence_check)
 
-      first_canvas_section = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)[0]
+      first_canvas_section = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)[0]
       first_canvas_section_id = first_canvas_section['section_id']
 
       expect(stub_existence_check).to receive(:section_defined?).twice do |id|
         id == first_canvas_section_id
       end
 
-      second_canvas_section = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)[0]
+      second_canvas_section = subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)[0]
       second_canvas_section_id = second_canvas_section['section_id']
       expect(second_canvas_section_id.present?).to be_truthy
       expect(second_canvas_section_id).to_not eq first_canvas_section_id
@@ -1054,7 +1088,7 @@ describe CanvasCsv::ProvideCourseSite do
 
     context 'site creator is not explicit instructor for any section' do
       it 'stores no explicitly instructed sections' do
-        subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)
+        subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)
         expect(subject.import_data['explicit_sections_for_instructor']).to be_empty
       end
     end
@@ -1062,12 +1096,12 @@ describe CanvasCsv::ProvideCourseSite do
     context 'site creator is explicit instructor for one section' do
       let(:discussion_instructor_2_id) { uid }
       it 'stores explicitly instructed section' do
-        subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list)
+        subject.generate_section_definitions(term_yr, term_cd, sis_course_id, courses_list, nil)
         explicitly_instructed = subject.import_data['explicit_sections_for_instructor']
         expect(explicitly_instructed).to have(1).item
         expect(explicitly_instructed.first).to include({
           'course_id' => sis_course_id,
-          'name' => 'ENGIN 7 DIS 102',
+          'name' => 'ENGIN 7 DIS 102 (In Person)',
           'status' => 'active'
         })
       end

@@ -12,17 +12,6 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
   $scope.stagingFocus = false;
 
   /*
-   * Return array of CCNs for sections present in the course site
-   */
-  var currentCcns = function() {
-    var ccns = [];
-    angular.forEach($scope.canvasCourse.officialSections, function(section) {
-      ccns.push(section.ccn);
-    });
-    return ccns;
-  };
-
-  /*
     Initializes application upon loading
    */
   var initState = function() {
@@ -65,7 +54,6 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
    */
   var loadCourseLists = function(teachingSemesters) {
     $scope.courseSemester = false;
-    var currentSectionCcns = currentCcns();
 
     // identify semester matching current course site
     angular.forEach(teachingSemesters, function(semester) {
@@ -82,14 +70,21 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
       // and flattened array of all sections for current sections staging table
       $scope.existingCourseSections = [];
       $scope.allSections = [];
+      var existingCcns = [];
       angular.forEach($scope.courseSemester.classes, function(classItem) {
         angular.forEach(classItem.sections, function(section) {
           section.parentClass = classItem;
           $scope.allSections.push(section);
           section.stagedState = null;
-          if (currentSectionCcns.indexOf(section.ccn) !== -1) {
-            $scope.existingCourseSections.push(section);
-          }
+          angular.forEach($scope.canvasCourse.officialSections, function(officialSection) {
+            if (officialSection.ccn === section.ccn && existingCcns.indexOf(section.ccn) === -1) {
+              existingCcns.push(section.ccn);
+              $scope.existingCourseSections.push(section);
+              if (officialSection.name !== section.courseCode + ' ' + section.section_label) {
+                section.nameDiscrepancy = true;
+              }
+            }
+          });
         });
       });
     } else {
@@ -147,7 +142,8 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
   var stagedSections = function() {
     var sections = {
       addSections: [],
-      deleteSections: []
+      deleteSections: [],
+      updateSections: []
     };
     if ($scope.courseSemester) {
       angular.forEach($scope.courseSemester.classes, function(classItem) {
@@ -157,6 +153,9 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
           }
           if (section.stagedState === 'delete') {
             sections.deleteSections.push(section.ccn);
+          }
+          if (section.stagedState === 'update') {
+            sections.updateSections.push(section.ccn);
           }
         });
       });
@@ -367,7 +366,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
       section.stagedState = 'delete';
     } else {
       $scope.displayError = 'invalidAction';
-      $scope.invalidActionError = 'Unable to delete CCN ' + sectionString(section) + ', as it already exists within the course site.';
+      $scope.invalidActionError = 'Unable to delete CCN ' + sectionString(section) + ' which does not exist within the course site.';
     }
   };
 
@@ -381,6 +380,20 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
     } else {
       $scope.displayError = 'invalidAction';
       $scope.invalidActionError = 'Unable to add ' + sectionString(section) + ', as it already exists within the course site.';
+    }
+  };
+
+  /*
+   * Stages section for update.
+   */
+  $scope.stageUpdate = function(section) {
+    if (section.isCourseSection) {
+      expandParentClass(section);
+      section.stagedState = 'update';
+      $scope.accessibilityAnnounce('Included in the list of sections to be updated');
+    } else {
+      $scope.displayError = 'invalidAction';
+      $scope.invalidActionError = 'Unable to update CCN ' + sectionString(section) + ' which does not exist within the course site.';
     }
   };
 
@@ -404,7 +417,7 @@ angular.module('calcentral.controllers').controller('CanvasCourseManageOfficialS
     $scope.changeWorkflowStep('processing');
     $scope.jobStatus = 'sendingRequest';
     var update = stagedSections();
-    canvasCourseProvisionFactory.updateSections(canvasCourseId, update.addSections, update.deleteSections).then(
+    canvasCourseProvisionFactory.updateSections(canvasCourseId, update.addSections, update.deleteSections, update.updateSections).then(
       sectionUpdateJobCreated,
       function errorCallback() {
         fetchFeed();

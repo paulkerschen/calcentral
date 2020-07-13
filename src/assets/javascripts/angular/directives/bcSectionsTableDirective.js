@@ -14,6 +14,8 @@ angular.module('calcentral.directives').directive('bcSectionsTable', function() 
       unstageAction: '&',
       // Attribute used to tie delete calls to delete method: data-stage-delete-action="stageDelete(section)"
       stageDeleteAction: '&',
+      // Attribute used to tie update calls to update method: data-stage-update-action="stageUpdate(section)"
+      stageUpdateAction: '&',
       // Attribute used to tie add calls to add method: data-stage-add-action="stageAdd(section)"
       stageAddAction: '&',
       // Attribute used to tie no current sections call: data-no-current-sections="noCurrentSections()"
