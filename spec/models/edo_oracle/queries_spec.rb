@@ -32,66 +32,6 @@ describe EdoOracle::Queries do
     expect(described_class.settings).to be Settings.edodb
   end
 
-  describe '#get_term_unit_totals' do
-    subject { described_class.get_term_unit_totals(uid, academic_careers, term_id) }
-    let(:uid) { 799934 }
-    let(:academic_careers) { ['UGRD'] }
-    let(:term_id) { 2178 }
-
-    it_behaves_like 'a successful query that returns one result'
-
-    it 'returns the expected result' do
-      expect(subject.count).to eq 3
-      expect(subject['total_earned_units']).to eq 96.67
-      expect(subject['total_enrolled_units']).to eq 6
-      expect(subject['grading_complete']).to eq 'Y'
-    end
-  end
-
-  describe '#get_term_law_unit_totals' do
-    subject { described_class.get_term_law_unit_totals(uid, academic_careers, term_id) }
-    let(:uid) { 300216 }
-    let(:academic_careers) { %w(GRAD LAW) }
-    let(:term_id) { 2172 }
-
-    it_behaves_like 'a successful query that returns one result'
-
-    it 'returns the expected result' do
-      expect(subject.count).to eq 2
-      expect(subject['total_earned_law_units']).to eq 15
-      expect(subject['total_enrolled_law_units']).to eq 18
-    end
-  end
-
-  describe '#get_careers' do
-    subject { described_class.get_careers(uid) }
-    let(:uid) { 300216 }
-
-    it_behaves_like 'a successful query'
-
-    it 'returns the expected result' do
-      expect(subject.count).to eq 3
-      expect(subject[0]).to be
-      expect(subject[1]).to be
-      expect(subject[2]).to be
-
-      expect(subject[0]['acad_career']).to eq 'GRAD'
-      expect(subject[0]['program_status']).to eq 'AC'
-      expect(subject[0]['total_cumulative_units']).to eq 16
-      expect(subject[0]['total_cumulative_law_units']).to eq 0
-
-      expect(subject[1]['acad_career']).to eq 'LAW'
-      expect(subject[1]['program_status']).to eq 'AC'
-      expect(subject[1]['total_cumulative_units']).to eq 61
-      expect(subject[1]['total_cumulative_law_units']).to eq 46
-
-      expect(subject[2]['acad_career']).to eq 'UGRD'
-      expect(subject[2]['program_status']).to be_falsey
-      expect(subject[2]['total_cumulative_units']).to eq 157
-      expect(subject[2]['total_cumulative_law_units']).to eq 0
-    end
-  end
-
   describe '#get_enrolled_sections' do
     subject { described_class.get_enrolled_sections(uid, terms) }
     let(:uid) { 799934 }
@@ -230,24 +170,6 @@ describe EdoOracle::Queries do
     end
   end
 
-  describe '#get_law_enrollment' do
-    subject { described_class.get_law_enrollment(uid, academic_career, term, section, require_desig_code) }
-    let (:uid) { 490452 }
-    let (:academic_career) { 'LAW' }
-    let (:term) { 2185 }
-    let (:section) { 11950 }
-    let (:require_desig_code) { 'LPR' }
-
-    it_behaves_like 'a successful query that returns one result'
-
-    it 'returns the expected result' do
-      expect(subject.count).to eq 3
-      expect(subject['units_taken_law']).to eq 3
-      expect(subject['units_earned_law']).to eq 0
-      expect(subject['rqmnt_desg_descr']).to eq 'Fulfills Professional Responsibility Requirement'
-    end
-  end
-
   describe '#get_concurrent_student_status' do
     subject { described_class.get_concurrent_student_status(student_id) }
     let (:student_id) { 95727964 }
@@ -256,20 +178,6 @@ describe EdoOracle::Queries do
 
     it 'returns the expected result' do
       expect(subject['concurrent_status']).to eq 'Y'
-    end
-  end
-
-  describe '#get_transfer_credit_detailed' do
-    subject { EdoOracle::Queries.get_transfer_credit_detailed(uid) }
-    let(:uid) { 300216 }
-
-    it_behaves_like 'a successful query'
-
-    it 'returns the expected result' do
-      expect(subject.count).to eq 3
-      expect(subject[0]).to have_keys(['career', 'school_descr', 'transfer_units', 'law_transfer_units', 'requirement_designation', 'grade_points', 'term_id'])
-      expect(subject[1]).to have_keys(['career', 'school_descr', 'transfer_units', 'law_transfer_units', 'requirement_designation', 'grade_points', 'term_id'])
-      expect(subject[2]).to have_keys(['career', 'school_descr', 'transfer_units', 'law_transfer_units', 'requirement_designation', 'grade_points', 'term_id'])
     end
   end
 

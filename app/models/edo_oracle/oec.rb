@@ -102,7 +102,7 @@ module EdoOracle
               enroll.CLASS_SECTION_ID as section_id,
               enroll.CAMPUS_UID AS ldap_uid,
               enroll.STUDENT_ID AS sis_id
-            FROM SISEDO.ETS_ENROLLMENTV00_VW enroll
+            FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
             WHERE
               enroll.TERM_ID = '#{term_id}'
               AND enroll.STDNT_ENRL_STATUS_CODE = 'E'
@@ -110,7 +110,7 @@ module EdoOracle
                 WHEN 'NON' THEN (
                   SELECT DISTINCT prim_enr.GRADE_MARK
                     FROM SISEDO.CLASSSECTIONALLV01_MVW sec
-                    LEFT JOIN SISEDO.ETS_ENROLLMENTV00_VW prim_enr
+                    LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
                       ON  prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
                       AND prim_enr.TERM_ID = enroll.TERM_ID
                       AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
