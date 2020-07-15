@@ -25,7 +25,7 @@ module EdoOracle
               enroll."GRADE_POINTS" AS grade_points,
               enroll."GRADING_BASIS_CODE" AS grading_basis,
               enroll."GRADE_MARK_MID" as grade_midterm
-            FROM SISEDO.ETS_ENROLLMENTV00_VW enroll
+            FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
             WHERE
               enroll."TERM_ID" = '#{term_id}'
             ORDER BY section_id, sis_id
