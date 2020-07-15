@@ -109,86 +109,6 @@ module EdoOracle
       SQL
     end
 
-    def self.get_term_unit_totals(person_id, academic_careers, term_id)
-      result = safe_query <<-SQL
-        SELECT
-          SUM(SCT.TOTAL_EARNED_UNITS) AS TOTAL_EARNED_UNITS,
-          SUM(SCT.TOTAL_ENROLLED_UNITS) AS TOTAL_ENROLLED_UNITS,
-          MIN(SCT.GRADING_COMPLETE) AS GRADING_COMPLETE
-        FROM SISEDO.CLC_STUDENT_CAREER_TERMV00_VW SCT
-        WHERE SCT.CAMPUS_ID = '#{person_id}'
-        #{and_academic_career('SCT', academic_careers)}
-        #{and_institution('SCT')}
-        AND SCT.TERM_ID = #{term_id}
-        GROUP BY SCT.TERM_ID
-      SQL
-      result.first
-    end
-
-    def self.get_term_law_unit_totals(person_id, academic_careers, term_id)
-      result = safe_query <<-SQL
-        SELECT
-          SUM(SCT.EARNED_UNITS_LAW) AS TOTAL_EARNED_LAW_UNITS,
-          SUM(SCT.ENROLLED_UNITS_LAW) AS TOTAL_ENROLLED_LAW_UNITS
-        FROM SISEDO.CLC_STUDENT_CAREER_TERM_LAWV00_VW SCT
-        WHERE SCT.CAMPUS_ID = '#{person_id}'
-        #{and_academic_career('SCT', academic_careers)}
-        #{and_institution('SCT')}
-        AND SCT.TERM_ID = #{term_id}
-        GROUP BY SCT.TERM_ID
-      SQL
-      result.first
-    end
-
-    def self.get_careers(person_id)
-      safe_query <<-SQL
-        SELECT
-          CAR.ACAD_CAREER,
-          CASE
-            WHEN CAR.PROGRAM_STATUS = 'AC'
-            THEN CAR.PROGRAM_STATUS
-            ELSE NULL
-          END AS PROGRAM_STATUS,
-          CAR.TOTAL_CUMULATIVE_UNITS,
-          LAW.TOTAL_CUMULATIVE_UNITS_LAW AS TOTAL_CUMULATIVE_LAW_UNITS,
-          CAR.TOTAL_TRANSFER_UNITS as total_transfer_units,
-          CAR.TRANSFER_CREDIT_UNITS_ADJUSTMENT as transfer_units_adjustment,
-          CAR.TRANSFER_TEST_UNITS_AP as ap_test_units,
-          CAR.TRANSFER_TEST_UNITS_IB as ib_test_units,
-          CAR.TRANSFER_TEST_UNITS_ALEVEL as alevel_test_units,
-          LAW.TOTAL_TRANSFER_UNITS_LAW as total_transfer_units_law
-          FROM SISEDO.CLC_STUDENT_CAREERV00_VW CAR
-          LEFT OUTER JOIN SISEDO.CLC_STUDENT_CAREER_LAWV00_VW LAW
-            ON CAR.STUDENT_ID = LAW.STUDENT_ID
-           AND CAR.ACAD_CAREER = LAW.ACAD_CAREER
-           AND CAR.INSTITUTION = LAW.INSTITUTION
-          WHERE CAR.CAMPUS_ID = '#{person_id}'
-            #{and_institution('CAR')}
-      SQL
-    end
-
-    def self.get_cumulative_units(person_id)
-      safe_query <<-SQL
-        SELECT
-          CAR.ACAD_CAREER,
-          CASE
-            WHEN CAR.PROGRAM_STATUS = 'AC'
-            THEN CAR.PROGRAM_STATUS
-            ELSE NULL
-          END AS PROGRAM_STATUS,
-          CAR.TOTAL_CUMULATIVE_UNITS,
-          LAW.TOTAL_CUMULATIVE_UNITS_LAW AS total_cumulative_law_units
-          FROM SISEDO.CLC_STUDENT_CAREERV00_VW CAR
-          LEFT OUTER JOIN SISEDO.CLC_STUDENT_CAREER_LAWV00_VW LAW
-            ON CAR.STUDENT_ID = LAW.STUDENT_ID
-           AND CAR.ACAD_CAREER = LAW.ACAD_CAREER
-           AND CAR.INSTITUTION = LAW.INSTITUTION
-          WHERE CAR.CAMPUS_ID = '#{person_id}'
-          AND CAR.ACAD_CAREER <> 'UCBX'
-            #{and_institution('CAR')}
-      SQL
-    end
-
     def self.get_enrolled_sections(person_id, terms)
       # The push_pred hint below alerts Oracle to use indexes on SISEDO.API_COURSEV00_VW, aka crs.
       in_term_where_clause = "enr.\"TERM_ID\" IN (#{terms_query_list terms}) AND" unless terms.nil?
@@ -205,12 +125,12 @@ module EdoOracle
           ENR.GRADING_BASIS_CODE AS grading_basis,
           ENR.ACAD_CAREER,
           CASE
-            WHEN ENR.CRSE_CAREER = 'LAW'
+            WHEN ENR.COURSE_CAREER = 'LAW'
             THEN ENR.RQMNT_DESIGNTN
             ELSE NULL
           END AS RQMNT_DESIGNTN
         FROM SISEDO.EXTENDED_TERM_MVW term,
-             SISEDO.CLC_ENROLLMENTV00_VW enr
+             SISEDO.ETS_ENROLLMENTV01_VW enr
         JOIN SISEDO.CLASSSECTIONALLV01_MVW sec ON (
           enr."TERM_ID" = sec."term-id" AND
           enr."SESSION_ID" = sec."session-id" AND
@@ -225,25 +145,6 @@ module EdoOracle
           #{where_course_term_updated_date}
         ORDER BY term_id DESC, #{CANONICAL_SECTION_ORDERING}
       SQL
-    end
-
-
-    def self.get_law_enrollment(person_id, academic_career, term, section, require_desig_code = nil)
-      require_desig_field = require_desig_code.blank? ? 'NULL' : 'RD.DESCRFORMAL'
-      result = safe_query <<-SQL
-        SELECT
-          ENR.UNITS_TAKEN_LAW,
-          ENR.UNITS_EARNED_LAW,
-          #{require_desig_field} AS RQMNT_DESG_DESCR
-        FROM SISEDO.CLC_ENROLLMENT_LAWV00_VW ENR
-         #{join_requirements_designation('ENR', require_desig_code)}
-        WHERE ENR.CAMPUS_UID = '#{person_id}'
-          #{and_institution('ENR')}
-          AND ENR.ACAD_CAREER = '#{academic_career}'
-          AND ENR.TERM_ID = '#{term}'
-          AND ENR.CLASS_NBR = '#{section}'
-      SQL
-      result.first
     end
 
     # EDO equivalent of CampusOracle::Queries.get_instructing_sections
@@ -474,7 +375,7 @@ module EdoOracle
           enroll."WAITLISTPOSITION" AS waitlist_position,
           enroll."UNITS_TAKEN" AS units,
           TRIM(enroll."GRADING_BASIS_CODE") AS grading_basis
-        FROM SISEDO.CLC_ENROLLMENTV00_VW enroll
+        FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
         WHERE
           enroll."CLASS_SECTION_ID" = '#{section_id}'
           AND enroll."TERM_ID" = '#{term_id}'
@@ -503,7 +404,7 @@ module EdoOracle
           plan."STATUSINPLAN_STATUS_CODE",
           stdgroup."HIGHEST_STDNT_GROUP" AS terms_in_attendance_group
           #{email_col}
-        FROM SISEDO.CLC_ENROLLMENTV00_VW enroll
+        FROM SISEDO.ETS_ENROLLMENTV01_VW enroll
         LEFT OUTER JOIN
           SISEDO.STUDENT_PLAN_CC_V00_VW plan ON enroll."STUDENT_ID" = plan."STUDENT_ID" AND
           plan."ACADPLAN_TYPE_CODE" IN ('CRT', 'HS', 'MAJ', 'SP', 'SS')
@@ -553,7 +454,7 @@ module EdoOracle
         SELECT
           count(enroll."TERM_ID") AS enroll_count
         FROM
-          SISEDO.CLC_ENROLLMENTV00_VW enroll
+          SISEDO.ETS_ENROLLMENTV01_VW enroll
         WHERE
           enroll."CAMPUS_UID" = '#{ldap_uid.to_i}' AND
           rownum < 2
@@ -782,21 +683,6 @@ module EdoOracle
         ORDER BY TERM_ID DESC
       SQL
       return result
-    end
-
-    def self.get_transfer_credit_detailed (person_id)
-      safe_query <<-SQL
-        SELECT TC.ACAD_CAREER as career,
-          TC.SCHOOL_DESCR as school_descr,
-          TC.UNITS_TRNSFR as transfer_units,
-          TC.UNITS_TRNSFR_LAW as law_transfer_units,
-          TC.RQMNT_DESIGNTN_DESCRFORMAL as requirement_designation,
-          TC.TRF_GRADE_POINTS as grade_points,
-          TC.ARTICULATION_TERM as term_id
-        FROM SISEDO.CLC_TRANSFER_CREDIT_SCHLV00_VW TC
-        WHERE CAMPUS_UID = '#{person_id}'
-          #{and_institution('TC')}
-      SQL
     end
 
     def self.get_undergrad_terms(oldest_term_id, opts={})
