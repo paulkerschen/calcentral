@@ -128,6 +128,37 @@ module Berkeley
       to_edo_id(term_yr, term_cd) <= slug_to_edo_id(Settings.terms.legacy_cutoff)
     end
 
+    def next_edo_term_id(edo_term_id)
+      if edo_term_id[-1] == '8'
+        (edo_term_id.to_i + 4).to_s
+      else
+        (edo_term_id.to_i + 3).to_s
+      end
+    end
+
+    def edo_term_ids_in_range(start_term_id, end_term_id)
+      term_ids = []
+      term_id = start_term_id
+      while term_id <= end_term_id do
+        term_ids << term_id
+        term_id = next_edo_term_id(term_id)
+      end
+      term_ids
+    end
+
+    # The string '2132-2142,2158' expands to ['2132', '2135', '2138', '2142', '2158'].
+    def expand_range_notation(range_string)
+      term_ids = range_string.split(',').map do |term_id|
+        if term_id.include? '-'
+          start_term_id, end_term_id = term_id.split '-'
+          edo_term_ids_in_range(start_term_id, end_term_id)
+        else
+          term_id
+        end
+      end
+      term_ids.flatten
+    end
+
     private
 
     def init_names
