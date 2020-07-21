@@ -118,20 +118,26 @@ describe DataLoch::Manager do
         expect(subject.get_daily_terms).to eq ['2185', '2188']
       end
     end
-    context 'one month before Fall term end' do
-      let(:fake_now) { '2018-11-24 04:20:00' }
+    context 'two months before Fall term end' do
+      let(:fake_now) { '2018-10-20 04:20:00' }
       it 'updates Fall and Spring' do
         expect(subject.get_daily_terms).to eq ['2188', '2192']
       end
     end
-    context 'one month before Spring term end' do
-      let(:fake_now) { '2018-04-21 04:20:00' }
+    context '70 days before Spring term end' do
+      let(:fake_now) { '2018-03-13 04:20:00' }
+      it 'updates Spring and Summer' do
+        expect(subject.get_daily_terms).to eq ['2182', '2185']
+      end
+    end
+    context '40 days before Spring term end' do
+      let(:fake_now) { '2018-04-13 04:20:00' }
       it 'updates Spring, Summer, and Fall' do
         expect(subject.get_daily_terms).to eq ['2182', '2185', '2188']
       end
     end
     context 'less than two weeks after term start' do
-      let(:fake_now) { '2018-01-19 04:20:00' }
+      let(:fake_now) { '2018-01-16 04:20:00' }
       it 'updates the previous term as well the current' do
         expect(subject.get_daily_terms).to eq ['2178', '2182']
       end

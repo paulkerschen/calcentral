@@ -91,6 +91,7 @@ module DataLoch
       today = Settings.terms.fake_now || DateTime.now
       term_ids = []
       terms = Berkeley::Terms.fetch
+
       # If we are between terms, 'current' is set to the upcoming term, and so its start date may be in the future.
       current_term = terms.current
 
@@ -102,12 +103,15 @@ module DataLoch
 
       term_ids << current_term.campus_solutions_id
 
-      # If today is one month or less before the end of the current term, add the next term.
-      if (current_term.end.advance(weeks: -4) < today) || current_term.is_summer
-        term_ids << terms.next.campus_solutions_id
-        # ... and if the upcoming term is Summer, add the next Fall term as well.
-        if terms.next.is_summer
-          term_ids << terms.future.campus_solutions_id
+      # Add any upcoming terms for which we expect enrollments to have started.
+      [terms.next, terms.future].compact.each do |upcoming_term|
+        advance_enrollment_period = case upcoming_term.name
+          when 'Spring' then 95
+          when 'Summer' then 124
+          when 'Fall' then 140 
+        end
+        if today >= upcoming_term.start.advance(days: (advance_enrollment_period * -1))
+          term_ids << upcoming_term.campus_solutions_id
         end
       end
 
