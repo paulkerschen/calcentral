@@ -93,4 +93,12 @@ describe Berkeley::TermCodes do
     expect(Berkeley::TermCodes.to_english('1974', 'A')).to eq 'Winter 1974'
   end
 
+  it 'expands range notation for EDO term codes' do
+    expect(Berkeley::TermCodes.expand_range_notation('2132-2148')).to eq ['2132', '2135', '2138', '2142', '2145', '2148']
+    expect(Berkeley::TermCodes.expand_range_notation('1998-2008')).to eq ['1998', '2002', '2005', '2008']
+    expect(Berkeley::TermCodes.expand_range_notation('1992,1998,2002')).to eq ['1992', '1998', '2002']
+    expect(Berkeley::TermCodes.expand_range_notation('1992-1998,2008')).to eq ['1992', '1995', '1998', '2008']
+    expect(Berkeley::TermCodes.expand_range_notation('1992-1998,2008-2015')).to eq ['1992', '1995', '1998', '2008', '2012', '2015']
+  end
+
 end

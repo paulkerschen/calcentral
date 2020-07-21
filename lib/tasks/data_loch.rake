@@ -34,7 +34,7 @@ namespace :data_loch do
     if term_ids == 'auto'
       DataLoch::Manager.new().manage_terms_data targets
     elsif term_ids.present?
-      term_ids = term_ids.split(',')
+      term_ids = Berkeley::TermCodes.expand_range_notation term_ids
       is_historical = ENV['HISTORICAL']
       DataLoch::Stocker.new().upload_term_data(term_ids, targets, is_historical)
     end
