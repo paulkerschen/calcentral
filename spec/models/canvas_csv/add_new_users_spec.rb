@@ -3,16 +3,30 @@ describe CanvasCsv::AddNewUsers do
   let(:sis_active_uids) { %w(946122 946123 946124 946125 946126 946127).to_set }
   let(:sis_active_people) do
     [
-      {ldap_uid: '946122', first_name: 'Charmaine', last_name: 'D\'Silva', email_address: 'charmainedsilva@example.com', student_id: '22729405'},
-      {ldap_uid: '946127', first_name: 'Dwight', last_name: 'Schrute', email_address: 'dschrute@schrutefarms.com', student_id: nil},
+      {
+        ldap_uid: '946122',
+        first_name: 'Charmaine',
+        last_name: 'D\'Silva', 
+        email_address: 'charmainedsilva@example.com',
+        official_bmail_address: 'cdsilva@berkeley.edu',
+        student_id: '22729405'
+      },
+      {
+        ldap_uid: '946127',
+        first_name: 'Dwight',
+        last_name: 'Schrute',
+        email_address: 'dschrute@schrutefarms.com',
+        official_bmail_address: 'dschrute@berkeley.edu',
+        student_id: nil
+      },
     ]
   end
 
   let(:fake_now_datetime) { DateTime.strptime('2014-07-23T09:00:06+07:00', '%Y-%m-%dT%H:%M:%S%z') }
   let(:new_canvas_users) do
     [
-      {'user_id'=>'22729405','login_id'=>'946122','password'=>nil,'first_name'=>'Charmaine','last_name'=>'D\'Silva','email'=>'charmainedsilva@example.com','status'=>'active'},
-      {'user_id'=>'UID:946127','login_id'=>'946127','password'=>nil,'first_name'=>'Dwight','last_name'=>'Schrute','email'=>'dschrute@schrutefarms.com','status'=>'active'}
+      {'user_id'=>'22729405','login_id'=>'946122','password'=>nil,'first_name'=>'Charmaine','last_name'=>'D\'Silva','email'=>'cdsilva@berkeley.edu','status'=>'active'},
+      {'user_id'=>'UID:946127','login_id'=>'946127','password'=>nil,'first_name'=>'Dwight','last_name'=>'Schrute','email'=>'dschrute@berkeley.edu','status'=>'active'}
     ]
   end
 

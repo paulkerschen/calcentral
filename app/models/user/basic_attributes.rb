@@ -33,7 +33,8 @@ module User
         last_name: result['last_name'],
         ldap_uid: result['ldap_uid'],
         roles: Berkeley::UserRoles.roles_from_campus_row(result),
-        student_id: result['student_id']
+        student_id: result['student_id'],
+        official_bmail_address: result['alternateid']
       }
     end
   end
