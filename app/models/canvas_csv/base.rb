@@ -19,13 +19,18 @@ module CanvasCsv
     end
 
     def canvas_user_from_campus_attributes(campus_user)
+      email_address = if campus_user[:official_bmail_address].present?
+        campus_user[:official_bmail_address]
+      else
+        campus_user[:email_address]
+      end
       {
         'user_id' => derive_sis_user_id(campus_user),
         'login_id' => campus_user[:ldap_uid].to_s,
         'password' => nil,
         'first_name' => campus_user[:first_name],
         'last_name' => campus_user[:last_name],
-        'email' => campus_user[:email_address],
+        'email' => email_address,
         'status' => 'active'
       }
     end

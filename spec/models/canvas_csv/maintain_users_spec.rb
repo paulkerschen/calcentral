@@ -17,7 +17,7 @@ describe CanvasCsv::MaintainUsers do
           'first_name' => 'Ema',
           'last_name' => 'Ilcha',
           'full_name' => 'Ema Ilcha',
-          'email' => 'old@example.edu',
+          'email' => 'old@berkeley.edu',
           'status' => 'active'
         }
       }
@@ -26,7 +26,8 @@ describe CanvasCsv::MaintainUsers do
           ldap_uid: uid.to_i,
           first_name: 'Ema',
           last_name: 'Ilcha',
-          email_address: 'new@example.edu',
+          email_address: 'old@berkeley.edu',
+          official_bmail_address: 'new@berkeley.edu',
           roles: {faculty: true}
         }
       ] }
@@ -35,7 +36,7 @@ describe CanvasCsv::MaintainUsers do
         expect(subject.sis_user_id_changes.length).to eq(0)
         expect(known_users.length).to eq(1)
         new_account = account_changes[0]
-        expect(new_account['email']).to eq('new@example.edu')
+        expect(new_account['email']).to eq('new@berkeley.edu')
       end
     end
 
@@ -51,7 +52,7 @@ describe CanvasCsv::MaintainUsers do
           'first_name' => 'Sissy',
           'last_name' => 'Changer',
           'full_name' => 'Sissy Changer',
-          'email' => "#{changed_sis_id_uid}@example.edu",
+          'email' => "#{changed_sis_id_uid}@berkeley.edu",
           'status' => 'active'
         }
       }
@@ -60,7 +61,8 @@ describe CanvasCsv::MaintainUsers do
           ldap_uid: changed_sis_id_uid.to_i,
           first_name: 'Sissy',
           last_name: 'Changer',
-          email_address: "#{changed_sis_id_uid}@example.edu",
+          email_address: "#{changed_sis_id_uid}@physics.berkeley.edu",
+          official_bmail_address: "#{changed_sis_id_uid}@berkeley.edu",
           roles: {staff: true, student: true, registered: true},
           student_id: changed_sis_id_student_id.to_i
         }
@@ -83,7 +85,7 @@ describe CanvasCsv::MaintainUsers do
           'first_name' => 'Noam',
           'last_name' => 'Changey',
           'full_name' => 'Noam Changey',
-          'email' => "#{uid}@example.edu",
+          'email' => "#{uid}@berkeley.edu",
           'status' => 'active'
         }
       }
@@ -92,7 +94,8 @@ describe CanvasCsv::MaintainUsers do
           ldap_uid: uid.to_i,
           first_name: 'Noam',
           last_name: 'Changey',
-          email_address: "#{uid}@example.edu",
+          email_address: "#{uid}@berkeley.edu",
+          official_bmail_address: "#{uid}@berkeley.edu",
           roles: {staff: true, exStudent: true},
           student_id: 9999999
         }
@@ -115,7 +118,7 @@ describe CanvasCsv::MaintainUsers do
           'first_name' => 'Eugene',
           'last_name' => 'Debs',
           'full_name' => 'Eugene V Debs',
-          'email' => "#{uid}@example.edu",
+          'email' => "#{uid}@berkeley.edu",
           'status' => 'active'
         }
       }
@@ -124,7 +127,8 @@ describe CanvasCsv::MaintainUsers do
           ldap_uid: uid.to_i,
           first_name: 'Eugene V',
           last_name: 'Debs',
-          email_address: "#{uid}@example.edu",
+          email_address: "#{uid}@berkeley.edu",
+          official_bmail_address: "#{uid}@berkeley.edu",
           roles: {staff: true, exStudent: true},
           student_id: 9999999
         }
@@ -149,7 +153,7 @@ describe CanvasCsv::MaintainUsers do
           'first_name' => 'Uneeda',
           'last_name' => 'Integer',
           'full_name' => 'Uneeda Integer',
-          'email' => "#{uid}@example.edu",
+          'email' => "#{uid}@berkeley.edu",
           'status' => 'active'
         }
       }
@@ -158,7 +162,8 @@ describe CanvasCsv::MaintainUsers do
           ldap_uid: 0,
           first_name: 'Sumotha',
           last_name: 'Match',
-          email_address: 'zero@example.edu',
+          email_address: 'zero@berkeley.edu',
+          official_bmail_address: 'zero@berkeley.edu',
           roles: {student: true, registered: true},
           student_id: 9999999
         }
@@ -192,6 +197,7 @@ describe CanvasCsv::MaintainUsers do
           first_name: 'Skip',
           last_name: 'James',
           email_address: "#{uid}@example.edu",
+          official_bmail_address: "#{uid}@berkeley.edu",
           roles: {student: true, registered: true},
           student_id: student_id
         }
@@ -200,7 +206,7 @@ describe CanvasCsv::MaintainUsers do
         expect(account_changes.length).to eq(1)
         expect(account_changes[0]['login_id']).to eq uid
         expect(account_changes[0]['user_id']).to eq student_id
-        expect(account_changes[0]['email']).to eq "#{uid}@example.edu"
+        expect(account_changes[0]['email']).to eq "#{uid}@berkeley.edu"
         expect(subject.sis_user_id_changes).to eq({"sis_login_id:inactive-#{uid}" => {
           'old_id' => "UID:#{uid}",
           'new_id' => student_id
@@ -237,6 +243,7 @@ describe CanvasCsv::MaintainUsers do
         first_name: 'Etta',
         last_name: 'James',
         email_address: "#{uid}@example.edu",
+        official_bmail_address: "#{uid}@berkeley.edu",
         roles: {student: true, expiredAccount: true},
         student_id: student_id
       }
@@ -249,7 +256,7 @@ describe CanvasCsv::MaintainUsers do
       expect(account_changes.length).to eq(1)
       expect(account_changes[0]['login_id']).to eq uid
       expect(account_changes[0]['user_id']).to eq "UID:#{uid}"
-      expect(account_changes[0]['email']).to eq "#{uid}@example.edu"
+      expect(account_changes[0]['email']).to eq "#{uid}@berkeley.edu"
       expect(subject.sis_user_id_changes).to be_blank
       expect(subject.user_email_deletions).to be_blank
     end

@@ -12,7 +12,8 @@ describe CalnetLdap::UserAttributes do
         o: ['University of California, Berkeley'],
         ou: ['people'],
         mail: ['oski@berkeley.edu'],
-        berkeleyeduofficialemail: ['oski_bearable@berkeley.edu'],
+        berkeleyeduofficialemail: ['oski_bearable@physics.berkeley.edu'],
+        berkeleyEduAlternateId: ['oski_bearable@berkeley.edu'],
         berkeleyeduaffiliations: [
           'AFFILIATE-TYPE-ADVCON-STUDENT',
           'AFFILIATE-TYPE-ADVCON-ATTENDEE',
@@ -106,7 +107,7 @@ describe CalnetLdap::UserAttributes do
 
     context 'when LDAP query returns no mail attribute' do
       before { ldap_result.delete :mail }
-      it 'falls back to berkeleyeduofficialemail' do
+      it 'falls back to berkeleyEduAlternateId' do
         expect(feed[:email_address]).to eq 'oski_bearable@berkeley.edu'
       end
     end

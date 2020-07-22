@@ -58,12 +58,12 @@ module CalnetLdap
       end
       roles[:confidential] = true if string_attribute(ldap_record, :berkeleyeduconfidentialflag) == 'true'
       identifiers(ldap_record).merge(
-        email_address: string_attribute(ldap_record, :mail) || string_attribute(ldap_record, :berkeleyeduofficialemail),
+        email_address: string_attribute(ldap_record, :mail) || string_attribute(ldap_record, :berkeleyEduAlternateId),
         first_name: string_attribute(ldap_record, :berkeleyEduFirstName) || string_attribute(ldap_record, :givenname),
         last_name: string_attribute(ldap_record, :berkeleyEduLastName) || string_attribute(ldap_record, :sn),
         person_name: string_attribute(ldap_record, :displayname),
         roles: roles,
-        official_bmail_address: string_attribute(ldap_record, :berkeleyeduofficialemail)
+        official_bmail_address: string_attribute(ldap_record, :berkeleyEduAlternateId)
       )
     end
 

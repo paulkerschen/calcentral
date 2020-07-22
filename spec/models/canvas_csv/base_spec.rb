@@ -6,8 +6,24 @@ describe CanvasCsv::Base do
     context 'when all users known' do
       before do
         people_attributes = [
-          { ldap_uid: '1234', first_name: 'John', last_name: 'Smith', email_address: 'johnsmith@example.com', student_id: nil, roles: {faculty: true} },
-          { ldap_uid: '1235', first_name: 'Jane', last_name: 'Smith', email_address: 'janesmith@example.com', student_id: nil, roles: {faculty: true} },
+          {
+            ldap_uid: '1234',
+            first_name: 'John',
+            last_name: 'Smith',
+            email_address: 'johnsmith@example.com',
+            official_bmail_address: 'johnsmith@berkeley.edu',
+            student_id: nil,
+            roles: {faculty: true}
+          },
+          { 
+            ldap_uid: '1235',
+            first_name: 'Jane',
+            last_name: 'Smith',
+            email_address: 'janesmith@example.com',
+            official_bmail_address: 'janesmith@berkeley.edu',
+            student_id: nil,
+            roles: {faculty: true}
+          },
         ]
         expect(User::BasicAttributes).to receive(:attributes_for_uids).with(['1234','1235']).and_return people_attributes
       end
@@ -19,7 +35,7 @@ describe CanvasCsv::Base do
         expect(result[0]['login_id']).to eq '1234'
         expect(result[0]['first_name']).to eq 'John'
         expect(result[0]['last_name']).to eq 'Smith'
-        expect(result[0]['email']).to eq 'johnsmith@example.com'
+        expect(result[0]['email']).to eq 'johnsmith@berkeley.edu'
         expect(result[0]['status']).to eq 'active'
       end
 
