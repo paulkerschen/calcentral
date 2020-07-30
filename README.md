@@ -1,5 +1,7 @@
 # ETS Junction
 
+Looking for the CalCentral web application? That code is maintained by Student Information Systems at https://github.com/sis-berkeley-edu/calcentral.
+
 * Master Build: [![Build Status](https://api.travis-ci.org/ets-berkeley-edu/calcentral.svg?branch=master)](https://travis-ci.org/ets-berkeley-edu/calcentral)
 
 ## Dependencies
