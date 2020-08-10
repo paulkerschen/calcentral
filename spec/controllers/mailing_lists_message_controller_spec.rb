@@ -106,8 +106,8 @@ describe MailingListsMessageController do
               'EC2CE1CA-4686-4412-88C7-EC9A2176D97F' => 'attachment-1'
             },
             data: {
-              'attachment-1' => attachment_1,
-              'attachment-2' => attachment_2
+              'attachment-1' => anything,
+              'attachment-2' => anything
             }
           }
         )).and_call_original

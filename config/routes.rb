@@ -1,4 +1,4 @@
-Calcentral::Application.routes.draw do
+Rails.application.routes.draw do
 
   mount RailsAdmin::Engine => '/ccadmin', :as => 'rails_admin'
 

@@ -1,27 +1,6 @@
 # RailsAdmin config file.
 # See github.com/sferik/rails_admin for more information.
 
-# simple adapter class from our AuthenticationStatePolicy (which is pundit-based) to CanCan, which is greatly preferred by rails_admin.
-class Ability
-  include CanCan::Ability
-
-  def initialize(user)
-    if user
-      can :access, :all
-      can :dashboard, :all
-      if user.policy.can_administrate?
-        can :manage, [
-          CanvasCsv::Synchronization,
-          MailingLists::Member,
-          MailingLists::SiteMailingList,
-          Oec::CourseCode,
-          User::Auth
-        ]
-      end
-    end
-  end
-end
-
 RailsAdmin.config do |config|
 
   ################  Global configuration  ################
@@ -31,7 +10,7 @@ RailsAdmin.config do |config|
   # or for a more dynamic name:
   # config.main_app_name = Proc.new { |controller| [Rails.application.engine_name.titleize, controller.params['action'].titleize] }
 
-  # We're not using Devise or Warden for RailsAdmin authentication; check for superuser in authorize_with instead.
+  # We're not using Devise or Warden for RailsAdmin authentication; check for superuser in authenticate_with instead.
   config.authenticate_with {
     if cookies[:reauthenticated] || !!Settings.features.reauthentication == false
       policy = AuthenticationState.new(session).policy
@@ -40,13 +19,6 @@ RailsAdmin.config do |config|
       redirect_to main_app.reauth_admin_path
     end
   }
-
-  # Because CanCan is not inheriting current_user from ApplicationController, we redefine it.
-  config.current_user_method {
-    AuthenticationState.new(session)
-  }
-
-  config.authorize_with :cancan
 
   # If you want to track changes on your models:
   # config.audit_with :history, 'Adminuser'

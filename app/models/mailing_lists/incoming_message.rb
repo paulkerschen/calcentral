@@ -1,3 +1,5 @@
+require 'mail'
+
 module MailingLists
   class IncomingMessage
 

@@ -2,30 +2,24 @@ source 'https://rubygems.org'
 
 # The core framework
 # https://github.com/rails/rails
-gem 'rails', '4.2.11.1'
+gem 'rails', '5.0.7.2'
 
 gem 'actionpack-action_caching', '~>1.2.1'
 gem 'actionpack-page_caching', '~>1.1.1'
 gem 'actionpack-xml_parser', '~>1.0.1'
 gem 'actionview-encoded_mail_to', '~>1.0.5'
 gem 'activerecord-session_store', '~>1.1.0'
-gem 'protected_attributes', '~> 1.0.8'
 gem 'rails-observers', '~>0.1.2'
-gem 'rails-perftest', '~>0.0.5'
 gem 'responders', '~> 2.0'
 
 gem 'rake', '~> 12.3.3'
 
-# ETS is temporarily maintaining its own fork of Rack to support the SameSite=None cookie property.
-gem 'rack', '~> 1.6.13', git: 'https://github.com/ets-berkeley-edu/rack.git', branch: 'ets-1-6-samesite'
+gem 'rack', '~> 2.2.3'
 
-gem 'activerecord-jdbc-adapter', '~> 1.3.16'
+gem 'activerecord-jdbc-adapter', '~> 50.7'
 
 # Postgresql adapter
-gem 'activerecord-jdbcpostgresql-adapter', '~> 1.3.16'
-
-# H2 adapter
-gem 'activerecord-jdbch2-adapter', '~> 1.3.16'
+gem 'activerecord-jdbcpostgresql-adapter', '~> 50.7'
 
 # A JSON implementation as a Ruby extension in C
 # http://flori.github.com/json/
@@ -39,7 +33,7 @@ gem 'omniauth-cas', '~> 1.1.0', git: 'https://github.com/ets-berkeley-edu/omniau
 gem 'net-ldap', '~> 0.16.0'
 
 # secure_headers provides x-frame, csp and other http headers
-gem 'secure_headers', '~> 3.9.0'
+gem 'secure_headers', '~> 5.0.5'
 
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', '~> 0.9.1'
@@ -60,7 +54,7 @@ gem 'dalli', '~> 2.7.2'
 gem 'log4r', '~> 1.1'
 
 # for easier non-DB-backed models
-gem 'active_attr', '~> 0.8.5'
+gem 'active_attr', '~> 0.15.0'
 
 # for production deployment
 gem 'jruby-activemq', '~> 5.13.0', git: 'https://github.com/ets-berkeley-edu/jruby-activemq.git'
@@ -77,7 +71,7 @@ gem 'nokogiri', '~> 1.10.8', platforms: :jruby
 gem 'link_header', '~> 0.0.7'
 
 # Background jobs
-gem 'concurrent-ruby', '~> 1.0.5'
+gem 'concurrent-ruby', '~> 1.0'
 
 # for building a WAR to deploy on Tomcat
 gem 'warbler', '~> 2.0.5'
@@ -89,7 +83,6 @@ gem 'retriable', '~> 2.0'
 # authorization abstraction layer
 gem 'pundit', '~> 0.3.0'
 
-gem 'cancan', '~> 1.6.10'
 gem 'net-ssh', '~>2.9.2' # v3 requires Ruby 2.0
 gem 'net-telnet', '~> 0.2.0'
 
@@ -101,7 +94,7 @@ gem 'rubyzip', '~> 1.3.0'
 gem 'aws-sdk-s3', '~> 1.8.2'
 
 # for simplified relational data management
-gem 'rails_admin', '1.3.0'
+gem 'rails_admin', '2.0.2'
 gem 'kaminari', '~> 1.2.1'
 
 # Closure Compiler Gem for JS compression
@@ -114,7 +107,7 @@ gem 'bootstrap-sass', '~> 3.4.1', group: :development
 # Oracle adapter
 # Purposely excluding this for test environments since folks have to install ojdbc6
 group :development, :production do
-  gem 'activerecord-oracle_enhanced-adapter', '~> 1.6.0'
+  gem 'activerecord-oracle_enhanced-adapter', '~> 1.7.11'
   gem 'rvm-capistrano', '~> 1.3.1'
   gem 'capistrano', '~> 2.15.4'
 end
@@ -123,16 +116,16 @@ group :development, :test do
   # Currently needed by RubyMine.
   gem 'test-unit'
 
-  gem 'rspec-core', '~> 3.4.0'
-  gem 'rspec-rails', '~> 3.4.1'
-  gem 'rspec-mocks', '~> 3.4.0'
-  gem 'rspec-support', '~> 3.4.0'
+  gem 'rspec-core', '~> 3.9.2'
+  gem 'rspec-rails', '~> 4.0.1'
+  gem 'rspec-mocks', '~> 3.9.1'
+  gem 'rspec-support', '~> 3.9.3'
   gem 'rspec-its', '~> 1.1.0'
-  gem 'rspec-collection_matchers', '~> 1.1.2'
+  gem 'rspec-collection_matchers', '~> 1.2.0'
   gem 'minitest-reporters', '~> 1.0.8'
 
   # We need to specify the latest webdriver here, to support the latest firefox
-  gem 'selenium-webdriver', '~> 2.53.4'
+  gem 'selenium-webdriver', '~> 3.142.7'
 
   # Code coverage for Ruby 1.9 with a powerful configuration library and automatic merging of coverage across test suites
   # https://rubygems.org/gems/simplecov
@@ -147,11 +140,6 @@ group :development, :test do
   # Headless is a Ruby interface for Xvfb. It allows you to create a headless display straight
   # from Ruby code, hiding some low-level action.
   gem 'headless', '~> 1.0.2'
-
-  # Spork can speed up multiple test runs.
-  gem 'spork','1.0.0rc0'
-  gem 'guard-spork'
-  gem 'spork-rails'
 
   # Webmock is not thread-safe and should never be enabled in production-like environments.
   gem 'webmock', '~> 1.20.4'
@@ -170,8 +158,8 @@ group :development do
 end
 
 group :test do
-  gem 'activerecord-jdbcsqlite3-adapter', '~> 1.3.16'
-  gem 'page-object', '~> 1.2.0'
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 50.7'
+  gem 'page-object', '~> 2.2.6'
 
   # RSpec results that Hudson + Bamboo + xml happy CI servers can read. See https://rubygems.org/gems/rspec_junit_formatter
   # TODO: Use gem 'rspec_junit_formatter', '~> 0.2.x' when deprecated concern of CLC-3565 is resolved.

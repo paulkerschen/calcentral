@@ -1,5 +1,5 @@
 module User
-  class Data < ActiveRecord::Base
+  class Data < ApplicationRecord
     include ActiveRecordHelper
 
     self.table_name = 'user_data'
@@ -8,7 +8,6 @@ module User
     has_many :recent_uids, :class_name => 'User::RecentUid', :foreign_key => 'owner_id'
 
     after_initialize :log_access
-    attr_accessible :preferred_name, :uid, :first_login_at
 
     def self.database_alive?
       is_alive = false

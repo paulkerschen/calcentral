@@ -3,7 +3,7 @@ bundler_args: --without development production --deployment --jobs=4 --retry=5
 jdk: openjdk8
 node_js: 10.1.0
 os: linux
-rvm: jruby-9.1.17.0
+rvm: jruby-9.2.13.0
 
 env:
   global:
