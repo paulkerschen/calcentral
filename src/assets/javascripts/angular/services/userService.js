@@ -139,11 +139,6 @@ angular.module('calcentral.services').service('userService', function($http, $lo
     });
   };
 
-  var enableOAuth = function(authorizationService) {
-    analyticsService.sendEvent('OAuth', 'Enable', 'service: ' + authorizationService);
-    window.location = '/api/' + authorizationService.toLowerCase() + '/request_authorization';
-  };
-
   var handleRouteChange = function() {
     if (!profile.features) {
       fetch();
@@ -155,22 +150,6 @@ angular.module('calcentral.services').service('userService', function($http, $lo
   var signIn = function() {
     analyticsService.sendEvent('Authentication', 'Redirect to login');
     window.location = '/auth/cas';
-  };
-
-  /**
-   * Remove OAuth permissions for a service for the currently logged in user
-   * @param {String} authorizationService The authorization service (e.g. 'google')
-   * @return {undefined}
-   */
-  var removeOAuth = function(authorizationService) {
-    // Send the request to remove the authorization for the specific OAuth service
-    // Only when the request was successful, we update the UI
-    $http.post('/api/' + authorizationService.toLowerCase() + '/remove_authorization').then(
-      function successCallback() {
-        analyticsService.sendEvent('OAuth', 'Remove', 'service: ' + authorizationService);
-        profile['has' + authorizationService + 'AccessToken'] = false;
-      }
-    );
   };
 
   var signOut = function() {
@@ -192,7 +171,6 @@ angular.module('calcentral.services').service('userService', function($http, $lo
 
   // Expose methods
   return {
-    enableOAuth: enableOAuth,
     events: events,
     fetch: fetch,
     handleAccessToPage: handleAccessToPage,
@@ -201,7 +179,6 @@ angular.module('calcentral.services').service('userService', function($http, $lo
     profile: profile,
     redirectToHome: redirectToHome,
     redirectToPage: redirectToPage,
-    removeOAuth: removeOAuth,
     setFirstLogin: setFirstLogin,
     signIn: signIn,
     signOut: signOut

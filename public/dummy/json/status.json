@@ -1,9 +1,6 @@
 {
-  "isBasicAuthEnabled": false,
   "isLoggedIn": true,
   "features": {
-    "myFinAid": true,
-    "textbooks": true,
     "videos": true
   },
   "actingAsUid": "1051203",
@@ -12,14 +9,9 @@
   "firstLoginAt": "2014-02-05T05:37:02-08:00",
   "firstName": "IWQROE",
   "fullName": "IWQROE BABTREW",
-  "isGoogleReminderDismissed": false,
-  "hasGoogleAccessToken": false,
   "hasStudentHistory": false,
   "hasInstructorHistory": false,
   "hasDashboardTab": true,
-  "hasAcademicsTab": true,
-  "canViewGrades": false,
-  "hasFinancialsTab": true,
   "hasToolboxTab": true,
   "googleEmail": "",
   "lastName": "BABTREW",
@@ -37,12 +29,7 @@
   "uid": "61889",
   "sid": null,
   "campusSolutionsID": null,
-  "isDelegateUser": false,
-  "showSisProfileUI": true,
   "isDirectlyAuthenticated": true,
-  "advisorActingAsUid": false,
   "delegateActingAsUid": false,
-  "canSeeCSLinks": true,
-  "canActOnFinances": true,
   "youtubeSplashId": "Yc3z0TIl_Fc"
 }

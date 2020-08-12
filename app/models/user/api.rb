@@ -110,8 +110,6 @@ module User
       names = person_names
       google_mail = User::Oauth2Data.get_google_email @uid
       current_user_policy = authentication_state.policy
-      is_google_reminder_dismissed = User::Oauth2Data.is_google_reminder_dismissed(@uid)
-      is_google_reminder_dismissed = is_google_reminder_dismissed && is_google_reminder_dismissed.present?
       has_student_history = User::HasStudentHistory.new(@uid).has_student_history?
       has_instructor_history = User::HasInstructorHistory.new(@uid).has_instructor_history?
       roles = @user_attributes[:roles]
@@ -129,12 +127,10 @@ module User
         givenFullName: names[:given_full_name],
         googleEmail: google_mail,
         hasDashboardTab: has_dashboard_tab?,
-        hasGoogleAccessToken: GoogleApps::Proxy.access_granted?(@uid),
         hasInstructorHistory: has_instructor_history,
         hasStudentHistory: has_student_history,
         hasToolboxTab: has_toolbox_tab?(current_user_policy),
         isDirectlyAuthenticated: directly_authenticated,
-        isGoogleReminderDismissed: is_google_reminder_dismissed,
         isSuperuser: super_user?,
         isViewer: viewer?(current_user_policy),
         lastName: names[:last_name],

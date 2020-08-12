@@ -7,15 +7,6 @@
       <div data-ng-include="'widgets/toolbox/view_as.html'" data-ng-if="(api.user.profile.isViewer || api.user.profile.isSuperuser) && api.user.profile.isDirectlyAuthenticated"></div>
     </div>
     <div class="medium-6 large-4 columns cc-column-2">
-      <div class="cc-widget">
-        <div class="cc-widget-title">
-          <h2>bConnected</h2>
-        </div>
-        <div
-          class="cc-page-profile-widget"
-          data-ng-include="'widgets/profile/bconnected.html'"
-        ></div>
-      </div>
       <div data-ng-include="'widgets/toolbox/uid_lookup.html'" data-ng-if="(api.user.profile.isViewer || api.user.profile.isSuperuser) && api.user.profile.isDirectlyAuthenticated"></div>
     </div>
     <div class="medium-6 large-4 columns cc-column-3">

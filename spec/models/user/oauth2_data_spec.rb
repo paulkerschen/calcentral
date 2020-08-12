@@ -133,13 +133,6 @@ describe User::Oauth2Data do
     expect(access_token).to be_nil
   end
 
-  it 'should remove dismiss_reminder app_data when a new google token is stored' do
-    expect(User::Oauth2Data.dismiss_google_reminder(user_id)).to be true
-    expect(User::Oauth2Data.is_google_reminder_dismissed(user_id)).to be true
-    User::Oauth2Data.new_or_update(user_id, GoogleApps::Proxy::APP_ID, access_token, refresh_token)
-    expect(User::Oauth2Data.is_google_reminder_dismissed user_id).to be_empty
-  end
-
   it 'new_or_update should merge new app_data into existing app_data' do
     User::Oauth2Data.new_or_update(user_id, GoogleApps::Proxy::APP_ID, access_token, refresh_token, 0, {app_data:{foo: 'foo?'}})
     expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::Proxy::APP_ID, user_id, :foo)).to eq 'foo?'

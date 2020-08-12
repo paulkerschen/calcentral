@@ -206,7 +206,6 @@ describe User::Api do
     allow(User::Data).to receive(:where).with(uid: uid).and_return mock_user_model
 
     allow(User::Oauth2Data).to receive(:get_google_email).with(uid).and_return ''
-    allow(User::Oauth2Data).to receive(:is_google_reminder_dismissed).with(uid).and_return false
 
     allow(User::HasStudentHistory).to receive(:new).with(uid).and_return double(has_student_history?: has_student_history)
     allow(User::HasInstructorHistory).to receive(:new).with(uid).and_return double(has_instructor_history?: has_instructor_history)
