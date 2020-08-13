@@ -41,10 +41,6 @@ module User
       get_appdata_field(Canvas::Proxy::APP_ID, user_id, 'email')
     end
 
-    def self.is_google_reminder_dismissed(user_id)
-      get_appdata_field(GoogleApps::Proxy::APP_ID, user_id, 'is_reminder_dismissed')
-    end
-
     def self.update_google_email!(user_id)
       #will be a noop if user hasn't granted google access
       use_pooled_connection {
@@ -89,14 +85,6 @@ module User
           entry.save
         end
       }
-    end
-
-    def self.dismiss_google_reminder(user_id)
-      new_or_update(user_id, GoogleApps::Proxy::APP_ID, '', '', 0, {
-        app_data: {
-          'is_reminder_dismissed' => true
-        }
-      })
     end
 
     def encrypt_tokens

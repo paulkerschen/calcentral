@@ -21,13 +21,6 @@ Calcentral::Application.routes.draw do
   get '/api/server_info' => 'server_runtime#get_info'
   get '/api/smoke_test_routes' => 'routes_list#smoke_test_routes', :as => :all_routes, :defaults => { :format => 'json' }
 
-  # Oauth endpoints: Google
-  get '/api/google/request_authorization'=> 'google_auth#refresh_tokens'
-  get '/api/google/handle_callback' => 'google_auth#handle_callback'
-  get '/api/google/current_scope' => 'google_auth#current_scope'
-  post '/api/google/remove_authorization' => 'google_auth#remove_authorization'
-  post '/api/google/dismiss_reminder' => 'google_auth#dismiss_reminder', :defaults => { :format => 'json'}
-
   # Authentication endpoints
   get '/auth/cas/callback' => 'sessions#lookup'
   get '/auth/failure' => 'sessions#failure'

@@ -2,8 +2,6 @@
   "isBasicAuthEnabled": true,
   "isLoggedIn": false,
   "features": {
-    "myFinAid": true,
-    "textbooks": true,
     "videos": true
   }
 }
