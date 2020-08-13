@@ -1,7 +1,6 @@
 feature 'act_as_user' do
   before do
     @target_uid = '978966'
-    @fake_events_list = GoogleApps::EventsList.new(fake: true)
     User::Auth.new_or_update_superuser! '238382'
     User::Auth.new_or_update_superuser! '2040'
     User::Data.create({uid: '238382'})
