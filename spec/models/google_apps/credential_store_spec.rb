@@ -1,6 +1,6 @@
 describe GoogleApps::CredentialStore do
 
-  let(:app_id) { GoogleApps::Proxy::APP_ID }
+  let(:app_id) { GoogleApps::CredentialStore::GOOGLE_APP_ID }
   let(:uid) { random_id }
   let(:settings) { GoogleApps::CredentialStore.settings_of app_id }
   let(:access_token) { random_string 10 }
@@ -60,7 +60,7 @@ describe GoogleApps::CredentialStore do
     end
 
     context 'OEC' do
-      let(:app_id) { GoogleApps::Proxy::OEC_APP_ID }
+      let(:app_id) { GoogleApps::CredentialStore::OEC_APP_ID }
 
       it 'should find settings per app_id' do
         expect(store.load_credentials).to_not be_nil

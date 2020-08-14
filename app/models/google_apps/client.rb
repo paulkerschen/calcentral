@@ -53,7 +53,7 @@ module GoogleApps
       private
 
       def new_auth(app_id, access_token, options={})
-        settings = GoogleApps::Proxy.config_of app_id
+        settings = GoogleApps::CredentialStore.config_of app_id
         authorization = client.authorization.dup
         authorization.client_id = settings.client_id
         authorization.client_secret = settings.client_secret
