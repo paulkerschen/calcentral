@@ -1,6 +1,6 @@
 describe OecGoogleAuthController do
 
-  let(:oec_user_id) { random_id }
+  let(:oec_user_id) { Settings.oec.google.uid }
   let(:settings) {
     {
       uid: oec_user_id,
@@ -11,7 +11,7 @@ describe OecGoogleAuthController do
   }
   let(:session_user_id) { random_id }
   let(:can_administer_oec) { true }
-  let(:app_id) { GoogleApps::Proxy::OEC_APP_ID }
+  let(:app_id) { GoogleApps::CredentialStore::OEC_APP_ID }
   let(:params) { {} }
 
   before do
@@ -32,7 +32,7 @@ describe OecGoogleAuthController do
     }
 
     before do
-      allow(GoogleApps::Proxy).to receive(:access_granted?).with(session_user_id).and_return true
+      allow(GoogleApps::CredentialStore).to receive(:access_granted?).with(session_user_id).and_return true
       allow(Google::APIClient).to receive(:authorization_uri).and_return google_url
     end
 
@@ -87,7 +87,6 @@ describe OecGoogleAuthController do
             refresh_token,
             0,
             hash_including(:expiration_time))
-          expect(User::Oauth2Data).to receive(:update_google_email!).never
         end
         it 'should record new client_id and client_secret' do
           post :handle_callback, params
@@ -108,7 +107,7 @@ describe OecGoogleAuthController do
 
   context 'indirectly authenticated' do
     before do
-      allow(GoogleApps::Proxy).to receive(:access_granted?).with(session_user_id).and_return true
+      allow(GoogleApps::CredentialStore).to receive(:access_granted?).with(session_user_id).and_return true
       allow(Google::APIClient).to receive(:new).never
     end
 

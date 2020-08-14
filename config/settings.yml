@@ -259,7 +259,7 @@ oec:
     sftp_user: ''
     ssh_private_key_file: ''
   google:
-    uid: ''
+    uid: '1000000'
     client_id: 'oecClientId'
     client_secret: 'oecClientSecret'
     scope: 'profile email https://mail.google.com/mail/feed/atom/ https://spreadsheets.google.com/feeds/ https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.apps.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly.metadata https://www.googleapis.com/auth/tasks'

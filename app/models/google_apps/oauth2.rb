@@ -1,13 +1,14 @@
 require 'google/api_client'
 
 module GoogleApps
-  class Oauth2TokensGrant
+  class Oauth2 < BaseProxy
     include ClassLogger
 
     def initialize(user_id, app_id, client_redirect_uri)
       @user_id = user_id
       @app_id = app_id
       @client_redirect_uri = client_redirect_uri
+      super(GoogleApps::CredentialStore.config_of(@app_id))
     end
 
     def refresh_oauth2_tokens_url(params)
@@ -46,28 +47,38 @@ module GoogleApps
         }
         store = GoogleApps::CredentialStore.new(@app_id, @user_id, @opts)
         store.write_credentials credentials
-        if @app_id == GoogleApps::Proxy::APP_ID
-          User::Oauth2Data.update_google_email! @user_id
-        end
       else
         logger.warn "Deleting the Google OAuth2 tokens of user #{@user_id} (app_id: #{@app_id}) because callback reported an error: #{params['error']}"
         User::Oauth2Data.remove(@user_id, @app_id)
       end
-
       expire
     end
 
-    def remove_user_authorization
+    def revoke_authorization
       logger.warn "Deleting Google OAuth2 tokens of user #{@user_id} (app_id: #{@app_id}) per user request"
-      GoogleApps::Revoke.new(user_id: @user_id).revoke
+      unless (access_token = get_access_token)
+        logger.error "Nil access_token for #{@user_id}; revoking Google OAuth privileges is not possible."
+        return false
+      end
+      response = get_response(
+        'https://accounts.google.com/o/oauth2/revoke',
+        query: {
+          token: access_token
+        },
+        on_error: {
+          rescue_status: :all
+        }
+      )
+      if response.code == 200
+        logger.warn "Successfully revoked Google access token for user #{@uid}"
+      else
+        logger.error "Got an error trying to revoke Google access token for user #{@uid}. Status: #{response.code} Body: #{response.body}"
+      end
       User::Oauth2Data.remove(@user_id, @app_id)
       expire
     end
 
-    def scope_granted
-      return [] unless GoogleApps::Proxy.access_granted?(@user_id, @app_id)
-      GoogleApps::Userinfo.new(user_id: @user_id, app_id: @app_id).current_scope
-    end
+    private
 
     def expire
       Cache::UserCacheExpiry.notify @user_id
@@ -99,6 +110,20 @@ module GoogleApps
         )
       end
       client
+    end
+
+    def get_access_token
+      authorization = get_authorization(@app_id, user_id)
+      authorization.access_token
+    end
+
+    def get_authorization(app_id, uid)
+      if @fake
+        GoogleApps::Client.new_fake_auth app_id
+      else
+        token_settings = User::Oauth2Data.get(uid, app_id)
+        GoogleApps::Client.new_client_auth(app_id, token_settings || { access_token: '' })
+      end
     end
 
   end

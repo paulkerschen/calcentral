@@ -1,7 +1,7 @@
 describe User::Oauth2Data do
 
   let(:user_id) { random_id }
-  let(:app_id) { GoogleApps::Proxy::APP_ID }
+  let(:app_id) { GoogleApps::CredentialStore::GOOGLE_APP_ID }
   let(:access_token) { random_string 10 }
   let(:refresh_token) { random_string 10 }
 
@@ -71,20 +71,6 @@ describe User::Oauth2Data do
     expect(tokens[:app_data]).to be_empty
   end
 
-  it 'should be able to get and update google email for authenticated users' do
-    User::Oauth2Data.new_or_update(
-      user_id,
-      app_id,
-      access_token,
-      refresh_token,
-      1)
-    expect(User::Oauth2Data.get_google_email(user_id)).to be_blank
-    user_info = GoogleApps::Userinfo.new(fake: true).user_info
-    allow(GoogleApps::Userinfo).to receive(:user_info).and_return user_info
-    User::Oauth2Data.update_google_email! user_id
-    expect(User::Oauth2Data.get_google_email user_id).to eq 'tammi.chang.clc@gmail.com'
-  end
-
   it 'should fail updating canvas email on a non-existant Canvas account' do
     allow_any_instance_of(Canvas::SisUserProfile).to receive(:sis_user_profile).and_return(
       statusCode: 404,
@@ -134,10 +120,10 @@ describe User::Oauth2Data do
   end
 
   it 'new_or_update should merge new app_data into existing app_data' do
-    User::Oauth2Data.new_or_update(user_id, GoogleApps::Proxy::APP_ID, access_token, refresh_token, 0, {app_data:{foo: 'foo?'}})
-    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::Proxy::APP_ID, user_id, :foo)).to eq 'foo?'
-    User::Oauth2Data.new_or_update(user_id, GoogleApps::Proxy::APP_ID, access_token, refresh_token, 0, {app_data:{baz: 'baz!'}})
-    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::Proxy::APP_ID, user_id, :baz)).to eq 'baz!'
-    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::Proxy::APP_ID, user_id, :foo)).to eq 'foo?'
+    User::Oauth2Data.new_or_update(user_id, GoogleApps::CredentialStore::GOOGLE_APP_ID, access_token, refresh_token, 0, {app_data:{foo: 'foo?'}})
+    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::CredentialStore::GOOGLE_APP_ID, user_id, :foo)).to eq 'foo?'
+    User::Oauth2Data.new_or_update(user_id, GoogleApps::CredentialStore::GOOGLE_APP_ID, access_token, refresh_token, 0, {app_data:{baz: 'baz!'}})
+    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::CredentialStore::GOOGLE_APP_ID, user_id, :baz)).to eq 'baz!'
+    expect(User::Oauth2Data.send(:get_appdata_field, GoogleApps::CredentialStore::GOOGLE_APP_ID, user_id, :foo)).to eq 'foo?'
   end
 end

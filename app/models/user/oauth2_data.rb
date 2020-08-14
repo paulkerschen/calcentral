@@ -33,24 +33,8 @@ module User
       Cache::UserCacheExpiry.notify uid
     end
 
-    def self.get_google_email(user_id)
-      get_appdata_field(GoogleApps::Proxy::APP_ID, user_id, 'email')
-    end
-
     def self.get_canvas_email(user_id)
       get_appdata_field(Canvas::Proxy::APP_ID, user_id, 'email')
-    end
-
-    def self.update_google_email!(user_id)
-      #will be a noop if user hasn't granted google access
-      use_pooled_connection {
-        authenticated_entry = self.where(uid: user_id, app_id: GoogleApps::Proxy::APP_ID).first
-        return unless authenticated_entry
-        userinfo = GoogleApps::Userinfo.new(user_id: user_id).user_info
-        return unless userinfo && userinfo.response.status == 200 && userinfo.data["emailAddresses"].present? && userinfo.data["emailAddresses"].length > 0
-        authenticated_entry.app_data["email"] = userinfo.data["emailAddresses"].first["value"]
-        authenticated_entry.save
-      }
     end
 
     def self.update_canvas_email!(user_id)

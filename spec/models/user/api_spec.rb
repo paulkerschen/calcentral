@@ -205,12 +205,10 @@ describe User::Api do
     mock_user_model = double('User::Data model', :first => calcentral_user_data, :first_or_create => calcentral_user_data)
     allow(User::Data).to receive(:where).with(uid: uid).and_return mock_user_model
 
-    allow(User::Oauth2Data).to receive(:get_google_email).with(uid).and_return ''
-
     allow(User::HasStudentHistory).to receive(:new).with(uid).and_return double(has_student_history?: has_student_history)
     allow(User::HasInstructorHistory).to receive(:new).with(uid).and_return double(has_instructor_history?: has_instructor_history)
 
-    allow(GoogleApps::Proxy).to receive(:access_granted?).and_return false
+    allow(GoogleApps::CredentialStore).to receive(:access_granted?).and_return false
 
     allow(User::AggregatedAttributes).to receive(:new).with(uid).and_return double(get_feed: user_attributes)
 

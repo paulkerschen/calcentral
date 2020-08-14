@@ -106,7 +106,6 @@ Calcentral::Application.routes.draw do
     # OEC endpoints
     get '/api/oec/google/request_authorization'=> 'oec_google_auth#refresh_tokens', :defaults => { :format => 'json' }
     get '/api/oec/google/handle_callback' => 'oec_google_auth#handle_callback', :defaults => { :format => 'json' }
-    get '/api/oec/google/current_scope' => 'oec_google_auth#current_scope', :defaults => { :format => 'json' }
     get '/api/oec/google/remove_authorization' => 'oec_google_auth#remove_authorization'
     get '/api/oec/tasks' => 'oec_tasks#index', :defaults => { :format => 'json' }
     post '/api/oec/tasks/:task_name' => 'oec_tasks#run', :defaults => { :format => 'json' }

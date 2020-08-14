@@ -108,7 +108,6 @@ module User
 
     def get_feed_internal
       names = person_names
-      google_mail = User::Oauth2Data.get_google_email @uid
       current_user_policy = authentication_state.policy
       has_student_history = User::HasStudentHistory.new(@uid).has_student_history?
       has_instructor_history = User::HasInstructorHistory.new(@uid).has_instructor_history?
@@ -125,7 +124,6 @@ module User
         fullName: names[:full_name],
         givenFirstName: names[:given_first_name],
         givenFullName: names[:given_full_name],
-        googleEmail: google_mail,
         hasDashboardTab: has_dashboard_tab?,
         hasInstructorHistory: has_instructor_history,
         hasStudentHistory: has_student_history,

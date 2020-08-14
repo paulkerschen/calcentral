@@ -22,29 +22,15 @@ class OecGoogleAuthController < ApplicationController
     redirect_to url
   end
 
-  def current_scope
-    render json: {
-      currentScope: google.scope_granted
-    }
-  end
-
   def remove_authorization
-    google.remove_user_authorization
+    google.revoke_authorization
     render nothing: true, status: 204
   end
 
   private
 
   def google
-    @google ||= GoogleApps::Oauth2TokensGrant.new(user_id, app_id, client_redirect_uri)
-  end
-
-  def user_id
-    opts[:uid]
-  end
-
-  def app_id
-    GoogleApps::Proxy::OEC_APP_ID
+    @google ||= GoogleApps::Oauth2.new(Settings.oec.google.uid, GoogleApps::CredentialStore::OEC_APP_ID, client_redirect_uri)
   end
 
   def opts

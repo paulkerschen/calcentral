@@ -9,7 +9,7 @@ describe OecTasksController do
   before do
     session['user_id'] = random_id
     allow_any_instance_of(AuthenticationStatePolicy).to receive(:can_administer_oec?).and_return true
-    allow(User::Oauth2Data).to receive(:get).with(anything, GoogleApps::Proxy::OEC_APP_ID).and_return oauth_tokens
+    allow(User::Oauth2Data).to receive(:get).with(anything, GoogleApps::CredentialStore::OEC_APP_ID).and_return oauth_tokens
   end
 
   shared_examples 'authorization and error handling' do

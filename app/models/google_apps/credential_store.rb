@@ -2,6 +2,9 @@ module GoogleApps
   class CredentialStore
     include ClassLogger
 
+    GOOGLE_APP_ID = 'Google'
+    OEC_APP_ID = 'OEC'
+
     def initialize(app_id, uid, opts={})
       raise ArgumentError, 'Credential store lookup requires both app_id and user_id' if app_id.blank? || uid.blank?
       @app_id = app_id
@@ -61,8 +64,16 @@ module GoogleApps
         opts)
     end
 
+    def self.config_of(app_id = nil)
+      case app_id
+        when GOOGLE_APP_ID then Settings.google_proxy
+        when OEC_APP_ID then Settings.oec.google
+        else nil
+      end
+    end
+
     def self.settings_of(app_id)
-      return nil unless (settings = Proxy.config_of app_id)
+      return nil unless (settings = self.config_of app_id)
       {
         client_id: settings.client_id,
         client_secret: settings.client_secret,
@@ -71,5 +82,10 @@ module GoogleApps
         authorization_uri: Google::APIClient::Storage::AUTHORIZATION_URI
       }
     end
+
+    def self.access_granted?(user_id, app_id = APP_ID)
+      self.config_of(app_id).fake || User::Oauth2Data.get(user_id, app_id)[:access_token].present?
+    end
+
   end
 end
