@@ -2,8 +2,7 @@ describe Oec::ValidationTask do
   let(:term_code) { '2015-B' }
   let(:task) { Oec::ValidationTask.new(term_code: term_code, local_write: 'Y', allow_past_term: true) }
 
-  include_context 'OEC enrollment data merge'
-  include_context 'OEC instructor data import from previous terms'
+  include_context 'OEC data validation'
 
   context 'valid fixture data' do
     it 'should pass validation' do

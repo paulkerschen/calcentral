@@ -6,16 +6,17 @@ module Oec
 
       term_folder = create_folder @term_code
       term_subfolders = {}
-      Oec::Folder::FOLDER_TITLES.each do |folder_type, folder_name|
+      Oec::Folder::FOLDER_NAMES.each do |folder_type, folder_name|
         term_subfolders[folder_type] = create_folder(folder_name, term_folder)
       end
 
       previous_term_csvs = find_previous_term_csvs
       [Oec::CourseInstructors, Oec::CourseSupervisors, Oec::Instructors, Oec::Supervisors].each do |worksheet_class|
         file = previous_term_csvs[worksheet_class]
-        if file && (file.mime_type == 'text/csv') && file.download_url
-          content = StringIO.new @remote_drive.download(file)
-          @remote_drive.upload_to_spreadsheet(file.title.chomp('.csv'), content, term_subfolders[:overrides].id)
+        if file && (file.mime_type == 'text/csv')
+          content = StringIO.new
+          @remote_drive.download(file, content)
+          @remote_drive.upload_to_spreadsheet(file.name.chomp('.csv'), content, term_subfolders[:overrides].id)
         elsif file
           copy_file(file, term_subfolders[:overrides])
         else

@@ -27,8 +27,8 @@ describe Oec::TermSetupTask do
 
       [:confirmations, :logs, :merged_confirmations, :published, :sis_imports].each do |folder_type|
         expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
-          .with(Oec::Folder::FOLDER_TITLES[folder_type], term_folder, anything)
-          .and_return mock_google_drive_item(Oec::Folder::FOLDER_TITLES[folder_type])
+          .with(Oec::Folder::FOLDER_NAMES[folder_type], term_folder, anything)
+          .and_return mock_google_drive_item(Oec::Folder::FOLDER_NAMES[folder_type])
       end
 
       expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)

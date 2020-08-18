@@ -43,9 +43,10 @@ describe Oec::ReportDiffTask do
       expect(remote_sheet).to receive(:worksheets).exactly(3).times.and_return []
       expect(remote_sheet).to receive(:add_worksheet).exactly(3).times.with('Diff Report', anything, anything).and_return (fake_worksheet = double(
         max_rows: 100,
-        rows: []
+        rows: [],
+        :[]= => true,
+        save: true
       ))
-      expect(fake_remote_drive).to receive(:update_worksheet).exactly(3).times.with(fake_worksheet, anything)
 
       expect(fake_remote_drive).to receive(:find_nested).with([term_code, Oec::Folder.confirmations]).and_return (departments_folder = double)
       allow(fake_remote_drive).to receive(:find_first_matching_item).and_return mock_google_drive_item

@@ -115,7 +115,7 @@ module CanvasCsv
 
     def reports_folder
       @reports_folder ||= sheets_manager.present? ?
-        sheets_manager.find_folders_by_title('bCourses Reports').first || sheets_manager.find_folders_by_title('bCourses Reports', shared: true).first :
+        sheets_manager.find_folders_by_name('bCourses Reports').first || sheets_manager.find_folders_by_name('bCourses Reports', shared: true).first :
         nil
     end
 

@@ -6,8 +6,7 @@ describe Oec::PublishTask do
   end
   let(:tmp_publish_directory) { now.strftime "publish_#{Oec::Task.date_format}_%H%M%S" }
 
-  include_context 'OEC enrollment data merge'
-  include_context 'OEC instructor data import from previous terms'
+  include_context 'OEC data validation'
 
   def read_exported_csv(filename)
     File.read task.staging_dir.join(tmp_publish_directory, "#{filename}.csv")
@@ -22,19 +21,6 @@ describe Oec::PublishTask do
   let(:course_supervisors) { Oec::CourseSupervisors.from_csv(read_exported_csv 'course_supervisors') }
   let(:department_hierarchy) { Oec::DepartmentHierarchy.from_csv(read_exported_csv 'department_hierarchy') }
   let(:report_viewer_hierarchy) { Oec::ReportViewerHierarchy.from_csv(read_exported_csv 'report_viewer_hierarchy') }
-
-  before(:each) do
-    allow(Oec::RemoteDrive).to receive(:new).and_return fake_remote_drive
-    allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
-    allow(fake_remote_drive).to receive(:export_csv).and_return(
-      merged_course_confirmations_csv,
-      merged_supervisor_confirmations_csv,
-      previous_course_supervisors_csv)
-    allow(Settings.terms).to receive(:fake_now).and_return DateTime.parse('2015-03-09 12:00:00')
-
-    allow(Oec::Queries).to receive(:get_enrollments).and_return enrollment_data
-    allow_any_instance_of(Oec::Task).to receive(:default_term_dates).and_return({'START_DATE' => '01-26-2015', 'END_DATE' => '05-11-2015'})
-  end
 
   describe 'exported sheet structure' do
     let(:local_write) { 'Y' }

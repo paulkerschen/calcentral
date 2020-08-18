@@ -128,8 +128,8 @@ module SpecHelperModule
     end
   end
 
-  def mock_google_drive_item(title='mock')
-    double(id: "#{title}_id", title: title)
+  def mock_google_drive_item(name='mock')
+    double(id: "#{name}_id", name: name)
   end
 
   RSpec::Matchers.define :be_url do

@@ -14,24 +14,29 @@ module GoogleApps
       find_items options
     end
 
-    def find_folders_by_title(title, options = {})
+    def find_folders_by_name(name, options = {})
       options.merge!(mime_type: 'application/vnd.google-apps.folder')
-      find_items_by_title(title, options)
+      find_items_by_name(name, options)
     end
 
     def find_folders(parent_id = 'root')
       find_items(mime_type: 'application/vnd.google-apps.folder', parent_id: parent_id)
     end
 
-    def find_items_by_title(title, options = {})
-      find_items options.merge(title: title)
+    def find_items_by_name(name, options = {})
+      find_items options.merge(name: name)
     end
 
-    def download(file)
-      result = google_api.execute(uri: file.download_url)
-      log_response result
-      raise Errors::ProxyError, "Failed to download '#{file.title}' (id: #{file.id}).\nError: #{result.data['error']}" if result.error?
-      result.body
+    def download(file, destination)
+      drive_api.get_file(file.id, download_dest: destination)
+    rescue Google::Apis::ClientError => e
+      raise Errors::ProxyError, "Failed to download '#{file.name}' (id: #{file.id}).\nError: #{e.message}"
+    end
+
+    def download_string(file)
+      strio = StringIO.new
+      download(file, strio)
+      strio.string
     end
 
     def find_items(options = {})
@@ -43,171 +48,84 @@ module GoogleApps
         parent_id = 'root'
       end
       query.concat " and '#{parent_id}' in parents" if parent_id
-      query.concat " and title='#{escape options[:title]}'" if options.has_key? :title
+      query.concat " and name='#{escape options[:name]}'" if options.has_key? :name
       query.concat " and mimeType='#{options[:mime_type]}'" if options.has_key? :mime_type
       query.concat ' and sharedWithMe' if options[:shared]
       page_token = nil
       begin
-        parameters = { q: query }
-        parameters[:pageToken] = page_token unless page_token.nil?
-        result = google_api.execute(api_method: drive_api.files.list, parameters: parameters)
-        log_response result
-        case result.status
-          when 200
-            files = result.data
-            items.concat files.items
-            page_token = files.next_page_token
-          when 404
-            logger.debug 'No items found, returning empty array'
-            page_token = nil
-          else
-            raise Errors::ProxyError, "Error in find_items(#{options}): #{result.data['error']['message']}"
-        end
+        args = {q: query}
+        args[:page_token] = page_token unless page_token.nil?
+        result = drive_api.list_files(args)
+        items.concat result.files
+        page_token = result.next_page_token
+      rescue Google::Apis::ClientError => e
+        raise Errors::ProxyError, "Error in find_items(#{options}): #{e.message}"
       end while page_token.to_s != ''
       items
     end
 
-    def create_folder(title, parent_id = 'root')
-      metadata = {
-        title: title,
-        mimeType: 'application/vnd.google-apps.folder'
-      }
-      dir = drive_api.files.insert.request_schema.new metadata
-      dir.parents = [{ id: parent_id }] if parent_id
-      result = google_api.execute(api_method: drive_api.files.insert, body_object: dir)
-      log_response result
-      raise Errors::ProxyError, "Error in create_folder(#{title}, ...): #{result.data['error']['message']}" if result.error?
-      result.data
+    def create_folder(name, parent_id='root')
+      metadata = Google::Apis::DriveV3::File.new(
+        name: name,
+        parents: [parent_id],
+        mime_type: 'application/vnd.google-apps.folder'
+      )
+      drive_api.create_file(metadata)
+    rescue Google::Apis::ClientError => e
+      raise Errors::ProxyError, "Error in create_folder(#{name}, ...): #{e.message}"
     end
 
-    def upload_file(title, description, parent_id, mime_type, file_path)
-      metadata = {
-        title: title,
+    def upload_file(name, description, parent_id, mime_type, file_path, content_type=nil)
+      metadata = Google::Apis::DriveV3::File.new(
+        name: name,
         description: description,
-        mimeType: mime_type
-      }
-      file = drive_api.files.insert.request_schema.new metadata
+        mime_type: mime_type
+      )
       # Target directory is optional
-      file.parents = [{ id: parent_id }] if parent_id
-      media = Google::APIClient::UploadIO.new(file_path, mime_type)
-      result = google_api.execute(
-        api_method: drive_api.files.insert,
-        body_object: file,
-        media: media,
-        parameters: {
-          uploadType: 'multipart',
-          alt: 'json'
-        })
-      log_response result
-      raise Errors::ProxyError, "Error in upload_file(#{title}): #{result.data['error']['message']}" if result.error?
-      result.data
+      metadata.parents = [parent_id] if parent_id
+      drive_api.create_file(metadata, upload_source: file_path, content_type: (content_type || mime_type))
+    rescue Google::Apis::ClientError => e
+      raise Errors::ProxyError, "Error in upload_file(#{name}): #{e.message}"
     end
 
-    def trash_item(item, opts={})
-      api_method = opts[:permanently_delete] ? drive_api.files.delete : drive_api.files.trash
-      result = google_api.execute(
-        api_method: api_method,
-        parameters: {
-          fileId: item.id
-        })
-      log_response result
-      raise Errors::ProxyError, "Error in trash_item(#{item.id}): #{result.data['error']['message']}" if result.error?
-      result.data
-    end
-
-    def empty_trash
-      result = google_api.execute(api_method: drive_api.files.empty_trash)
-      log_response result
-      raise Errors::ProxyError, "Error in empty_trash: #{result.data['error']['message']}" if result.error?
-      result.data
-    end
-
-    def copy_item_to_folder(item, folder_id, copy_title=nil)
-      copy_title ||= item.title
-      if (copy = copy_item(item.id, copy_title))
-        old_parent_id = copy.parents.first.id
-        add_parent(copy.id, folder_id) && remove_parent(copy.id, old_parent_id)
-      end
-      copy
-    end
-
-    def copy_item(id, copy_title)
-      copy_schema = drive_api.files.copy.request_schema.new({'title' => copy_title})
-      result = google_api.execute(
-        api_method: drive_api.files.copy,
-        body_object: copy_schema,
-        parameters: {
-          fileId: id
-        }
+    def copy_item_to_folder(item, folder_id, copy_name=nil)
+      copy_name ||= item.name
+      metadata = Google::Apis::DriveV3::File.new(
+        name: copy_name,
+        parents: [folder_id],
       )
-      log_response result
-      raise Errors::ProxyError, "Error in copy_item(#{id}): #{result.data['error']['message']}" if result.error?
-      result.data
+      drive_api.copy_file(item.id, metadata)
+    rescue Google::Apis::ClientError => e
+      raise Errors::ProxyError, "Error in copy_item_to_folder(#{copy_name}): #{e.message}"
     end
 
-    def add_parent(id, parent_id)
-      new_parent = drive_api.parents.insert.request_schema.new({'id' => parent_id})
-      result = google_api.execute(
-        api_method: drive_api.parents.insert,
-        body_object: new_parent,
-        parameters: {
-          fileId: id
-        }
-      )
-      log_response result
-      raise Errors::ProxyError, "Error in add_parent(#{id}, #{parent_id}): #{result.data['error']['message']}" if result.error?
-      result.data
-    end
-
-    def remove_parent(id, parent_id)
-      result = google_api.execute(
-        api_method: drive_api.parents.delete,
-        parameters: {
-          'fileId' => id,
-          'parentId' => parent_id
-        }
-      )
-      log_response result
-      raise Errors::ProxyError, "Error in remove_parent(#{id}, #{parent_id}): #{result.data['error']['message']}" if result.error?
-      result.data
+    def copy_item(id, copy_name)
+      metadata = Google::Apis::DriveV3::File.new(name: copy_name)
+      drive_api.copy_file(id, metadata)
+    rescue Google::Apis::ClientError => e
+      raise Errors::ProxyError, "Error in copy_item(#{id}): #{e.message}"
     end
 
     def folder_id(folder)
       folder ? folder.id : 'root'
     end
 
-    def folder_title(folder)
-      folder ? folder.title : 'root'
+    def folder_name(folder)
+      folder ? folder.name : 'root'
     end
 
     private
 
     def drive_api
-      @drive_api ||= google_api.discovered_api('drive', 'v2')
+      unless @drive_api
+        @drive_api ||= Google::Apis::DriveV3::DriveService.new
+        @drive_api.authorization = get_authorization
+      end
+      @drive_api
     end
 
-    def google_api
-      @client ||= begin
-        store = GoogleApps::CredentialStore.new(@app_id, @uid, @options)
-        storage = Google::APIClient::Storage.new store
-        auth = storage.authorize
-        raise Errors::ProxyError, "Failed to refresh Google OAuth tokens (app_id: #{@app_id}; uid: #{@uid}" if auth.nil?
-        client = GoogleApps::Client.client
-        client.authorization = auth
-        tokens = client.authorization.fetch_access_token!
-        tokens.merge! refresh_token: client.authorization.refresh_token
-        store.write_credentials tokens
-        client
-      end
-    end
-
-    def log_response(api_response)
-      request_description = if api_response.request.api_method
-        "#{api_response.request.api_method.id} #{api_response.request.parameters}"
-      else
-        api_response.request.uri
-      end
-      logger.debug "Google Drive API request #{request_description} returned status #{api_response.status}"
+    def get_authorization
+      GoogleApps::Authorization.new(@uid, @app_id).get_authorization
     end
 
     def escape(arg)

@@ -6,7 +6,7 @@ module Oec
     def run_internal
       term_folder = @remote_drive.find_first_matching_item @term_code
       imports_folder = @remote_drive.find_first_matching_item(Oec::Folder.sis_imports, term_folder)
-      most_recent_import = @remote_drive.find_folders(imports_folder.id).sort_by(&:title).last
+      most_recent_import = @remote_drive.find_folders(imports_folder.id).sort_by(&:name).last
       raise UnexpectedDataError, "No SIS imports found for term #{@term_code}" unless most_recent_import
 
       overrides = @remote_drive.find_first_matching_item(Oec::Folder.overrides, term_folder)
@@ -38,9 +38,9 @@ module Oec
               dept_sheet = (template_copy = @remote_drive.copy_item(template.id, dept_name)) && @remote_drive.spreadsheet_by_id(template_copy.id)
               dept_worksheets = dept_sheet.worksheets
               courses_worksheet = dept_worksheets.find { |w| w.title == 'Courses' }
-              raise UnexpectedDataError, "Could not find worksheet 'Courses' in template copy '#{dept_sheet.title}'" unless courses_worksheet
+              raise UnexpectedDataError, "Could not find worksheet 'Courses' in template copy '#{dept_sheet.name}'" unless courses_worksheet
               report_viewers_worksheet = dept_worksheets.find { |w| w.title == 'Report Viewers' }
-              raise UnexpectedDataError, "Could not find worksheet 'Report Viewers' in template copy '#{dept_sheet.title}'" unless report_viewers_worksheet
+              raise UnexpectedDataError, "Could not find worksheet 'Report Viewers' in template copy '#{dept_sheet.name}'" unless report_viewers_worksheet
             else
               log :debug, "No template confirmation sheet found, will create blank '#{dept_name}' confirmation sheet"
               dept_sheet = @remote_drive.upload_to_spreadsheet(dept_name, StringIO.new(dept_confirmations[:courses].headers.join(',')), departments_folder.id)
@@ -64,8 +64,8 @@ module Oec
       import_items = @remote_drive.get_items_in_folder imports.id
       Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(@departments_filter).each do |dept_code, course_codes|
         dept_name = Berkeley::Departments.get(dept_code, concise: true)
-        unless (dept_import_sheet = import_items.find { |f| f.title == dept_name })
-          log :warn, "No sheet found for #{dept_name} in import folder '#{imports.title}'; skipping confirmation sheet creation."
+        unless (dept_import_sheet = import_items.find { |f| f.name == dept_name })
+          log :warn, "No sheet found for #{dept_name} in import folder '#{imports.name}'; skipping confirmation sheet creation."
           next
         end
         confirmations[dept_name] = {
@@ -98,12 +98,11 @@ module Oec
     def update_worksheet(remote_sheet, local_sheet)
       headers = remote_sheet.rows.last
       offset = remote_sheet.rows.count + 1
-      cell_updates = {}
       local_sheet.each_sorted_with_index do |local_sheet_row, y|
-        headers.each_with_index { |header, x| cell_updates[[y+offset, x+1]] = local_sheet_row[header] }
+        headers.each_with_index { |header, x| remote_sheet[y+offset, x+1] = local_sheet_row[header] }
       end
       begin
-        @remote_drive.update_worksheet(remote_sheet, cell_updates)
+        remote_sheet.save
         log :debug, "Exported confirmation data to '#{remote_sheet.title}' worksheet"
       rescue Errors::ProxyError => e
         log :error, "Export of confirmation data to '#{remote_sheet.title}' failed: #{e}"

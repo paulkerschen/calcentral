@@ -211,8 +211,8 @@ module Oec
     end
 
     def worksheet_from_folder(folder, klass)
-      if (file = find_csv_in_folder(folder, "#{klass.export_name}.csv")) && (file.mime_type == 'text/csv') && file.download_url
-        klass.from_csv @remote_drive.download(file)
+      if (file = find_csv_in_folder(folder, "#{klass.export_name}.csv")) && (file.mime_type == 'text/csv')
+        klass.from_csv @remote_drive.download_string(file)
       end
     end
 

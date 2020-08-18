@@ -6,7 +6,7 @@ module Oec
     def run_internal
       term_folder = @remote_drive.find_first_matching_item @term_code
       imports_folder = @remote_drive.find_first_matching_item(Oec::Folder.sis_imports, term_folder)
-      most_recent_import = @remote_drive.find_folders(imports_folder.id).sort_by(&:title).last
+      most_recent_import = @remote_drive.find_folders(imports_folder.id).sort_by(&:name).last
       raise UnexpectedDataError, "No SIS imports found for term #{@term_code}" unless most_recent_import
 
       confirmations_folder = @remote_drive.find_first_matching_item(Oec::Folder.confirmations, term_folder)
@@ -26,28 +26,28 @@ module Oec
       department_names = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(@departments_filter).keys.map { |code| Berkeley::Departments.get(code, concise: true) }
 
       @remote_drive.get_items_in_folder(confirmations_folder.id).each do |department_item|
-        next unless department_names.include? department_item.title
+        next unless department_names.include? department_item.name
 
-        if (sis_import_sheet = @remote_drive.find_first_matching_item(department_item.title, most_recent_import))
+        if (sis_import_sheet = @remote_drive.find_first_matching_item(department_item.name, most_recent_import))
           sis_import = Oec::SisImportSheet.from_csv(@remote_drive.export_csv(sis_import_sheet), term_code: @term_code)
         else
-          raise UnexpectedDataError, "Could not find sheet '#{department_item.title}' in folder '#{most_recent_import.title}'"
+          raise UnexpectedDataError, "Could not find sheet '#{department_item.name}' in folder '#{most_recent_import.name}'"
         end
 
         confirmation_sheet = @remote_drive.spreadsheet_by_id department_item.id
 
         if (course_confirmation_worksheet = confirmation_sheet.worksheets.find { |w| w.title == 'Courses' })
           course_confirmation = Oec::CourseConfirmation.from_csv @remote_drive.export_csv(course_confirmation_worksheet)
-          log :info, "Retrieved course confirmations from department sheet '#{department_item.title}'"
+          log :info, "Retrieved course confirmations from department sheet '#{department_item.name}'"
         else
-          raise UnexpectedDataError, "Could not find worksheet 'Courses' in sheet '#{confirmation_sheet.title}'"
+          raise UnexpectedDataError, "Could not find worksheet 'Courses' in sheet '#{confirmation_sheet.name}'"
         end
 
         if (supervisor_confirmation_worksheet = confirmation_sheet.worksheets.find { |w| w.title == 'Report Viewers' })
           supervisor_confirmation = Oec::SupervisorConfirmation.from_csv @remote_drive.export_csv(supervisor_confirmation_worksheet)
-          log :info, "Retrieved supervisor confirmations from department sheet '#{department_item.title}'"
+          log :info, "Retrieved supervisor confirmations from department sheet '#{department_item.name}'"
         else
-          raise UnexpectedDataError, "Could not find worksheet 'Report Viewers' in sheet '#{confirmation_sheet.title}'"
+          raise UnexpectedDataError, "Could not find worksheet 'Report Viewers' in sheet '#{confirmation_sheet.name}'"
         end
 
         merged_course_rows = []
@@ -92,7 +92,7 @@ module Oec
           validate_and_add(merged_supervisor_confirmations, row, %w(LDAP_UID), strict: false)
         end
 
-        log :info, "Merged all rows from department sheet '#{department_item.title}'"
+        log :info, "Merged all rows from department sheet '#{department_item.name}'"
       end
 
       if !valid?
