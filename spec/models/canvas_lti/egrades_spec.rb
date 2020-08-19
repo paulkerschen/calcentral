@@ -35,10 +35,10 @@ describe CanvasLti::Egrades do
   context 'when serving official student grades csv' do
     let(:official_student_grades_list) do
       [
-        {sis_login_id: '872584', final_grade: 'F', current_grade: 'C', grading_basis: 'GRD', student_id: '2004491', name: 'Gregory, Matt'},
-        {sis_login_id: '4000123', final_grade: 'C', current_grade: 'C', grading_basis: 'ESU', student_id: '24000123', name: 'Lyons, Marcus'},
-        {sis_login_id: '872527', final_grade: 'D-', current_grade: 'C', grading_basis: 'DPN', student_id: '2004445', name: 'Tarpey, Luke'},
-        {sis_login_id: '872529', final_grade: 'D-', current_grade: 'C', grading_basis: 'GRD', student_id: '2004421', name: 'MacDougall, Johnny'}
+        {sis_login_id: '872584', final_grade: 'F', current_grade: 'C', override_grade: nil, grading_basis: 'GRD', student_id: '2004491', name: 'Gregory, Matt'},
+        {sis_login_id: '4000123', final_grade: 'C', current_grade: 'C', override_grade: nil, grading_basis: 'ESU', student_id: '24000123', name: 'Lyons, Marcus'},
+        {sis_login_id: '872527', final_grade: 'D-', current_grade: 'C', override_grade: nil, grading_basis: 'DPN', student_id: '2004445', name: 'Tarpey, Luke'},
+        {sis_login_id: '872529', final_grade: 'D-', current_grade: 'C', override_grade: 'C+', grading_basis: 'GRD', student_id: '2004421', name: 'MacDougall, Johnny'}
       ]
     end
 
@@ -80,10 +80,12 @@ describe CanvasLti::Egrades do
         expect(official_grades_csv[2]['Grade']).to eq 'P'
         expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
         expect(official_grades_csv[2]['Comments']).to eq ''
+      end
 
+      it 'overrides current grades when override is present' do
         expect(official_grades_csv[3]['ID']).to eq '2004421'
         expect(official_grades_csv[3]['Name']).to eq 'MacDougall, Johnny'
-        expect(official_grades_csv[3]['Grade']).to eq 'C'
+        expect(official_grades_csv[3]['Grade']).to eq 'C+'
         expect(official_grades_csv[3]['Grading Basis']).to eq 'GRD'
         expect(official_grades_csv[3]['Comments']).to eq 'Opted for letter grade'
       end
@@ -135,10 +137,12 @@ describe CanvasLti::Egrades do
         expect(official_grades_csv[2]['Grade']).to eq 'NP'
         expect(official_grades_csv[2]['Grading Basis']).to eq 'DPN'
         expect(official_grades_csv[2]['Comments']).to eq ''
+      end
 
+      it 'overrides final grades if override is present' do
         expect(official_grades_csv[3]['ID']).to eq '2004421'
         expect(official_grades_csv[3]['Name']).to eq 'MacDougall, Johnny'
-        expect(official_grades_csv[3]['Grade']).to eq 'D-'
+        expect(official_grades_csv[3]['Grade']).to eq 'C+'
         expect(official_grades_csv[3]['Grading Basis']).to eq 'GRD'
         expect(official_grades_csv[3]['Comments']).to eq 'Opted for letter grade'
       end
@@ -260,8 +264,10 @@ describe CanvasLti::Egrades do
         'grades' => {
           'current_score' => 96.5,
           'final_score' => 95.0,
+          'override_score' => 93.0,
           'current_grade' => 'A+',
-          'final_grade' => 'A'
+          'final_grade' => 'A',
+          'override_grade' => 'A-'
         }
       }
     end
@@ -296,21 +302,27 @@ describe CanvasLti::Egrades do
     it 'returns blank grade score when not present' do
       student_enrollment['grades'].delete 'current_score'
       student_enrollment['grades'].delete 'final_score'
+      student_enrollment['grades'].delete 'override_score'
       result = subject.student_grade [student_enrollment]
       expect(result[:current_score]).to eq nil
       expect(result[:current_grade]).to eq 'A+'
       expect(result[:final_score]).to eq nil
       expect(result[:final_grade]).to eq 'A'
+      expect(result[:override_score]).to eq nil
+      expect(result[:override_grade]).to eq 'A-'
     end
 
     it 'returns blank letter grade when not present' do
       student_enrollment['grades'].delete 'current_grade'
       student_enrollment['grades'].delete 'final_grade'
+      student_enrollment['grades'].delete 'override_grade'
       result = subject.student_grade [student_enrollment]
       expect(result[:current_score]).to eq 96.5
       expect(result[:current_grade]).to eq nil
       expect(result[:final_score]).to eq 95.0
       expect(result[:final_grade]).to eq nil
+      expect(result[:override_score]).to eq 93.0
+      expect(result[:override_grade]).to eq nil
     end
 
     it 'returns grade when student enrollment is present' do
@@ -319,6 +331,8 @@ describe CanvasLti::Egrades do
       expect(result[:current_grade]).to eq 'A+'
       expect(result[:final_score]).to eq 95.0
       expect(result[:final_grade]).to eq 'A'
+      expect(result[:override_score]).to eq 93.0
+      expect(result[:override_grade]).to eq 'A-'
     end
   end
 
