@@ -24,7 +24,7 @@ module CanvasLti
       csv_string = CSV.generate(row_sep: "\r\n") do |csv|
         csv << ['ID', 'Name', 'Grade', 'Grading Basis', 'Comments']
         official_student_grades(term_cd, term_yr, ccn).each do |student|
-          grade = convert_to_basis(student["#{type}_grade".to_sym].to_s, student[:grading_basis], pnp_cutoff)
+          grade = convert_to_basis(student["#{type}_grade".to_sym].to_s, student[:override_grade], student[:grading_basis], pnp_cutoff)
           basis = student[:grading_basis] || ''
           comment = case student[:grading_basis]
             when 'GRD' then 'Opted for letter grade'
@@ -63,7 +63,7 @@ module CanvasLti
         proxy = Canvas::CourseUsers.new(course_id: @canvas_course_id, paging_callback: self)
         course_users = proxy.course_users(cache: false)[:body] || []
         course_users.map do |course_user|
-          student_grade(course_user['enrollments']).slice(:current_grade, :final_grade).merge(
+          student_grade(course_user['enrollments']).slice(:current_grade, :final_grade, :override_grade).merge(
             name: course_user['sortable_name'],
             sis_login_id: course_user['login_id']
           )
@@ -71,31 +71,31 @@ module CanvasLti
       end
     end
 
-    def convert_to_basis(grade, basis, pnp_cutoff)
-      if LETTER_GRADES.include?(grade) && %w(DPN EPN ESU PNP SUS).include?(basis) && pnp_cutoff != 'ignore'
-        passing = LETTER_GRADES.index(grade) <= LETTER_GRADES.index(pnp_cutoff)
+    def convert_to_basis(grade, override_grade, basis, pnp_cutoff)
+      effective_grade = override_grade || grade
+      if LETTER_GRADES.include?(effective_grade) && %w(DPN EPN ESU PNP SUS).include?(basis) && pnp_cutoff != 'ignore'
+        passing = LETTER_GRADES.index(effective_grade) <= LETTER_GRADES.index(pnp_cutoff)
         case basis
           when 'DPN', 'EPN', 'PNP' then (passing ? 'P' : 'NP')
           when 'ESU', 'SUS' then (passing ? 'S' : 'U')
         end
       else
-        grade
+        effective_grade
       end
     end
 
     # Extracts scores and grades from enrollments
     def student_grade(enrollments)
-      grade = { :current_score => nil, :current_grade => nil, :final_score => nil, :final_grade => nil }
-      return grade if enrollments.to_a.empty?
+      keys = %w(current_score current_grade final_score final_grade override_score override_grade)
+      grade_hash = keys.each_with_object({}) { |key, hash| hash[key.to_sym] = nil }
+
       enrollments.reject! {|e| e['type'] != 'StudentEnrollment' || !e.include?('grades') }
-      return grade if enrollments.to_a.empty?
-      grades = enrollments[0]['grades']
-      # multiple student enrollments carry identical grades for course user in canvas
-      grade[:current_score] = grades['current_score'] if grades.include?('current_score')
-      grade[:current_grade] = grades['current_grade'] if grades.include?('current_grade')
-      grade[:final_score] = grades['final_score'] if grades.include?('final_score')
-      grade[:final_grade] = grades['final_grade'] if grades.include?('final_grade')
-      grade
+      return grade_hash if enrollments.to_a.empty?
+
+      # Multiple student enrollments carry identical grades for course users in Canvas.
+      api_grades = enrollments[0]['grades']
+      keys.each { |k| grade_hash[k.to_sym] = api_grades[k] if api_grades.include?(k) }
+      grade_hash
     end
 
     # Provides official sections associated with Canvas course
