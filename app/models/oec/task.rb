@@ -99,7 +99,7 @@ module Oec
     def copy_file(file, dest_folder)
       return if @opts[:local_write]
       @remote_drive.check_conflicts_and_copy_file(file, dest_folder,
-        on_success: -> { log :debug, "Copied file '#{file.title}' to remote drive folder '#{dest_folder.title}'" }
+        on_success: -> { log :debug, "Copied file '#{file.name}' to remote drive folder '#{dest_folder.name}'" }
       )
     end
 
@@ -145,17 +145,17 @@ module Oec
         log :debug, "Exported to header-only local file #{worksheet.csv_export_path}"
       else
         @remote_drive.check_conflicts_and_upload(worksheet, klass.export_name, Oec::Worksheet, dest_folder,
-          on_success: -> { log :debug, "Uploaded header-only sheet '#{klass.export_name}' to remote drive folder '#{dest_folder.title}'" })
+          on_success: -> { log :debug, "Uploaded header-only sheet '#{klass.export_name}' to remote drive folder '#{dest_folder.name}'" })
       end
     end
 
-    def find_csv_in_folder(term_folder, title)
-      @remote_drive.find_items_by_title(title, parent_id: term_folder.id, mime_type: 'text/csv').first
+    def find_csv_in_folder(term_folder, name)
+      @remote_drive.find_items_by_name(name, parent_id: term_folder.id, mime_type: 'text/csv').first
     end
 
     def find_last_export(term_folder)
       if (exports = @remote_drive.find_first_matching_folder(Oec::Folder.published, term_folder))
-        @remote_drive.find_folders(exports.id).sort_by(&:title).last
+        @remote_drive.find_folders(exports.id).sort_by(&:name).last
       end
     end
 
@@ -180,7 +180,7 @@ module Oec
 
     def find_previous_term_folder
       if (folders = @remote_drive.find_folders)
-        folders.select { |f| f.title.match(/\A\d{4}-[A-D]\Z/) && f.title < @term_code }.sort_by(&:title).last
+        folders.select { |f| f.name.match(/\A\d{4}-[A-D]\Z/) && f.name < @term_code }.sort_by(&:name).last
       end
     end
 
@@ -191,18 +191,18 @@ module Oec
     end
 
     def date_time_of_most_recent(category_name)
-      # Deduce date from folder title
+      # Deduce date from folder name
       parent = @remote_drive.find_nested([@term_code, category_name])
       folders = @remote_drive.find_folders(parent.id)
-      unless (last = folders.sort_by(&:title).last)
+      unless (last = folders.sort_by(&:name).last)
         raise UnexpectedDataError, "#{self.class.name} requires a non-empty '#{@term_code}/#{category_name}' folder"
       end
-      log :info, "#{self.class.name} will pull data from '#{@term_code}/#{category_name}/#{last.title}'"
+      log :info, "#{self.class.name} will pull data from '#{@term_code}/#{category_name}/#{last.name}'"
       datetime_format = "#{self.class.date_format} #{self.class.timestamp_format}"
       begin
-        DateTime.strptime(last.title, datetime_format)
+        DateTime.strptime(last.name, datetime_format)
       rescue
-        raise UnexpectedDataError, "Folder '#{@term_code}/#{category_name}/#{last.title}' failed to match datetime format '#{datetime_format}'"
+        raise UnexpectedDataError, "Folder '#{@term_code}/#{category_name}/#{last.name}' failed to match datetime format '#{datetime_format}'"
       end
     end
 
@@ -237,12 +237,12 @@ module Oec
 
     def upload_file(path, remote_name, type, folder)
       @remote_drive.check_conflicts_and_upload(path, remote_name, type, folder,
-        on_success: -> { log :debug, "Uploaded item #{path} to remote drive folder '#{folder.title}'" })
+        on_success: -> { log :debug, "Uploaded item #{path} to remote drive folder '#{folder.name}'" })
     end
 
-    def upload_worksheet(worksheet, title, folder)
-      @remote_drive.check_conflicts_and_upload(worksheet, title, Oec::Worksheet, folder,
-        on_success: -> { log :debug, "Uploaded sheet '#{title}' to remote drive folder '#{folder.title}'" })
+    def upload_worksheet(worksheet, name, folder)
+      @remote_drive.check_conflicts_and_upload(worksheet, name, Oec::Worksheet, folder,
+        on_success: -> { log :debug, "Uploaded sheet '#{name}' to remote drive folder '#{folder.name}'" })
     end
 
     def write_log

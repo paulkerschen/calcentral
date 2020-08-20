@@ -32,24 +32,24 @@ module Oec
       diff_report_worksheet = (dept_confirmation_sheet.worksheets.find { |w| w.title == 'Diff Report' }) ||
                                dept_confirmation_sheet.add_worksheet('Diff Report', updated_diff.count+1, updated_diff.headers.count)
 
-      if diff_report_worksheet.max_rows <= updated_diff.count
-        diff_report_worksheet.max_rows = updated_diff.count + 1
-        diff_report_worksheet.save
-      end
-
       # Write header and data rows.
-      cell_updates = {}
-      updated_diff.headers.each_with_index { |header, x| cell_updates[[1, x+1]] = "'#{header}" }
+      updated_diff.headers.each_with_index { |header, x| diff_report_worksheet[1, x+1] = "'#{header}" }
       updated_diff.each_sorted_with_index do |diff_report_row, y|
-        updated_diff.headers.each_with_index { |header, x| cell_updates[[y+2, x+1]] = diff_report_row[header] }
+        updated_diff.headers.each_with_index do |header, x|
+          diff_report_worksheet[y+2, x+1] = diff_report_row[header]
+        end
       end
       # If the old worksheet has more rows than the new worksheet, overwrite old values with blanks.
-      (updated_diff.count + 1).upto(diff_report_worksheet.rows.count) do |y|
-        1.upto(updated_diff.headers.count) { |x| cell_updates[[y, x]] = '' }
+      (updated_diff.count + 2).upto(diff_report_worksheet.rows.count) do |y|
+        1.upto(updated_diff.headers.count) { |x| diff_report_worksheet[y, x] = '' }
+      end
+
+      if diff_report_worksheet.max_rows <= updated_diff.count
+        diff_report_worksheet.max_rows = updated_diff.count + 1
       end
 
       begin
-        @remote_drive.update_worksheet(diff_report_worksheet, cell_updates)
+        diff_report_worksheet.save
         log :debug, "Updated diff report for '#{dept_name}' confirmation sheet"
       rescue Errors::ProxyError => e
         log :error, "Update of diff report for '#{dept_name}' confirmation sheet failed: #{e}"
@@ -143,8 +143,8 @@ module Oec
       end
     end
 
-    def csv_row_hash(folder_titles, dept_code, klass)
-      return unless (file = @remote_drive.find_nested(folder_titles, @opts))
+    def csv_row_hash(folder_names, dept_code, klass)
+      return unless (file = @remote_drive.find_nested(folder_names, @opts))
       hash = {}
       csv = @remote_drive.export_csv file
       klass.from_csv(csv, dept_code: dept_code, term_code: @term_code).each do |row|
@@ -161,16 +161,16 @@ module Oec
             end
             hash[id] = row
           else
-            log :warn, "#{folder_titles}: No course identifier found in row:\n#{row}"
+            log :warn, "#{folder_names}: No course identifier found in row:\n#{row}"
           end
         rescue => e
-          log :error, "#{folder_titles}: Failed to parse a row due to '#{e.message}'.\nThe offending data:\n#{row}"
+          log :error, "#{folder_names}: Failed to parse a row due to '#{e.message}'.\nThe offending data:\n#{row}"
         end
       end
       hash
     rescue => e
       # We do not tolerate fatal errors when loading CSV file.
-      log :error, "\nBoom! Crash! Fatal error in csv_row_hash(#{folder_titles}, #{dept_code}, #{klass})\n"
+      log :error, "\nBoom! Crash! Fatal error in csv_row_hash(#{folder_names}, #{dept_code}, #{klass})\n"
       raise e
     end
 

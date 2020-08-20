@@ -46,9 +46,9 @@ gem 'faraday_middleware', '~> 0.9.1'
 gem 'httparty', '~> 0.13.3'
 
 # OAuth2 support
-gem 'signet', '~> 0.7.2'
-gem 'google-api-client', '~> 0.8.6'
-gem 'google_drive', '~> 1.0.6'
+gem 'signet', '~> 0.10.0'
+gem 'google-api-client', '0.32.1'
+gem 'google_drive', '~> 3.0.5'
 
 # LTI support
 gem 'ims-lti', :git => 'https://github.com/instructure/ims-lti.git'
@@ -84,7 +84,7 @@ gem 'warbler', '~> 2.0.5'
 gem 'jruby-jars', '9.2.0.0'
 
 # for trying, and trying again, and then giving up.
-gem 'retriable', '~> 1.4'
+gem 'retriable', '~> 2.0'
 
 # authorization abstraction layer
 gem 'pundit', '~> 0.3.0'

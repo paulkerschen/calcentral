@@ -22,71 +22,34 @@ describe OecGoogleAuthController do
 
   describe 'Google transaction' do
     let(:google_url) { random_string 10 }
-    let(:omit_domain_restriction) { false }
-    let(:default_scope) { settings[:scope] }
-    let(:expected_scope) { default_scope }
-    let(:client) {
-      expect(Google::APIClient).to receive(:new).and_return (google_api = double)
-      expect(google_api).to receive(:authorization).and_return (client = double)
-      client
+    let(:authorizer) {
+      expect(Google::Auth::WebUserAuthorizer).to receive(:new).and_return (authorizer = double)
+      authorizer
     }
 
     before do
       allow(GoogleApps::CredentialStore).to receive(:access_granted?).with(session_user_id).and_return true
-      allow(Google::APIClient).to receive(:authorization_uri).and_return google_url
-    end
-
-    before do
-      expect(client).to receive(:client_id=).with settings[:client_id]
-      expect(client).to receive(:client_secret=).with settings[:client_secret]
-      expect(client).to receive(:redirect_uri=)
-      expect(client).to receive(:state=)
-      expect(client).to receive(:authorization_uri=).exactly(omit_domain_restriction ? 0 : 1).times
     end
 
     describe '#refresh_tokens' do
       before do
-        expect(client).to receive :authorization_uri
-        expect(client).to receive(:scope=).and_return expected_scope
-        expect(client).to receive :update!
-      end
-
-      subject do
-        post :refresh_tokens, params
+        expect(authorizer).to receive(:get_authorization_url).and_return google_url
       end
 
       context 'user can refresh Google OAuth tokens' do
         let(:params) { {} }
 
-        context 'custom scope' do
-          let(:params) { { 'scope' => 'extra1 extra2' } }
-          let(:expected_scope) { "#{default_scope} extra1 extra2" }
-          it 'should redirect to Google' do
-            post :refresh_tokens, params
-            expect(response).to have_http_status 302
-          end
+        it 'should redirect to Google' do
+          post :refresh_tokens, params
+          expect(response).to have_http_status 302
         end
       end
     end
 
     describe '#process_callback' do
       context 'handle Google callback' do
-        let(:params) { { 'code' => random_string(10) } }
-        let(:access_token) { random_string 10 }
-        let(:refresh_token) { random_string 10 }
         before do
-          expect(client).to receive(:code=).with params['code']
-          expect(client).to receive :fetch_access_token!
-          expect(client).to receive(:expires_in).and_return nil
-          expect(client).to receive(:access_token).and_return access_token
-          expect(client).to receive(:refresh_token).and_return refresh_token
-          expect(User::Oauth2Data).to receive(:new_or_update).with(
-            oec_user_id,
-            app_id,
-            access_token,
-            refresh_token,
-            0,
-            hash_including(:expiration_time))
+          expect(authorizer).to receive(:handle_auth_callback)
         end
         it 'should record new client_id and client_secret' do
           post :handle_callback, params
@@ -108,7 +71,7 @@ describe OecGoogleAuthController do
   context 'indirectly authenticated' do
     before do
       allow(GoogleApps::CredentialStore).to receive(:access_granted?).with(session_user_id).and_return true
-      allow(Google::APIClient).to receive(:new).never
+      allow(Google::Auth::WebUserAuthorizer).to receive(:new).never
     end
 
     subject do

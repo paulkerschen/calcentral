@@ -20,7 +20,7 @@ describe Oec::MergeConfirmationSheetsTask do
                     filename
                   end
     sheet = {
-      sheet: mock_google_drive_item(sheet_title),
+      sheet: double(id: "#{sheet_title}_id", title: sheet_title),
       csv: File.read(Rails.root.join('fixtures', 'oec', "#{filename}.csv"))
     }
     @mock_sheets << sheet

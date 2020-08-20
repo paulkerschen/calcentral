@@ -43,18 +43,15 @@ describe Oec::CreateConfirmationSheetsTask do
 
   context 'expected API calls' do
     let(:local_write) { nil }
-    let(:template) { double(id: 'template_id', title: 'TEMPLATE', mime_type: 'application/vnd.google-apps.spreadsheet') }
+    let(:template) { double(id: 'template_id', name: 'TEMPLATE', mime_type: 'application/vnd.google-apps.spreadsheet') }
     let(:spreadsheet) { double(worksheets: [courses_worksheet, report_viewers_worksheet]) }
-    let(:courses_worksheet) { double(title: 'Courses', rows: [Oec::CourseConfirmation.new.headers]) }
-    let(:report_viewers_worksheet) { double(title: 'Report Viewers', rows: [Oec::SupervisorConfirmation.new.headers]) }
+    let(:courses_worksheet) { double(title: 'Courses', rows: [Oec::CourseConfirmation.new.headers], :[]= => true, save: true) }
+    let(:report_viewers_worksheet) { double(title: 'Report Viewers', rows: [Oec::SupervisorConfirmation.new.headers], :[]= => true, save: true) }
 
     it 'should copy template, update cells and upload log' do
       expect(fake_remote_drive).to receive(:find_first_matching_item).with('TEMPLATE', anything).and_return template
       expect(fake_remote_drive).to receive(:copy_item).with(template.id, 'Molecular and Cell Biology').and_return double(id: 'spreadsheet_id')
       expect(fake_remote_drive).to receive(:spreadsheet_by_id).with('spreadsheet_id').and_return spreadsheet
-
-      expect(fake_remote_drive).to receive(:update_worksheet).with(courses_worksheet, anything)
-      expect(fake_remote_drive).to receive(:update_worksheet).with(report_viewers_worksheet, anything)
       expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Pathname), kind_of(String), 'text/plain', anything, anything).and_return true
 
       task.run

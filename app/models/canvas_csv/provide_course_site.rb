@@ -428,7 +428,7 @@ module CanvasCsv
       sis_id_root = "#{slug}-#{term_yr}-#{term_cd}"
       sis_id_suffix = ''
       sis_id = nil
-      Retriable.retriable(on: IdNotUniqueException, tries: 20) do
+      Retriable.retriable(on: IdNotUniqueException, tries: 20, multiplier: 1) do
         candidate = "CRS:#{sis_id_root}#{sis_id_suffix}".upcase
         if existence_proxy.course_defined?(candidate)
           logger.info "Already have Canvas course with SIS ID #{candidate}"
