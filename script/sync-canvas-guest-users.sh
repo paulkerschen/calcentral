@@ -23,4 +23,8 @@ echo | $LOGIT
 echo "------------------------------------------" | $LOGIT
 echo "`date`: About to run the guest user sync script..." | $LOGIT
 
-bundle exec rake canvas:guest_user_sync |& $LOGIT
+set -o pipefail
+/usr/bin/flock -n /tmp/canvas-guest-user-sync.lock bundle exec rake canvas:guest_user_sync |& $LOGIT
+if [[ $? != 0 ]]; then
+  echo "Found a /tmp/canvas-guest-user-sync.lock file from another sync in progress; will not run." |& $LOGIT
+fi
