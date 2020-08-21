@@ -20,7 +20,7 @@ describe Berkeley::Terms do
     end
   end
 
-  context 'working against test data', if: CampusOracle::Queries.test_data? do
+  context 'working against test data', if: EdoOracle::Queries.test_data? do
     let(:fake_now) {Settings.terms.fake_now.to_datetime}
     it 'finds the legacy SIS CT term' do
       expect(subject.sis_current_term.slug).to eq 'fall-2013'
@@ -58,14 +58,14 @@ describe Berkeley::Terms do
       its('current.slug') {should eq 'spring-2014'}
       its(:running) {should be_nil}
       its('next.slug') {should eq 'summer-2014'}
-      its('future.slug') {should eq 'fall-2014'}
+      its(:future) {should be_nil}
       its('grading_in_progress.slug') {should eq 'fall-2013'}
     end
     context 'in last of available terms' do
-      let(:fake_now) {DateTime.parse('2017-1-27')}
+      let(:fake_now) {DateTime.parse('2019-11-27')}
       it_behaves_like 'a list of campus terms'
-      its('current.slug') {should eq 'spring-2017'}
-      its('running.slug') {should eq 'spring-2017'}
+      its('current.slug') {should eq 'fall-2019'}
+      its('running.slug') {should eq 'fall-2019'}
       its(:next) {should be_nil}
       its(:future) {should be_nil}
       its('grading_in_progress') {should be_nil}
@@ -115,18 +115,6 @@ describe Berkeley::Terms do
     end
   end
 
-  describe '.legacy_group' do
-    before { allow(Settings.features).to receive(:hub_term_api).and_return true }
-    let(:terms) { Berkeley::Terms.fetch(fake_now: DateTime.parse('2016-07-12')).campus.values[0..2] }
-    it 'returns terms grouped by data source' do
-      result = Berkeley::Terms.legacy_group(terms)
-      expect(result[:legacy].count).to eq 1
-      expect(result[:legacy][0]).to eq terms[2]
-      expect(result[:sisedo].count).to eq 2
-      expect(result[:sisedo][0]).to eq terms[0]
-    end
-  end
-
   describe '.find_by_campus_solutions_id' do
     it 'returns term object for given campus solutions id' do
       spring_2010_term = described_class.find_by_campus_solutions_id('2102')
@@ -142,7 +130,7 @@ describe Berkeley::Terms do
       subject { Berkeley::Terms.new(fake_now: DateTime.parse('2016-07-12')) }
       it 'finds all post-legacy data' do
         terms = subject.fetch_terms_from_api
-        expect(terms.length).to eq 2
+        expect(terms.length).to eq 5
         expect(terms[0].to_english).to eq 'Spring 2017'
         expect(terms[1].to_english).to eq 'Fall 2016'
       end
@@ -150,7 +138,7 @@ describe Berkeley::Terms do
         before { allow(Settings.terms).to receive(:legacy_cutoff).and_return 'spring-2016' }
         it 'finds all post-legacy data' do
           terms = subject.fetch_terms_from_api
-          expect(terms.length).to eq 3
+          expect(terms.length).to eq 5
           expect(terms[0].to_english).to eq 'Spring 2017'
           expect(terms[1].to_english).to eq 'Fall 2016'
           expect(terms[2].to_english).to eq 'Summer 2016'
@@ -167,7 +155,7 @@ describe Berkeley::Terms do
       subject { Berkeley::Terms.new(fake_now: DateTime.parse('2018-07-12'), oldest: 'spring-2016') }
       it 'loads terms from edodb with only 2 future terms and sorted in proper order' do
         terms = subject.load_terms_from_edo_db
-        expect(terms.length).to eq 8
+        expect(terms.length).to eq 10
         expect(terms[0].to_english).to eq 'Spring 2019'
         expect(terms[1].to_english).to eq 'Fall 2018'
         expect(terms[2].to_english).to eq 'Summer 2018'

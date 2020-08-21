@@ -48,9 +48,6 @@ cache:
     default: <%= 35.minutes %>
     User::Api: <%= 1.day %>
 
-
 features:
-  allow_legacy_fallback: true
   cal1card: true
-  hub_term_api: true
   videos: true

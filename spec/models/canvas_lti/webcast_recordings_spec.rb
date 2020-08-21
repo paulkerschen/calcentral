@@ -34,6 +34,7 @@ describe CanvasLti::WebcastRecordings do
           }
         ]
         expect_any_instance_of(Berkeley::Teaching).to receive(:courses_list_from_ccns).once.and_return courses_list
+        allow(Berkeley::TermCodes).to receive(:legacy?).and_return false
       end
 
       it 'contains two sets of recordings' do

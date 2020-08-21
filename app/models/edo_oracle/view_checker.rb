@@ -18,6 +18,10 @@ class EdoOracle::ViewChecker
       :columns => %w(campus-uid cs-course-id familyName formattedName givenName gradeRosterAccess instructor-id number offeringNumber printInScheduleOfClasses role-code role-descr session-id term-id)
     },
     {
+      :id => 'SISEDO.CALCENTRAL_PERSON_INFO_VW',
+      :columns => %w(LDAP_UID FIRST_NAME LAST_NAME EMAIL_ADDRESS STUDENT_ID AFFILIATIONS PERSON_TYPE)
+    },
+    {
       :id => 'SISEDO.CLASSSECTIONALLV01_MVW',
       :columns => %w(component-code cs-course-id displayName endDate finalExam id maxEnroll maxWaitlist primary primaryAssociatedSectionId printInScheduleOfClasses sectionNumber status-code session-id startDate term-id)
     },
@@ -287,12 +291,6 @@ class EdoOracle::ViewChecker
     end
     if ProvidedServices.bcourses?
       VIEW_DEPENDENCIES.concat VIEW_DEPENDENCIES_JUNCTION
-    end
-    if !Settings.features.legacy_caldap
-      VIEW_DEPENDENCIES << {
-        :id => 'SISEDO.CALCENTRAL_PERSON_INFO_VW',
-        :columns => %w(LDAP_UID FIRST_NAME LAST_NAME EMAIL_ADDRESS STUDENT_ID AFFILIATIONS PERSON_TYPE)
-      }
     end
   end
 

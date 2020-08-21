@@ -125,8 +125,8 @@ describe Oec::TermSetupTask do
       subject.run
       courses = Oec::Courses.from_csv File.read(Rails.root.join 'tmp', 'oec', 'courses.csv')
       expect(courses.first.to_hash).to include({
-        'START_DATE' => '01-22-2013',
-        'END_DATE' => '05-12-2013'
+        'START_DATE' => '01-29-2013',
+        'END_DATE' => '05-07-2013'
       })
     end
   end

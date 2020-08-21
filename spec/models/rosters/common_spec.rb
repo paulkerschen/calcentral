@@ -39,49 +39,6 @@ describe Rosters::Common do
   end
 
   describe '#get_enrollments' do
-    context 'when term is legacy sis' do
-      let(:legacy_enrollments) {
-        [
-          {
-            'course_cntl_num' => course_id,
-            'ldap_uid' => '111111',
-            'enroll_status' => 'E',
-            'pnp_flag' => 'N',
-            'first_name' => 'JIM',
-            'last_name' => 'HALPERT',
-            'student_email_address' => 'jhalpert@berkeley.edu',
-            'student_id' => '22200999',
-            'affiliations' => 'STUDENT-TYPE-REGISTERED'
-          },
-          {
-            'course_cntl_num' => course_id,
-            'ldap_uid' => '222222',
-            'enroll_status' => 'W',
-            'pnp_flag' => 'N',
-            'first_name' => 'DWIGHT',
-            'last_name' => 'SCHRUTE',
-            'student_email_address' => 'dschrute@berkeley.edu',
-            'student_id' => '22200777',
-            'affiliations' => 'STUDENT-TYPE-REGISTERED'
-          }
-        ]
-      }
-      before do
-        allow(Berkeley::Terms).to receive(:legacy?).and_return(true)
-        allow(CampusOracle::Queries).to receive(:get_enrolled_students_for_ccns).and_return(legacy_enrollments)
-      end
-      it 'returns student basic attributes and enrollment status' do
-        enrollments = subject.get_enrollments([course_id], '2016', 'D')
-        expect(enrollments.keys).to eq [course_id]
-        expect(enrollments[course_id].count).to eq 2
-        expect(enrollments[course_id][1][:ldap_uid]).to eq '222222'
-        expect(enrollments[course_id][1][:student_id]).to eq '22200777'
-        expect(enrollments[course_id][1][:first_name]).to eq 'DWIGHT'
-        expect(enrollments[course_id][1][:last_name]).to eq 'SCHRUTE'
-        expect(enrollments[course_id][1][:email]).to eq 'dschrute@berkeley.edu'
-        expect(enrollments[course_id][1][:enroll_status]).to eq 'W'
-      end
-    end
     context 'when term is campus solutions' do
       let(:cs_enrollments) {
         [

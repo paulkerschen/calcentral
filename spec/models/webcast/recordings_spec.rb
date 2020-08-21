@@ -1,10 +1,5 @@
 describe Webcast::Recordings do
 
-  let(:use_legacy_ccns) { true }
-  before do
-    allow(Settings.features).to receive(:allow_legacy_fallback).and_return(use_legacy_ccns)
-  end
-
   context 'a fake proxy' do
     let(:recordings) { Webcast::Recordings.new(fake: true).get }
     context 'when integrating with an SIS source which understands legacy CCNs' do

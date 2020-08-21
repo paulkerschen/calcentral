@@ -38,7 +38,7 @@ module Webcast
         media_per_ccn = Webcast::CourseMedia.new(@term_yr, @term_cd, @ccn_list, @options).get_feed
         if media_per_ccn.any?
           ccn_list = media_per_ccn.keys
-          if !Settings.features.allow_legacy_fallback && Berkeley::TermCodes.legacy?(@term_yr, @term_cd)
+          if Berkeley::TermCodes.legacy?(@term_yr, @term_cd)
             legacy_sections = Berkeley::LegacyTerms.get_sections_from_legacy_ccns(@term_yr, @term_cd, ccn_list)
             legacy_sections.each do |section|
               ccn = section['ccn']

@@ -6,6 +6,9 @@ describe Webcast::Merged do
     let(:policy) do
       AuthenticationStatePolicy.new(AuthenticationState.new('user_id' => user_id), nil)
     end
+    before do
+      allow(Berkeley::TermCodes).to receive(:legacy?).and_return false
+    end
 
     context 'no matching course' do
       let(:feed) do
