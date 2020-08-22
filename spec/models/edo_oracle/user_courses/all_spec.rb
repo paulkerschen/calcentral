@@ -8,7 +8,7 @@ describe EdoOracle::UserCourses::All do
 
   context 'EDO DB errors' do
     before do
-      # Fetch CampusOracle terms in advance before we start forcing database errors.
+      # Fetch terms in advance before we start forcing database errors.
       fetched_terms = Berkeley::Terms.fetch
       allow(Berkeley::Terms).to receive(:fetch).and_return fetched_terms
 

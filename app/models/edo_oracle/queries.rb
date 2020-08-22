@@ -9,12 +9,6 @@ module EdoOracle
 
     CANONICAL_SECTION_ORDERING = 'section_display_name, "primary" DESC, instruction_format, section_num'
 
-    # Changes from CampusOracle::Queries section columns:
-    #   - 'course_cntl_num' now 'section_id'
-    #   - 'term_yr' and 'term_cd' replaced by 'term_id'
-    #   - 'catalog_suffix_1' and 'catalog_suffix_2' replaced by 'catalog_suffix' (combined)
-    #   - 'primary_secondary_cd' replaced by Boolean 'primary'
-    #   - 'course_display_name' and 'section_display_name' added
     SECTION_COLUMNS = <<-SQL
       sec."id" AS section_id,
       sec."term-id" AS term_id,
@@ -147,9 +141,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_instructing_sections
-    # Changes:
-    #   - 'cs-course-id' added.
     def self.get_instructing_sections(person_id, terms = nil)
       # Reduce performance hit and only add Terms whare clause if limiting number of terms pulled
       in_term_where_clause = " AND instr.\"term-id\" IN (#{terms_query_list terms})" unless terms.nil?
@@ -187,11 +178,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_secondary_sections.
-    # Changes:
-    #   - More precise associations allow us to query by primary section rather
-    #     than course catalog ID.
-    #   - 'cs-course-id' added.
     def self.get_associated_secondary_sections(term_id, section_id)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -210,17 +196,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_section_schedules
-    # Changes:
-    #   - 'course_cntl_num' is replaced with 'section_id'
-    #   - 'term_yr' and 'term_cd' replaced by 'term_id'
-    #   - 'session_id' added
-    #   - 'building_name' and 'room_number' combined as 'location'
-    #   - 'meeting_start_time_ampm_flag' is included in 'meeting_start_time' timestamp
-    #   - 'meeting_end_time_ampm_flag' is included in 'meeting_end_time' timestamp
-    #   - 'multi_entry_cd' obsolete now that multiple meetings directly associated with section
-    #   - 'print_cd' replaced with 'print_in_schedule_of_classes' boolean
-    #   - 'meeting_start_date' and 'meeting_end_date' added
     def self.get_section_meetings(term_id, section_id)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -250,7 +225,6 @@ module EdoOracle
       SQL
     end
 
-    # No Campus Oracle equivalent.
     def self.get_section_final_exams(term_id, section_id)
       safe_query <<-SQL
       SELECT
@@ -280,12 +254,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_sections_from_ccns
-    # Changes:
-    #   - 'course_cntl_num' is replaced with 'section_id'
-    #   - 'term_yr' and 'term_cd' replaced by 'term_id'
-    #   - 'catalog_suffix_1' and 'catalog_suffix_2' replaced by 'catalog_suffix' (combined)
-    #   - 'primary_secondary_cd' replaced by Boolean 'primary'
     def self.get_sections_by_ids(term_id, section_ids)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -299,14 +267,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_section_instructors
-    # Changes:
-    #   - 'ccn' replaced by 'section_id' argument
-    #   - 'term_yr' and 'term_cd' replaced by 'term_id'
-    #   - 'instructor_func' has become represented by 'role_code' and 'role_description'
-    #   - Does not provide all user profile fields ('email_address', 'student_id', 'affiliations').
-    #     This will require a programmatic join at a higher level.
-    #     See CLC-6239 for implementation of batch LDAP profile requests.
     def self.get_section_instructors(term_id, section_id)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -359,13 +319,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.get_enrolled_students
-    # Changes:
-    #   - 'ccn' replaced by 'section_id' argument
-    #   - 'pnp_flag' replaced by 'grading_basis'
-    #   - 'term_yr' and 'term_yr' replaced by 'term_id'
-    #   - 'calcentral_student_info_vw' data (first_name, last_name, student_email_address,
-    #     affiliations) are not present as these are provided by the CalNet LDAP or HubEdos module.
     def self.get_enrolled_students(section_id, term_id)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -423,7 +376,6 @@ module EdoOracle
       SQL
     end
 
-    # EDO equivalent of CampusOracle::Queries.has_instructor_history?
     def self.has_instructor_history?(ldap_uid, instructor_terms = nil)
       if instructor_terms.to_a.any?
         instructor_term_clause = "AND instr.\"term-id\" IN (#{terms_query_list instructor_terms.to_a})"

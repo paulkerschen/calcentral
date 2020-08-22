@@ -3,8 +3,6 @@ module Berkeley
 
     def merge(data)
       feed = EdoOracle::UserCourses::All.new(user_id: @uid).get_all_campus_courses
-      # TODO Legacy terms are currently used only to prop up automated tests - dump or rewrite!
-      feed.merge!  CampusOracle::UserCourses::All.new(user_id: @uid).get_all_campus_courses if Settings.features.allow_legacy_fallback
       teaching_semesters = format_teaching_semesters feed
       if teaching_semesters.present?
         data[:teachingSemesters] = teaching_semesters

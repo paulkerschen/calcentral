@@ -10,7 +10,6 @@ module Berkeley
 
     def is_course_instructor?
       users_courses = EdoOracle::UserCourses::All.new(user_id: @user.user_id).get_all_campus_courses
-      users_courses.merge! CampusOracle::UserCourses::All.new(user_id: @user.user_id).get_all_campus_courses if Settings.features.allow_legacy_fallback
       record_course = users_courses.values.flatten.select {|c| c[:id] == @record.course_id }[0]
       return false if record_course.nil?
       if record_course[:role] != 'Instructor'

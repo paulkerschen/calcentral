@@ -52,20 +52,10 @@ edodb:
   password: sa
   pool: 95
 
-campusdb:
-  fake: false
-  adapter: h2
-  driver: org.h2.Driver
-  url: jdbc:h2:mem:h2CampusOracle::CampusDataSource;DB_CLOSE_DELAY=-1;MODE=Oracle
-  username: sa
-  password: sa
-  pool: 95
-  fake_user_id: "300939"
-
 terms:
   # Limit how far back our academic history goes.
   oldest: spring-2010
-  # This term and earlier will pull academic data from legacy CampusOracle. Later terms will pull from EdoOracle.
+  # This term and earlier have slightly different CCN logic, currently relevant only to Webcasts.
   legacy_cutoff: summer-2016
   # Timestamp in UTC, needed when testing against test Campus data.
   # Can also be used to force selection of a "current term" different
@@ -214,10 +204,6 @@ cache:
     Berkeley::Terms: NEXT_08_00
     Berkeley::LegacyTerms: <%= 29.days %>
 
-    CampusOracle::CourseSections: NEXT_08_00
-    CampusOracle::UserAttributes: NEXT_08_00
-    CampusOracle::UserCourses::All: NEXT_08_00
-
     EdoOracle::CourseSections: <%= 8.hours %>
     EdoOracle::UserCourses::All: <%= 8.hours %>
 
@@ -316,7 +302,6 @@ edw_db:
 
 # A feature will be disabled if the corresponding feature-flag is false or nil.
 features:
-  allow_legacy_fallback: false
   allow_alt_email_addr_for_enrollments: true
   authentication_validator: false
   background_jobs_check: true
@@ -324,7 +309,6 @@ features:
   course_manage_official_sections: false
   hub_term_api: false
   ldap_student_affiliations: false
-  legacy_caldap: true
   manage_site_mailing_lists: false
   prevent_acting_as_users_from_posting: true
   reauthentication: true

@@ -30,7 +30,6 @@ describe Concerns::AcademicsModule do
         expect(subject[:termCode]).to eq 'D'
         expect(subject[:termYear]).to eq '2017'
         expect(subject[:timeBucket]).to eq 'past'
-        expect(subject[:campusSolutionsTerm]).to be true
         expect(subject[:gradingInProgress]).to be nil
         expect(subject[:classes]).to eq []
       end

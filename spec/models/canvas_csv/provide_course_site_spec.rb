@@ -185,8 +185,6 @@ describe CanvasCsv::ProvideCourseSite do
           expect(subject).to_not receive(:prepare_users_courses_list)
           expect(subject).to_not receive(:prepare_section_definitions)
           expect(subject).to_not receive(:prepare_section_updates)
-          puts 'CAVNVAS COURSE INFO HA'
-          puts canvas_course_info
           subject.edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
         end
         it 'calculates 4 total steps to completion' do
@@ -731,7 +729,7 @@ describe CanvasCsv::ProvideCourseSite do
       expect(result[1][:classes]).to eq []
     end
 
-    context 'course data from fake Oracle MV', :if => CampusOracle::Connection.test_data? do
+    context 'course data from fake SISEDO', :if => EdoOracle::Connection.test_data? do
       let(:candidate_courses_list) { CanvasCsv::ProvideCourseSite.new('238382').candidate_courses_list }
 
       it 'should properly format the candidate courses list' do
@@ -749,7 +747,7 @@ describe CanvasCsv::ProvideCourseSite do
         expect(bio1a[:sections][1][:is_primary_section]).to be_falsey
         expect(bio1a[:sections][2][:is_primary_section]).to be_falsey
 
-        cogsci = courses_for_term.find {|course| course[:course_code] == 'COG SCI C147'}
+        cogsci = courses_for_term.find {|course| course[:course_code] == 'COGSCI 147'}
         expect(cogsci[:title]).to eq 'Language Disorders'
       end
 
@@ -759,7 +757,7 @@ describe CanvasCsv::ProvideCourseSite do
           courses: [{
             id: canvas_site_id,
             site_url: "http://bcourses.berkeley.edu/courses/#{canvas_site_id}",
-            name: 'COG SCI C147',
+            name: 'COGSCI 147',
             shortDescription: 'Language Disorders',
             term_yr: '2013',
             term_cd: 'D',
@@ -770,7 +768,7 @@ describe CanvasCsv::ProvideCourseSite do
           }],
           groups: []
         })
-        cogsci = candidate_courses_list.first[:classes].find {|course| course[:course_code] == 'COG SCI C147'}
+        cogsci = candidate_courses_list.first[:classes].find {|course| course[:course_code] == 'COGSCI 147'}
         expect(cogsci[:class_sites]).to have(1).item
         expect(cogsci[:class_sites].first[:id]).to eq canvas_site_id
       end

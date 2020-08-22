@@ -65,7 +65,6 @@ describe Berkeley::Teaching do
     before do
       allow(Settings.terms).to receive(:legacy_cutoff).and_return 'fall-2009'
       expect(EdoOracle::UserCourses::All).to receive(:new).and_return double(get_all_campus_courses: edo_courses)
-      expect(CampusOracle::Queries).not_to receive :get_instructing_sections
     end
     let(:uid) { '242881' }
     let(:edo_courses) do
@@ -242,9 +241,6 @@ describe Berkeley::Teaching do
       }
     end
     it_should_behave_like 'a properly translated feed'
-    it 'advertises Campus Solutions source' do
-      expect(teaching).to all include({campusSolutionsTerm: true})
-    end
     it 'merges cross-listings preserving course title' do
       language_disorders = teaching[0][:classes].find { |course| course[:title] == 'Language Disorders' }
       expect(language_disorders[:listings].map { |listing| listing[:dept]}).to match_array ['COG SCI', 'SUMERIAN']
@@ -291,7 +287,6 @@ describe Berkeley::Teaching do
       before do
         allow(Settings.terms).to receive(:legacy_cutoff).and_return 'fall-2009'
         expect(EdoOracle::UserCourses::SelectedSections).to receive(:new).and_return double(get_selected_sections: edo_courses)
-        expect(CampusOracle::UserCourses::SelectedSections).not_to receive :new
       end
       let(:term) { {yr: '2013', cd: 'D'} }
       let(:edo_courses) do

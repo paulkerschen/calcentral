@@ -87,7 +87,6 @@ module Berkeley
 
       # Do initial term parsing.
       terms_array = fetch_terms_from_api
-      merge_terms_from_legacy_db terms_array if Settings.features.allow_legacy_fallback
 
       # Classify and map terms.
       terms_array.each do |term|
@@ -105,9 +104,6 @@ module Berkeley
 
       @current = @running || future_terms.pop
       if (@next = future_terms.pop)
-        # Temporary workaround for Summer 2016, during which legacy SIS says the "current term" is Fall 2016 but CS SIS
-        # says the "current term" is Summer 2016.
-        @sis_current_term ||= @next if @current.legacy? && @current.is_summer && !@next.legacy?
         @future = future_terms.pop
         unless future_terms.empty?
           logger.info("Found more than two future terms: #{future_terms.map(&:slug).join(', ')}")
@@ -175,7 +171,7 @@ module Berkeley
         logger.error "No Next term found from HubTerm::Proxy; no non-legacy academic terms are available"
       else
         term = Berkeley::Term.new.from_cs_api(feed)
-        cs_terms << term unless term.legacy? && Settings.features.allow_legacy_fallback
+        cs_terms << term
         term_date = term.end.to_date.to_s
         if (next_after_next = HubTerm::Proxy.new(temporal_position: HubTerm::Proxy::NEXT_TERM, as_of_date: term_date).get_term)
           cs_terms.unshift Berkeley::Term.new.from_cs_api(next_after_next)
@@ -185,7 +181,6 @@ module Berkeley
           feed = HubTerm::Proxy.new(temporal_position: HubTerm::Proxy::PREVIOUS_TERM, as_of_date: term_date).get_term
           break unless feed.present?
           term = Berkeley::Term.new.from_cs_api(feed)
-          break if term.legacy? && Settings.features.allow_legacy_fallback
           @sis_current_term = term if term.sis_current_term?
           cs_terms << term
           break if term.slug == @oldest
@@ -194,36 +189,11 @@ module Berkeley
       cs_terms
     end
 
-    def merge_terms_from_legacy_db(terms)
-      CampusOracle::Queries.terms.each do |db_term|
-        term = Term.new(db_term)
-        if term.legacy? || @hub_api_disabled
-          @sis_current_term ||= term if term.legacy_sis_term_status == 'CT'
-          terms << term
-        end
-        break if term.slug == @oldest
-      end
-      terms
-    end
-
     # True if the current term in CalCentral UX is not the official "current term" in SIS.
     # In CS SIS, this will probably only happen when between the end date of one term and the
     # start date of the next. In legacy SIS, it was also true during the Summer term.
     def in_term_transition?
       @current != @sis_current_term
-    end
-
-    def self.legacy_group(terms=nil)
-      terms ||= self.fetch.campus.values
-      terms = terms.to_a
-      sisedo_terms, legacy_terms = [], []
-      if terms.count > 0
-        grouped = terms.group_by &:legacy?
-        legacy_terms = grouped[true]
-        sisedo_terms = grouped[false]
-      end
-      return {:legacy => legacy_terms, :sisedo => sisedo_terms} if Settings.features.allow_legacy_fallback
-      {:legacy => nil, :sisedo => terms}
     end
 
   end

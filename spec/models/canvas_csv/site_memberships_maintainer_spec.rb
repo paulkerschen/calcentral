@@ -73,8 +73,8 @@ describe CanvasCsv::SiteMembershipsMaintainer do
       } }
       let(:campus_data_row) { invariable_campus_row.merge('enroll_status' => enroll_status) }
       before do
-        allow(CampusOracle::Queries).to receive(:get_enrolled_students).and_return([campus_data_row])
-        allow(CampusOracle::Queries).to receive(:get_section_instructors).and_return([])
+        allow(EdoOracle::Bcourses).to receive(:get_enrolled_students).and_return([campus_data_row])
+        allow(EdoOracle::Bcourses).to receive(:get_section_instructors).and_return([])
         end
       context 'when student is waitlisted' do
         let(:enroll_status) { 'W' }
@@ -114,27 +114,27 @@ describe CanvasCsv::SiteMembershipsMaintainer do
       let(:padded_ccns) { ccn_to_uids.keys.collect {|ccn| sprintf('%05d', ccn)} }
       let(:sis_section_ids) { ["SEC:2014-B-0#{ccn_to_uids.keys[0]}", "SEC:2014-B-#{ccn_to_uids.keys[1]}"] }
       before do
-        allow(CampusOracle::Queries).to receive(:get_enrolled_students).and_return([])
-        allow(CampusOracle::Queries).to receive(:get_section_instructors) do |term_yr, term_cd, ccn|
-          if term_yr == '2014' && term_cd == 'B'
+        allow(EdoOracle::Bcourses).to receive(:get_enrolled_students).and_return([])
+        allow(EdoOracle::Bcourses).to receive(:get_section_instructors) do |term_id, ccn|
+          if term_id == '2142'
             [
               # Teaching and In Charge role
-              {'ldap_uid' => ccn_to_uids[ccn.to_i.to_s][0], 'instructor_func' => '1'},
+              {'ldap_uid' => ccn_to_uids[ccn.to_i.to_s][0], 'role_code' => 'PI'},
               # Administrative Proxy role
-              {'ldap_uid' => ccn_to_uids[ccn.to_i.to_s][1], 'instructor_func' => '5'}
+              {'ldap_uid' => ccn_to_uids[ccn.to_i.to_s][1], 'role_code' => 'APRX'}
             ]
           end
         end
       end
       context 'when all course site sections are in the refresh list' do
         before do
-          allow(CampusOracle::Queries).to receive(:get_sections_from_ccns).with('2014', 'B', padded_ccns).and_return([
-            {'course_cntl_num' => padded_ccns[0], 'primary_secondary_cd' => first_section_type},
-            {'course_cntl_num' => padded_ccns[1], 'primary_secondary_cd' => 'S'}
+          allow(EdoOracle::Queries).to receive(:get_sections_by_ids).with('2142', padded_ccns).and_return([
+            {'term_id' => '2142', 'dept_name' => 'HITTITE', 'catalog_id' => '99', 'section_id' => padded_ccns[0], 'primary' => first_section_primary},
+            {'term_id' => '2142', 'dept_name' => 'HITTITE', 'catalog_id' => '99', 'section_id' => padded_ccns[1], 'primary' => 'false' }
           ])
         end
         context 'when a mix of primary and secondary sections' do
-          let(:first_section_type) {'P'}
+          let(:first_section_primary) { 'true' }
           it 'assigns TA role for secondary sections' do
             expect(subject.length).to eq(4)
             expect(enrollments_for(ccn_to_uids.values[0][0]).first['role']).to eq 'teacher'
@@ -151,7 +151,7 @@ describe CanvasCsv::SiteMembershipsMaintainer do
           end
         end
         context 'when all secondary sections' do
-          let(:first_section_type) {'S'}
+          let(:first_section_primary) { 'false' }
           it 'assigns teacher role for secondary sections' do
             expect(subject.length).to eq(4)
             expect(enrollments_for(ccn_to_uids.values[0][0]).first['role']).to eq 'teacher'
@@ -190,10 +190,10 @@ describe CanvasCsv::SiteMembershipsMaintainer do
               }
             ]
           )
-          allow(CampusOracle::Queries).to receive(:get_sections_from_ccns).with('2014', 'B', site_ccns).and_return([
-            {'course_cntl_num' => padded_ccns[0], 'primary_secondary_cd' => 'S'},
-            {'course_cntl_num' => padded_ccns[1], 'primary_secondary_cd' => 'S'},
-            {'course_cntl_num' => existing_ccn, 'primary_secondary_cd' => 'P'}
+          allow(EdoOracle::Queries).to receive(:get_sections_by_ids).with('2142', site_ccns).and_return([
+            {'term_id' => '2142', 'dept_name' => 'HITTITE', 'catalog_id' => '99', 'section_id' => padded_ccns[0], 'primary' => 'false'},
+            {'term_id' => '2142', 'dept_name' => 'HITTITE', 'catalog_id' => '99', 'section_id' => padded_ccns[1], 'primary' => 'false'},
+            {'term_id' => '2142', 'dept_name' => 'HITTITE', 'catalog_id' => '99', 'section_id' => existing_ccn, 'primary' => 'true'}
           ])
         end
         it 'assigns TA role for secondary sections' do
@@ -230,9 +230,9 @@ describe CanvasCsv::SiteMembershipsMaintainer do
     end
 
     before do
-      expect(CampusOracle::Queries).to receive(:get_enrolled_students).
-        with(sis_course_id, '2014', 'B').and_return([campus_data_row])
-      allow(CampusOracle::Queries).to receive(:get_section_instructors).and_return([])
+      expect(EdoOracle::Bcourses).to receive(:get_enrolled_students).
+        with(sis_course_id, '2142').and_return([campus_data_row])
+      allow(EdoOracle::Bcourses).to receive(:get_section_instructors).and_return([])
     end
 
     context 'live enrollments comparison' do
