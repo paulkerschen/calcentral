@@ -18,12 +18,27 @@ env:
     - PATH="${HOME}/.local/bin:$PATH"
     - S3_PATH="/${TRAVIS_BRANCH}/$(date -u +%Y%m%d_%H%M%SZ)_${TRAVIS_COMMIT}"
 
+# Note: the artifacts add-on does not run on pull request builds. Read https://docs.travis-ci.com/user/uploading-artifacts/
+addons:
+  artifacts:
+    s3_region: 'us-west-2'
+    debug: true
+    target_paths:
+      - ${S3_PATH}
+  postgresql: "9.6"
+
 before_install:
   - gem uninstall bundler --force -x
   - gem install bundler -v '1.17.3'
   - npm config set strict-ssl false
   - npm install --production
   - npm run build
+
+  # Set up test db
+  - psql -c "create user calcentral_test with password 'secret';" -U postgres
+  - psql -c 'create database edodb_test;' -U postgres
+  - psql -c 'grant all privileges on database edodb_test to calcentral_test;' -U postgres
+  - psql -c 'alter database edodb_test owner to calcentral_test;' -U postgres
 
 jobs:
   include:
@@ -57,11 +72,3 @@ jobs:
         - bundle exec warble NAME=junction 2>&1 1>/dev/null
         - echo -n "${S3_PATH}/junction.war" > latest.txt
         - aws s3 cp latest.txt "s3://${ARTIFACTS_BUCKET}/${TRAVIS_BRANCH}/"
-
-# Note: the artifacts add-on does not run on pull request builds. Read https://docs.travis-ci.com/user/uploading-artifacts/
-addons:
-  artifacts:
-    s3_region: 'us-west-2'
-    debug: true
-    target_paths:
-      - ${S3_PATH}

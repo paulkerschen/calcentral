@@ -202,7 +202,7 @@ describe DataLoch::Stocker do
 
       plan_owners_csv = unzipped('academic-plan-owners')
       expect(plan_owners_csv).to have(2).items
-      expect(plan_owners_csv[0]).to eq '25975U,Integrative Biology BA,MAJ,Major - Regular Acad/Prfnl,INTEGBI,Integrative Biology,100,UCLS,Undergrad Letters & Science'
+      expect(plan_owners_csv).to include('25975U,Integrative Biology BA,MAJ,Major - Regular Acad/Prfnl,INTEGBI,Integrative Biology,100,UCLS,Undergrad Letters & Science')
     end
   end
 end
