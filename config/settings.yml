@@ -295,6 +295,9 @@ edwdb:
   adapter: postgresql
   pool: 5
 
+vue:
+  localhost_base_url: null
+
 # A feature will be disabled if the corresponding feature-flag is false or nil.
 features:
   allow_alt_email_addr_for_enrollments: true

@@ -40,6 +40,9 @@ edodb:
 hub_term_proxy:
   fake: true
 
+vue:
+  localhost_base_url: 'http://localhost:8080'
+
 features:
   cal1card: true
   course_manage_official_sections: true
