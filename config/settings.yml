@@ -307,3 +307,4 @@ features:
   manage_site_mailing_lists: false
   prevent_acting_as_users_from_posting: true
   reauthentication: true
+  vue_js: false

@@ -31,8 +31,6 @@ before_install:
   - gem uninstall bundler --force -x
   - gem install bundler -v '1.17.3'
   - npm config set strict-ssl false
-  - npm install --production
-  - npm run build
 
   # Set up test db
   - psql -c "create user calcentral_test with password 'secret';" -U postgres
@@ -45,7 +43,10 @@ jobs:
     - # Lint Js
       if: type = pull_request
       script:
+        - npm install
         - npm run lint
+        - npm run lint-vue
+        - npm run build
     - # Lint SCSS
       if: type = pull_request
       script:
@@ -59,6 +60,8 @@ jobs:
     - stage: Deploy
       if: type = push OR env(DEPLOY_JUNCTION_WAR) = true
       script:
+        - npm install --production
+        - npm run build
         - pip install --user awscli
         - aws configure list
         - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc7.jar .
