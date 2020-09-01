@@ -10,7 +10,8 @@ class BootstrapController < ApplicationController
   # We don't want to serve index-junction statically because that would skip the check_databases_alive and
   # check_reauthentication code.
   def index
-    render file: 'public/index-junction.html', formats: [:html]
+    index_file = Settings.features.vue_js ? 'public/index-vue-js.html' : 'public/index-junction.html'
+    render file: index_file, formats: [:html]
   end
 
   # CalCentral cannot fully trust a user session which was initiated via an LTI embedded app,
