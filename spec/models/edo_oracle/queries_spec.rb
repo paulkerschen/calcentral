@@ -56,7 +56,7 @@ describe EdoOracle::Queries do
       expect(subject.first['instruction_mode']).to eq 'P'
       expect(subject.first['primary_associated_section_id']).to eq '12392'
       expect(subject.first['section_display_name']).to eq 'AMERSTD 191'
-      expect(subject.first['topic_description']).to be nil
+      expect(subject.first['topic_description']).to be_blank
       expect(subject.first['course_display_name']).to eq 'AMERSTD 191'
       expect(subject.first['catalog_id']).to eq '191'
       expect(subject.first['catalog_root']).to eq '191'
@@ -139,7 +139,7 @@ describe EdoOracle::Queries do
       expect(subject.first['instruction_format']).to eq 'TUT'
       expect(subject.first['primary_associated_section_id']).to eq '12392'
       expect(subject.first['section_display_name']).to eq 'UGIS 192C'
-      expect(subject.first['topic_description']).to be nil
+      expect(subject.first['topic_description']).to be_blank
       expect(subject.first['course_display_name']).to eq 'UGIS 192C'
       expect(subject.first['catalog_id']).to eq '192C'
       expect(subject.first['catalog_root']).to eq '192'
@@ -149,35 +149,6 @@ describe EdoOracle::Queries do
       expect(subject.first['waitlist_limit']).to eq 30.0
       expect(subject.first['start_date']).to eq Date.parse('Wed, 22 Aug 2018')
       expect(subject.first['end_date']).to eq Date.parse('Fri, 07 Dec 2018')
-    end
-
-    describe '.get_section_final_exams' do
-      let(:term_id) { '2178' }
-      let(:section_id) { '11950' }
-      subject { described_class.get_section_final_exams(term_id, section_id) }
-      it 'returns the expected result' do
-        expect(subject[0]['term_id']).to eq '2178'
-        expect(subject[0]['session_id']).to eq '1'
-        expect(subject[0]['section_id']).to eq '11950'
-        expect(subject[0]['exam_type']).to eq 'N'
-        expect(subject[0]['exam_date']).to eq Date.parse('Thu, 17 Dec 2015')
-        expect(subject[0]['exam_start_time'].utc).to be
-        expect(subject[0]['exam_end_time'].utc).to be
-        expect(subject[0]['location']).to eq 'Hearst Gym 188'
-        expect(subject[0]['exam_exception']).to eq 'Y'
-        expect(subject[0]['finalized']).to eq 'N'
-      end
-    end
-  end
-
-  describe '#get_concurrent_student_status' do
-    subject { described_class.get_concurrent_student_status(student_id) }
-    let (:student_id) { 95727964 }
-
-    it_behaves_like 'a successful query that returns one result'
-
-    it 'returns the expected result' do
-      expect(subject['concurrent_status']).to eq 'Y'
     end
   end
 
@@ -228,21 +199,6 @@ describe EdoOracle::Queries do
     end
   end
 
-  describe '.get_section_final_exams' do
-    let(:section_id) { '11950' }
-    let(:term_id) { '2178' }
-    it 'returns exams for section id specified' do
-      results = EdoOracle::Queries.get_section_final_exams(term_id, section_id)
-      expect(results.count).to eq 1
-      expected_keys = %w(term_id session_id section_id exam_type exam_date exam_start_time exam_end_time location exam_exception finalized)
-      expect(results[0]).to have_keys(expected_keys)
-      expect(results[0]['term_id']).to eq '2178'
-      expect(results[0]['section_id']).to eq '11950'
-      expect(results[0]['exam_type']).to eq 'N'
-      expect(results[0]['exam_date']).to eq Time.parse('2015-12-17 00:00:00 UTC')
-    end
-  end
-
   describe '.get_section_instructors' do
     let(:section_id) { '11950' }
     let(:term_id) { '2172' }
@@ -266,7 +222,7 @@ describe EdoOracle::Queries do
   describe '.get_subject_areas' do
     it 'returns subject areas' do
       results = EdoOracle::Queries.get_subject_areas
-      subject_areas = results.map { |result| result['subjectarea'] }
+      subject_areas = results.map { |result| result['subjectArea'] }
       expect(subject_areas).to all(be_present)
       expect(subject_areas).to include('HISTART', 'AMERSTD', 'ART', 'ARCH')
     end
@@ -326,17 +282,6 @@ describe EdoOracle::Queries do
     end
   end
 
-  describe '.get_instructing_legacy_terms' do
-    let(:person_id) { '7093' }
-    it 'fetches expected data' do
-      results = EdoOracle::Queries.get_instructing_legacy_terms(person_id)
-      expect(results.count).to eq 16
-      expect(results[0]['term_id']).to eq '2072'
-      expect(results[1]['term_id']).to eq '2068'
-      expect(results[2]['term_id']).to eq '2065'
-    end
-  end
-
   describe '.get_instructing_sections' do
     let(:term) { Berkeley::Terms.fetch.campus['fall-2018'] }
     let(:uid) { '27' }
@@ -393,22 +338,6 @@ describe EdoOracle::Queries do
     end
   end
 
-  describe '.get_grading_dates' do
-    subject { EdoOracle::Queries.get_grading_dates }
-    it 'returns grading dates' do
-      expect(subject.count).to eq 3
-    end
-  end
-
-  describe '.section_reserved_capacity_count' do
-    let(:term_id) { '2188' }
-    let(:section_id) { '27893' }
-    subject { EdoOracle::Queries.section_reserved_capacity_count(term_id, section_id) }
-    it 'returns sections reserved capacity count' do
-      expect(subject.first['reserved_seating_rules_count']).to eq 1
-    end
-  end
-
   describe '.get_student_term_cpp' do
     subject { EdoOracle::Queries.get_student_term_cpp(student_id) }
     context 'when valid uid' do
@@ -420,16 +349,4 @@ describe EdoOracle::Queries do
     end
   end
 
-  describe '.search_students' do
-    subject { EdoOracle::Queries.search_students(search_string) }
-    context 'when matching name' do
-      let(:search_string) { 'lexander' }
-      it 'should return matching search results' do
-        expect(subject.count).to eq 2
-        subject.each do |search_result|
-          expect(search_result).to have_keys(['student_id', 'campus_uid', 'oprid', 'first_name_legal', 'middle_name_legal', 'last_name_legal', 'first_name_preferred', 'middle_name_preferred', 'email', 'academic_programs'])
-        end
-      end
-    end
-  end
 end

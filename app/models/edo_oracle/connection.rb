@@ -1,18 +1,22 @@
 module EdoOracle
   class Connection < OracleBase
 
-    # WARNING: Default Rails SQL query caching (done for the lifetime of a controller action) apparently does not apply
-    # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
-    establish_connection :edodb
-
     def self.settings
       Settings.edodb
+    end
+
+    # WARNING: Default Rails SQL query caching (done for the lifetime of a controller action) apparently does not apply
+    # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
+    if self.fake?
+      establish_connection :edodb_test
+    else
+      establish_connection :edodb
     end
 
     def self.query(sql, opts={})
       result = use_pooled_connection do
         Rails.logger.debug("#{self.name} working with connection #{connection}, object_id #{connection.object_id}, from pool #{connection_pool}")
-        inner_query(sql)
+        inner_query(preprocess sql)
       end
       opts[:do_not_stringify] ? result : stringify_ints!(result)
     end

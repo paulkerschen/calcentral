@@ -3,12 +3,16 @@ module EdwOracle
     include ActiveRecordHelper
     include ClassLogger
 
+    def self.settings
+      Settings.edwdb
+    end
+
     # WARNING: Default Rails SQL query caching (done for the lifetime of a controller action) apparently does not apply
     # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
-    establish_connection :edw_db
-
-    def self.settings
-      Settings.edw_db
+    if self.fake?
+      establish_connection :edwdb_test
+    else
+      establish_connection :edwdb
     end
 
     def self.query(sql, opts={})

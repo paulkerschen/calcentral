@@ -1,21 +1,10 @@
 class OracleBase < ActiveRecord::Base
   def self.test_data?
-    self.settings.adapter == "h2"
+    self.settings.adapter == "postgresql"
   end
 
   def self.fake?
     self.settings.fake
-  end
-
-  # Oracle and H2 have no timestamp formatting function in common.
-  def self.timestamp_format(timestamp_column)
-    return "formatdatetime(#{timestamp_column}, 'yyyy-MM-dd HH:mm:ss')" if test_data?
-    "to_char(#{timestamp_column}, 'yyyy-mm-dd hh24:mi:ss')"
-  end
-
-  def self.timestamp_parse(datetime)
-    return "parsedatetime('#{datetime.utc.to_s(:db)}', 'yyyy-MM-dd HH:mm:ss')" if test_data?
-    "to_date('#{datetime.utc.to_s(:db)}', 'yyyy-mm-dd hh24:mi:ss')"
   end
 
   def self.stringify_ints!(results, additional_columns=[])
@@ -50,5 +39,17 @@ class OracleBase < ActiveRecord::Base
       "#{column_name} IN (#{slice.join ','})"
     end
     "(#{predicates.join ' OR '})"
+  end
+
+  def self.preprocess(sql)
+    # If using Postgres to mock an Oracle database during test runs, a couple of syntax hacks are necessary.
+    # TODO We should probably come up with some kind of fixture/mock setup to avoid having to depend on fake databases. 
+    if self.test_data?
+      # Oracle wants double quotes around column names; Postgres seems to want them only if there are lowercase characters or dashes involved.
+      sql.gsub!(/"([A-Z_]+)"/, '\1')
+      # Remove ROWNUM clauses.
+      sql.gsub!(/(and|where)\s+rownum\s+[<=]+\s+\d+/mi, '')
+    end
+    sql
   end
 end

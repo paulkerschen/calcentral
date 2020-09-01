@@ -12,38 +12,6 @@ shared_examples 'an Oracle driven data source' do
   end
   let(:row_hash) { db_results[0].dup }
 
-  context 'when in test mode' do
-    before { allow(subject).to receive(:test_data?).and_return(true) }
-    describe '.timestamp_format' do
-      it 'provides H2 timestamp formatter string' do
-        result = subject.timestamp_format('example_column')
-        expect(result).to eq "formatdatetime(example_column, 'yyyy-MM-dd HH:mm:ss')"
-      end
-    end
-    describe '.timestamp_parse' do
-      it 'provides H2 timestamp parser string' do
-        result = subject.timestamp_parse(ucb_birthday)
-        expect(result).to eq "parsedatetime('1868-03-23 22:05:05', 'yyyy-MM-dd HH:mm:ss')"
-      end
-    end
-  end
-
-  context 'when not in test mode' do
-    before { allow(subject).to receive(:test_data?).and_return(false) }
-    describe '.timestamp_format' do
-      it 'provides Oracle timestamp formatter string' do
-        result = subject.timestamp_format('example_column2')
-        expect(result).to eq "to_char(example_column2, 'yyyy-mm-dd hh24:mi:ss')"
-      end
-    end
-    describe '.timestamp_parse' do
-      it 'provides Oracle timestamp parser string' do
-        result = subject.timestamp_parse(ucb_birthday)
-        expect(result).to eq "to_date('1868-03-23 22:05:05', 'yyyy-mm-dd hh24:mi:ss')"
-      end
-    end
-  end
-
   describe '.stringify_ints!' do
     it 'converts single result row' do
       subject.stringify_ints!(row_hash, ['id', 'buffalo_wings'])

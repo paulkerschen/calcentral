@@ -70,6 +70,9 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     create user calcentral_test with password 'secret' createdb;
     grant all privileges on database calcentral_test to calcentral_test;
     alter database calcentral_test owner to calcentral_test;
+    create database edodb_test;
+    grant all privileges on database edodb_test to calcentral_test;
+    alter database edodb_test owner to calcentral_test;
     \q
     ```
 

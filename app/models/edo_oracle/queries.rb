@@ -76,24 +76,6 @@ module EdoOracle
       sql_clause
     end
 
-    def self.and_academic_career(object_alias, academic_careers)
-      return nil if academic_careers.blank?
-      <<-SQL
-        AND #{object_alias}.ACAD_CAREER IN ('#{academic_careers.join "','"}')
-      SQL
-    end
-
-    def self.join_requirements_designation(object_alias, require_desig_code)
-      return nil if require_desig_code.blank?
-      <<-SQL
-      LEFT OUTER JOIN SISEDO.CLC_RQMNT_DESIG_DESCR RD
-        ON #{object_alias}.ACAD_CAREER = RD.ACAD_CAREER
-       AND #{object_alias}.INSTITUTION = RD.INSTITUTION
-       AND #{object_alias}.TERM_ID = RD.TERM_ID
-       AND RD.RQMNT_DESIGNTN = '#{require_desig_code}'
-      SQL
-    end
-
     def self.get_basic_people_attributes(up_to_1000_ldap_uids)
       safe_query <<-SQL
         select pi.ldap_uid, trim(pi.first_name) as first_name, trim(pi.last_name) as last_name, 
@@ -170,14 +152,6 @@ module EdoOracle
       SQL
     end
 
-    def self.get_instructing_legacy_terms(person_id)
-      safe_query <<-SQL
-        SELECT "STRM" as term_id
-        FROM SISEDO.CLC_TERM_INSTR_BF2008V00_VW
-        WHERE "INSTRUCTOR_ID" = '#{person_id}'
-      SQL
-    end
-
     def self.get_associated_secondary_sections(term_id, section_id)
       safe_query <<-SQL
         SELECT DISTINCT
@@ -222,35 +196,6 @@ module EdoOracle
           sec."term-id" = '#{term_id}' AND
           sec."id" = '#{section_id}'
         ORDER BY meeting_start_date, meeting_start_time
-      SQL
-    end
-
-    def self.get_section_final_exams(term_id, section_id)
-      safe_query <<-SQL
-      SELECT
-        sec."term-id" AS term_id,
-        sec."session-id" AS session_id,
-        sec."id" AS section_id,
-        sec."finalExam" AS exam_type,
-        exam."EXAM_DT" AS exam_date,
-        exam."EXAM_START_TIME" AS exam_start_time,
-        exam."EXAM_END_TIME" AS exam_end_time,
-        exam."EXAM_EXCEPTION" as exam_exception,
-        exam."FACILITY_DESCR" AS location,
-        exam."FINALIZED" AS finalized
-      FROM
-        SISEDO.CLASSSECTIONALLV01_MVW sec
-      LEFT JOIN SISEDO.CLC_FINAL_EXAM_INFOV00_VW exam ON (
-        sec."cs-course-id" = exam."CRSE_ID" AND
-        sec."term-id" = exam."STRM" AND
-        sec."session-id" = exam."SESSION_CODE" AND
-        sec."offeringNumber" = exam."CRSE_OFFER_NBR" AND
-        sec."sectionNumber" = exam."CLASS_SECTION"
-      )
-      WHERE
-        sec."term-id" = '#{term_id}' AND
-        sec."id" = '#{section_id}'
-      ORDER BY exam_date
       SQL
     end
 
@@ -440,186 +385,6 @@ module EdoOracle
       end
     end
 
-    def self.get_registration_status (person_id)
-      safe_query <<-SQL
-        SELECT STUDENT_ID as student_id,
-          ACADCAREER_CODE as acadcareer_code,
-          TERM_ID as term_id,
-          WITHCNCL_TYPE_CODE as withcncl_type_code,
-          WITHCNCL_TYPE_DESCR as withcncl_type_descr,
-          WITHCNCL_REASON_CODE as withcncl_reason_code,
-          WITHCNCL_REASON_DESCR as withcncl_reason_descr,
-          WITHCNCL_FROMDATE as withcncl_fromdate,
-          WITHCNCL_LASTATTENDDATE as withcncl_lastattendate,
-          SPLSTUDYPROG_TYPE_CODE as splstudyprog_type_code,
-          SPLSTUDYPROG_TYPE_DESCR as splstudyprog_type_descr
-        FROM
-          SISEDO.STUDENT_REGISTRATIONV01_VW
-        WHERE
-          STUDENT_ID = '#{person_id}' AND
-          (WITHCNCL_TYPE_CODE IS NOT NULL
-            OR SPLSTUDYPROG_TYPE_CODE = '#{ABSENTIA_CODE}'
-            OR SPLSTUDYPROG_TYPE_CODE = '#{FILING_FEE_CODE}')
-      SQL
-    end
-
-    def self.get_pnp_unit_count (student_id)
-      result = safe_query <<-SQL
-        SELECT STUDENT_ID,
-               PNP_TOT_UNITS_TAKEN as pnp_taken,
-               PNP_TOT_UNITS_PASSED as pnp_passed
-        FROM (
-          SELECT *
-          FROM SISEDO.STUCAR_TERMV00_VW
-          WHERE STUDENT_ID = #{student_id}
-          ORDER BY term_id DESC)
-        WHERE rownum = 1
-      SQL
-      result.first
-    end
-
-    def self.get_new_admit_data(student_id)
-      result = safe_query <<-SQL
-        SELECT
-          ACAD_PROG as applicant_program,
-          ADMIT_TERM as admit_term,
-          ADMIT_TYPE as admit_type,
-          UC_ADMITTED_GEP as global_edge_program,
-          ADM_APPL_NBR as application_nbr,
-          UC_ATHLETE as athlete,
-          UC_EXPIRE_DT_ADTL as expiration_date,
-          PROG_ACTION as admit_action,
-          PROG_STATUS as admit_status
-        FROM
-          SYSADM.PS_UCC_AD_ADMITSIR
-        WHERE
-          EMPLID = '#{student_id}' AND
-          (
-            PROG_ACTION <> 'DATA' OR
-            (PROG_REASON = 'LMAY' AND PROG_STATUS <> 'C')
-          )
-      SQL
-      result
-    end
-
-    def self.get_transfer_credit_expiration(student_id)
-      result = safe_query <<-SQL
-        SELECT
-          EXPIRE_DT_TC as expire_date
-        FROM
-          SISEDO.APPLICANT_ADMIT_DATAV00_VW
-        WHERE
-          STUDENT_ID = '#{student_id}' AND
-          APPLICATION_CENTER = 'UGRD'
-        ORDER BY APPLICATION_NBR DESC
-      SQL
-      result.first
-    end
-
-    def self.get_new_admit_evaluator(student_id, application_nbr)
-      result = safe_query <<-SQL
-        SELECT
-          EVALUATOR_NAME as evaluator_name,
-          EVALUATOR_EMAIL as evaluator_email
-        FROM
-          SISEDO.APPLICANT_ADMIT_DATAV00_VW
-        WHERE
-          STUDENT_ID = '#{student_id}' AND
-          APPLICATION_NBR = '#{application_nbr}' AND
-          APPLICATION_CENTER = 'UGRD'
-      SQL
-      result.first
-    end
-
-    def self.get_concurrent_student_status (student_id)
-      result = safe_query <<-SQL
-        SELECT
-          CONCURRENT_PROGRAM as concurrent_status
-        FROM
-            SISEDO.CLC_CONCURRENT_PROGRAMV00_VW
-          WHERE STUDENT_ID = '#{student_id}' AND
-              INSTITUTION = 'UCB01'
-      SQL
-      result.first
-    end
-
-    def self.get_academic_standings (student_id)
-      safe_query <<-SQL
-        SELECT STUDENT_ID as student_id,
-          ACAD_STANDING_STATUS as acad_standing_status,
-          ACAD_STANDING_STATUS_DESCR as acad_standing_status_descr,
-          ACAD_STANDING_ACTION_DESCR as acad_standing_action_descr,
-          TERM_ID as term_id,
-          ACTION_DATE as action_date
-        FROM
-          SISEDO.STUDENT_ACAD_STNDNGV00_VW
-        WHERE
-          STUDENT_ID = '#{student_id}' AND
-          ACADCAREER_CODE = 'UGRD'
-      SQL
-    end
-
-    def self.get_grading_dates
-      safe_query <<-SQL
-        SELECT
-          ACAD_CAREER as acad_career,
-          TERM_ID as term_id,
-          SESSION_CODE as session_code,
-          MID_BEGIN_DT as mid_term_begin_date,
-          MID_END_DT as mid_term_end_date,
-          FINAL_BEGIN_DT as final_begin_date,
-          FINAL_END_DT as final_end_date
-        FROM
-          SISEDO.GRADING_DATES_CS_V00_VW
-      SQL
-    end
-
-    def self.section_reserved_capacity_count(term_id, section_id)
-      safe_query <<-SQL
-        SELECT COUNT(*) as reserved_seating_rules_count
-        FROM
-          SISEDO.CLC_CURRENT_RESERVE_CAPACITYV00_VW
-        WHERE
-          TERM_ID = '#{term_id}' AND
-          CLASS_NBR = '#{section_id}' AND
-          RESERVED_SEATS > 0
-      SQL
-    end
-
-    def self.get_section_reserved_capacity(term_id, section_id)
-      safe_query <<-SQL
-        SELECT CLASS_NBR as class_nbr,
-          CLASS_SECTION as class_section,
-          COMPONENT as component,
-          CATALOG_NBR as catalog_nbr,
-          RESERVED_SEATS as reserved_seats,
-          RESERVED_SEATS_TAKEN as reserved_seats_taken,
-          REQUIREMENT_GROUP_DESCR as requirement_group_descr,
-          TERM_ID as term_id
-        FROM
-          SISEDO.CLC_CURRENT_RESERVE_CAPACITYV00_VW
-        WHERE
-          TERM_ID = '#{term_id}' AND
-          CLASS_NBR = '#{section_id}'
-      SQL
-    end
-
-    def self.get_section_capacity(term_id, section_id)
-      safe_query <<-SQL
-        SELECT
-          "enrolledCount" as enrolled_count,
-          "waitlistedCount" as waitlisted_count,
-          "minEnroll" as min_enroll,
-          "maxEnroll" as max_enroll,
-          "maxWaitlist" as max_waitlist
-        FROM
-          SISEDO.CLASSSECTIONALLV01_MVW
-        WHERE
-          "id" = '#{section_id}' AND
-          "term-id" = '#{term_id}'
-      SQL
-    end
-
     def self.get_student_term_cpp(student_id)
       result = safe_query <<-SQL
         SELECT
@@ -663,96 +428,26 @@ module EdoOracle
       safe_query(sql, opts)
     end
 
-    def self.search_students(search_string)
-      result = safe_query <<-SQL
-        SELECT *
-        FROM
-          (
-            SELECT DISTINCT
-              STUDENT_ID AS student_id,
-              CAMPUS_ID AS campus_uid,
-              OPRID AS oprid,
-              FIRST_NAME AS first_name_legal,
-              MIDDLE_NAME AS middle_name_legal,
-              LAST_NAME AS last_name_legal,
-              UC_PRF_FIRST_NM AS first_name_preferred,
-              UC_PRF_MIDDLE_NM AS middle_name_preferred,
-              EMAIL_ADDR AS email,
-              ACAD_PROG AS academic_programs
-            FROM SISEDO.CLC_STDNT_LOOKUP_V00_VW
-            WHERE upper(UC_SRCH_CRIT) LIKE upper('%#{search_string}%')
-            AND ((CAMPUS_ID <> ' ' AND CAMPUS_ID IS NOT NULL) OR (OPRID <> ' ' AND OPRID IS NOT NULL))
-          )
-        WHERE rownum < 31
-      SQL
-      result
-    end
-
-    def self.get_exam_results(student_id)
-      result = safe_query <<-SQL
-        SELECT TEST_ID AS id,
-          TEST_DESCRIPTION AS descr,
-          TEST_SCORE AS score,
-          TEST_DATE AS taken
-        FROM SISEDO.CLC_SR_TEST_RSLTV00_VW
-        WHERE STUDENT_ID = '#{student_id}'
-      SQL
-      result
-    end
-
-    def self.has_exam_results?(student_id)
-      result = safe_query <<-SQL
-        SELECT TEST_ID
-        FROM SISEDO.CLC_SR_TEST_RSLTV00_VW
-        WHERE STUDENT_ID = '#{student_id}' AND
-        rownum = 1
-      SQL
-      result.any?
-    end
-
-    def self.get_pnp_calculator_values(student_id)
-      result = safe_query <<-SQL
-        SELECT TOTAL_GPA_UNITS,
-          TOTAL_NOGPA_UNITS as total_no_gpa_units,
-          TOTAL_TRANSFER_UNITS,
-          MAX_RATIO_BASE_UNITS,
-          GPA_RATIO_UNITS,
-          NOGPA_RATIO_UNITS as no_gpa_ratio_units,
-          PNP_RATIO
-        FROM SISEDO.CLC_PNP_RATIOV00_VW
-        WHERE STUDENT_ID = '#{student_id}'
-      SQL
-      result.first
-    end
-
     def self.omit_drops_and_withdrawals
-      # Our H2 test db can't handle the fancy CASE join below.
-      if Settings.edodb.adapter == 'h2'
-        <<-SQL
-          enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
-          enroll.GRADE_MARK != 'W'
-        SQL
       # Late withdrawals are only indicated in primary section enrollments, and do not change
       # any values in secondary section enrollment rows. The CASE clause implements a
       # conditional join for secondary sections.
-      else
-        <<-SQL
-          enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
-          CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
-          SELECT DISTINCT prim_enr.GRADE_MARK
-            FROM SISEDO.CLASSSECTIONALLV01_MVW sec
-            LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
-              ON prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
-              AND prim_enr.TERM_ID = enroll.TERM_ID
-              AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
-              AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
-            WHERE sec."id" = enroll.CLASS_SECTION_ID
-              AND sec."term-id" = enroll.TERM_ID
-              AND prim_enr.STUDENT_ID IS NOT NULL
-          )
-          ELSE enroll.GRADE_MARK END != 'W'
-        SQL
-      end
+      <<-SQL
+        enroll.STDNT_ENRL_STATUS_CODE != 'D' AND
+        CASE enroll.GRADING_BASIS_CODE WHEN 'NON' THEN (
+        SELECT DISTINCT prim_enr.GRADE_MARK
+          FROM SISEDO.CLASSSECTIONALLV01_MVW sec
+          LEFT JOIN SISEDO.ETS_ENROLLMENTV01_VW prim_enr
+            ON prim_enr.CLASS_SECTION_ID = sec."primaryAssociatedSectionId"
+            AND prim_enr.TERM_ID = enroll.TERM_ID
+            AND prim_enr.STUDENT_ID = enroll.STUDENT_ID
+            AND prim_enr.STDNT_ENRL_STATUS_CODE != 'D'
+          WHERE sec."id" = enroll.CLASS_SECTION_ID
+            AND sec."term-id" = enroll.TERM_ID
+            AND prim_enr.STUDENT_ID IS NOT NULL
+        )
+        ELSE enroll.GRADE_MARK END != 'W'
+      SQL
     end
   end
 end
