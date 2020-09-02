@@ -4,6 +4,8 @@ Looking for the CalCentral web application? That code is maintained by Student I
 
 * Master Build: [![Build Status](https://api.travis-ci.org/ets-berkeley-edu/calcentral.svg?branch=master)](https://travis-ci.org/ets-berkeley-edu/calcentral)
 
+![Cartoon image of a maze of railroad tracks](src/assets/images/conjunction-junction.jpg)
+
 ## Dependencies
 
 * Administrator privileges
