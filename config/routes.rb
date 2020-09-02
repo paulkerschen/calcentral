@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
 
-  mount RailsAdmin::Engine => '/ccadmin', :as => 'rails_admin'
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -24,8 +22,6 @@ Rails.application.routes.draw do
   # Authentication endpoints
   get '/auth/cas/callback' => 'sessions#lookup'
   get '/auth/failure' => 'sessions#failure'
-  get '/reauth/admin' => 'sessions#reauth_admin', :as => :reauth_admin
-  delete '/logout' => 'sessions#destroy', :as => :logout_ccadmin
   if Settings.developer_auth.enabled
     # the backdoor for http basic auth (bypasses CAS) only on development environments.
     get '/basic_auth_login' => 'sessions#basic_lookup'

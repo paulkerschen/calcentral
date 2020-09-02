@@ -34,8 +34,6 @@ class ApplicationController < ActionController::Base
     redirect_to url_for_path url
   end
 
-  # This method does not handle the reauthentication check for "ccadmin" authoring. That is
-  # enforced by "config/initializers/rails_admin.rb".
   def check_reauthentication
     unless !!session['user_id']
       delete_reauth_cookie

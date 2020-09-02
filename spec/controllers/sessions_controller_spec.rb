@@ -92,11 +92,4 @@ describe SessionsController do
     end
   end
 
-  describe '#reauth_admin' do
-    it 'will redirect to designated reauth path' do
-      # The after hook below will make the appropriate assertions
-      get :reauth_admin
-    end
-  end
-
 end

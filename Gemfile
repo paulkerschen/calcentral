@@ -93,12 +93,6 @@ gem 'rubyzip', '~> 1.3.0'
 # Data Loch integration
 gem 'aws-sdk-s3', '~> 1.8.2'
 
-# for simplified relational data management
-gem 'rails_admin', '2.0.2'
-gem 'kaminari', '~> 1.2.1'
-# for rails_admin styling
-gem 'bootstrap-sass', '~> 3.4.1'
-
 # Closure Compiler Gem for JS compression
 # https://github.com/documentcloud/closure-compiler
 gem 'closure-compiler', '~> 1.1.11'
