@@ -68,10 +68,6 @@ class SessionsController < ApplicationController
     cookies[:reauthenticated] = {:value => true, :expires => 8.hours.from_now}
   end
 
-  def reauth_admin
-    redirect_to url_for_path '/auth/cas?renew=true&url=/ccadmin'
-  end
-
   def basic_lookup
     uid = authenticate_with_http_basic do |uid, password|
       uid if password == Settings.developer_auth.password
