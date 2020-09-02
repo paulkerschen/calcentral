@@ -11,7 +11,7 @@ Looking for the CalCentral web application? That code is maintained by Student I
 * [Git](https://help.github.com/articles/set-up-git)
 * [JDBC Oracle driver](http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html)
 * [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [JRuby 9.1.17.0](http://jruby.org/)
+* [JRuby 9.2.13.0](http://jruby.org/)
 * [Node.js >=8.9.4](http://nodejs.org/)
 * [PostgreSQL](http://www.postgresql.org/)
 * [Rubygems 2.7.10](https://rubygems.org/pages/download)
@@ -107,7 +107,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
     ```bash
     rvm get head
-    rvm install jruby-9.1.17.0
+    rvm install jruby-9.2.13.0
     cd ..
     cd calcentral
     # Answer "yes" again if it asks you to trust a new .rvmrc file.
@@ -125,7 +125,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
     ```bash
     cd ~
-    rvm use jruby-9.1.17.0 --default # This may output 'Unknown ruby string (do not know how to handle): jruby-9.1.17.0.', which can be ignored.
+    rvm use jruby-9.2.13.0 --default # This may output 'Unknown ruby string (do not know how to handle): jruby-9.2.13.0.', which can be ignored.
     rvm gemset use global
 
     ```
@@ -161,7 +161,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     * Download [ojdbc7_g.jar](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html)
     * Note: You do not have to open the file.
     * Rename the file to `ojdbc7.jar`
-    * Copy `ojdbc7.jar` to `~/.rvm/rubies/jruby-9.1.17.0/lib/`
+    * Copy `ojdbc7.jar` to `~/.rvm/rubies/jruby-9.2.13.0/lib/`
 
 1. Initialize PostgreSQL database tables:
 
@@ -214,17 +214,6 @@ To run the tests from the command line:
 ```bash
 rspec
 ```
-
-To run the tests faster, use spork, which is a little server that keeps the Rails app initialized while you change code
-and run multiple tests against it. Command line:
-
-```bash
-spork
-# (...wait a minute for startup...)
-rspec --drb spec/lib/my_spec.rb
-```
-
-You can even run Spork right inside [IntelliJ RubyMine or IDEA](http://www.jetbrains.com/ruby/webhelp/using-drb-server.html).
 
 ## Front-end Linting
 

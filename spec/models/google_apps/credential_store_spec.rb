@@ -26,9 +26,6 @@ describe GoogleApps::CredentialStore do
     context 'uid has access and refresh token in the database' do
       it 'should load default credentials' do
         c = MultiJson.load(store.load(uid))
-        puts '-------------'
-        puts c
-        puts '-------------'
         expect(c['client_id']).to eq client_id
         expect(c['access_token']).to eq oauth2_data[:access_token]
         expect(c['refresh_token']).to eq oauth2_data[:refresh_token]

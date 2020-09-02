@@ -70,7 +70,7 @@
       "semi-spacing": ["error"],
       "space-before-function-paren": ["error", "never"],
       "space-infix-ops": ["error"],
-      "spaced-comment": ["error", "always"],
+      "spaced-comment": ["error", "always", {"markers": ["="]}],
       "strict": ["error", "global"],
       "valid-jsdoc": ["error"],
       "wrap-iife": ["error"],

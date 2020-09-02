@@ -71,9 +71,9 @@ module Oec
       @all_mappings ||= self.class.fetch_from_cache @term_code do
         mappings = Oec::CourseCode.all
         if @term_code.present?
-          mappings.concat create_virtual_department_mappings @term_code
+          mappings.to_a.concat create_virtual_department_mappings(@term_code)
         else
-          mappings
+          mappings.to_a
         end
       end
     end

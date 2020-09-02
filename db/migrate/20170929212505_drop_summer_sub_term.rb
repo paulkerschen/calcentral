@@ -1,6 +1,5 @@
 class DropSummerSubTerm < ActiveRecord::Migration
   class SummerSubTermMigrationModel < ActiveRecord::Base
-    attr_accessible :year, :sub_term_code, :start, :end
     self.table_name = 'summer_sub_terms'
   end
 

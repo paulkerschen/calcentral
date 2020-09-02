@@ -1,4 +1,4 @@
-Calcentral::Application.configure do
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   config.dependency_loading = true if $rails_rake_task

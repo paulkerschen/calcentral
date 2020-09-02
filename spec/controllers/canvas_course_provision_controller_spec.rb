@@ -120,11 +120,12 @@ describe CanvasCourseProvisionController do
 
       context 'when authorized to create the course site' do
         before do
+          session['user_id'] = instructor_id
           allow_any_instance_of(CanvasLti::CourseProvision).to receive(:create_course_site).and_return('canvas.courseprovision.12345.1383330151057')
         end
 
         it 'responds with success when course provisioning job is created' do
-          post :create_course_site, ccns: @ccns, admin_acting_as: @instructor_id, term_slug: @term_slug
+          post :create_course_site, ccns: ccns, term_slug: term_slug
           assert_response :success
           json_response = JSON.parse(response.body)
           json_response['job_request_status'].should == 'Success'

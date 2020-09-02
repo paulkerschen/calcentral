@@ -1,9 +1,8 @@
-class PopulateSisedosTestData < ActiveRecord::Base
+class PopulateSisedoTestData < ApplicationRecord
   include ClassLogger
   Rails.application.config.after_initialize do
-    logger.warn('Initializing SISEDO')
     if Settings.edodb.adapter == 'postgresql'
-      logger.warn('Connecting to SISEDO')
+      logger.warn('Initializing mock SISEDO test data')
       establish_connection :edodb_test
       sql = <<-SQL
 

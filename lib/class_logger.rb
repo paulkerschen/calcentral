@@ -8,6 +8,9 @@ module ClassLogger
         define_method method_name do |msg|
           Rails.logger.send(method_name, decorate_message(msg))
         end
+        define_method "#{method_name}?".to_sym do
+          Rails.logger.send "#{method_name}?".to_sym
+        end
       end
     end
     decorate_outputters

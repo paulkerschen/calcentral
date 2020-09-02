@@ -9,8 +9,10 @@ module EdoOracle
     # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
     if self.fake?
       establish_connection :edodb_test
+      Rails.logger.info 'Established fake EDODB connection'
     else
       establish_connection :edodb
+      Rails.logger.info 'Established non-fake EDODB connection'
     end
 
     def self.query(sql, opts={})

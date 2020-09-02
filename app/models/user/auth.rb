@@ -1,11 +1,10 @@
 module User
-  class Auth < ActiveRecord::Base
+  class Auth < ApplicationRecord
     include ActiveRecordHelper
 
     self.table_name = 'user_auths'
 
     after_initialize :log_access
-    attr_accessible :uid, :is_superuser, :is_viewer, :is_canvas_whitelisted, :active
 
     def self.get(uid)
       user_auth = uid.nil? ? nil : User::Auth.where(:uid => uid.to_s).first

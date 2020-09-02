@@ -1,4 +1,4 @@
-Calcentral::Application.configure do
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
@@ -19,9 +19,6 @@ Calcentral::Application.configure do
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
-
-  # Raise exception on mass assignment protection for Active Record models
-  config.active_record.mass_assignment_sanitizer = :strict
 
   # For rails_admin, to prevent live emails from going out from dev environment
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }

@@ -1,12 +1,11 @@
 module MailingLists
-  class SiteMailingList < ActiveRecord::Base
+  class SiteMailingList < ApplicationRecord
     include ActiveRecordHelper
     include ClassLogger
     include DatedFeed
 
     self.table_name = 'canvas_site_mailing_lists'
 
-    attr_accessible :canvas_site_id, :list_name, :canvas_site_name, :state, :members_count, :populated_at, :populate_add_errors, :populate_remove_errors
     attr_accessor :request_failure
     attr_accessor :population_results
 

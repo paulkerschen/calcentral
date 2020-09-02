@@ -1,5 +1,5 @@
 module User
-  class RecentUid < ActiveRecord::Base
+  class RecentUid < ApplicationRecord
     include ActiveRecordHelper
 
     MAX_PER_OWNER_ID = 30
@@ -7,8 +7,6 @@ module User
     self.table_name = 'recent_uids'
 
     belongs_to :data, :class_name => 'User::Data', :foreign_key => 'owner_id'
-
-    attr_accessible :stored_uid
 
     before_create :limit_by_owner_id
 

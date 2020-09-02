@@ -1,9 +1,8 @@
-class PopulateSysadmTestData < ActiveRecord::Base
+class PopulateSysadmTestData < ApplicationRecord
   include ClassLogger
   Rails.application.config.after_initialize do
-    logger.warn('Initializing SYSADM')
     if Settings.edodb.adapter == 'postgresql'
-      logger.warn('Connecting to SYSADM')
+      logger.warn('Initializing mock SYSADM test data')
       establish_connection :edodb_test
       sql = <<-SQL
 

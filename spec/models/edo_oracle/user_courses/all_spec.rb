@@ -13,7 +13,7 @@ describe EdoOracle::UserCourses::All do
       allow(Berkeley::Terms).to receive(:fetch).and_return fetched_terms
 
       allow(Settings.edodb).to receive(:fake).and_return false
-      allow_any_instance_of(ActiveRecord::ConnectionAdapters::JdbcAdapter).to receive(:select_all)
+      allow_any_instance_of(ActiveRecord::ConnectionAdapters::AbstractAdapter).to receive(:select_all)
         .and_raise ActiveRecord::JDBCError, "Hornets' nest in the btree"
     end
     it 'logs errors and returns a blank hash' do

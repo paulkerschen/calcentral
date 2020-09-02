@@ -8,10 +8,7 @@ development:
   password: <%= Settings.postgres.password %>
   host: <%= Settings.postgres.host %>
   port: <%= Settings.postgres.port %>
-  properties:
-    sslcert: <%= Settings.postgres.sslcert %>
-    sslkey: <%= Settings.postgres.sslkey %>
-    sslmode: <%= Settings.postgres.sslmode %>
+  sslmode: <%= Settings.postgres.sslmode %>
 
 production:
   adapter: postgresql
