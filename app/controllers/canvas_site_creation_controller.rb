@@ -1,7 +1,7 @@
 class CanvasSiteCreationController < ApplicationController
   include AllowLti
 
-  before_filter :api_authenticate
+  before_action :api_authenticate
   rescue_from StandardError, with: :handle_api_exception
 
   # Serves feed determining access to course and project site creation tools

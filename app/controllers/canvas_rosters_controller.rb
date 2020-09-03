@@ -3,8 +3,8 @@ class CanvasRostersController < RostersController
   include ClassLogger
   include SpecificToCourseSite
 
-  before_filter :api_authenticate
-  before_filter :authorize_viewing_rosters
+  before_action :api_authenticate
+  before_action :authorize_viewing_rosters
   before_action :disable_xframe_options
 
   rescue_from StandardError, with: :handle_api_exception

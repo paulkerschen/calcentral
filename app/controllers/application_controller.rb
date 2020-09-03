@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
   include Pundit
   protect_from_forgery
-  before_filter :check_reauthentication
-  before_filter :deny_if_filtered
-  before_filter :set_access_control_headers
-  after_filter :access_log
+  before_action :check_reauthentication
+  before_action :deny_if_filtered
+  before_action :set_access_control_headers
+  after_action :access_log
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   def authenticate(force = false)

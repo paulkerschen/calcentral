@@ -1,8 +1,8 @@
 class StoredUsersController < ApplicationController
   include ViewAsAuthorization
 
-  before_filter :authenticate
-  before_filter :numeric_uid?, except: [:get, :delete_all_recent, :delete_all_saved]
+  before_action :authenticate
+  before_action :numeric_uid?, except: [:get, :delete_all_recent, :delete_all_saved]
   respond_to :json
 
   def get

@@ -5,7 +5,7 @@ class CanvasLtiController < ApplicationController
 
   # Since LTI provider views are in an iframe, we need to skip the iframe buster.
   # Since the LTI session is initiated by a POST, to receive the request we also need to skip the CSRF check.
-  before_filter :get_settings, :initialize_calcentral_config
+  before_action :get_settings, :initialize_calcentral_config
   
   skip_before_action :verify_authenticity_token
   

@@ -2,7 +2,7 @@ class ActAsController < ApplicationController
   include ViewAsAuthorization
   include ClassLogger
 
-  skip_before_filter :check_reauthentication, :only => [:stop_act_as]
+  skip_before_action :check_reauthentication, :only => [:stop_act_as]
 
   def initialize(options = {})
     @act_as_session_key = options[:act_as_session_key] || SessionKey.original_user_id

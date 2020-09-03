@@ -2,7 +2,7 @@ class SessionsController < ApplicationController
   include ActiveRecordHelper, ClassLogger
   include AllowLti
 
-  skip_before_filter :check_reauthentication, :only => [:lookup, :destroy]
+  skip_before_action :check_reauthentication, :only => [:lookup, :destroy]
 
   def lookup
     auth = request.env['omniauth.auth']
