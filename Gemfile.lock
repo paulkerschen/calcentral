@@ -60,8 +60,6 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    actionview-encoded_mail_to (1.0.5)
-      rails
     active_attr (0.15.0)
       actionpack (>= 3.0.2, < 6.1)
       activemodel (>= 3.0.2, < 6.1)
@@ -412,7 +410,6 @@ DEPENDENCIES
   actionpack-action_caching (~> 1.2.1)
   actionpack-page_caching (~> 1.1.1)
   actionpack-xml_parser (~> 1.0.1)
-  actionview-encoded_mail_to (~> 1.0.5)
   active_attr (~> 0.15.0)
   activerecord-jdbc-adapter (~> 50.7)
   activerecord-jdbcpostgresql-adapter (~> 50.7)
