@@ -1,9 +1,9 @@
 class BootstrapController < ApplicationController
   include ActiveRecordHelper
   include AllowLti
-  before_filter :get_settings, :initialize_calcentral_config
-  before_filter :check_lti_only
-  before_filter :check_databases_alive
+  before_action :get_settings, :initialize_calcentral_config
+  before_action :check_lti_only
+  before_action :check_databases_alive
   layout false
 
   # View code is public/index-junction.html (compiled by webpack build).

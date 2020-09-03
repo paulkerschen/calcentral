@@ -2,7 +2,7 @@ class CanvasController < ApplicationController
   include AllowLti
   include ClassLogger
 
-  before_filter :set_cross_origin_access_control_headers, :only => [:external_tools, :user_can_create_site]
+  before_action :set_cross_origin_access_control_headers, :only => [:external_tools, :user_can_create_site]
   rescue_from StandardError, with: :handle_api_exception
   rescue_from Errors::ClientError, with: :handle_client_error
 

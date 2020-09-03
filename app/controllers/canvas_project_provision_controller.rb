@@ -2,8 +2,8 @@ class CanvasProjectProvisionController < ApplicationController
   include AllowLti
   include ClassLogger
 
-  before_filter :api_authenticate
-  before_filter :authorize_creating_project_site
+  before_action :api_authenticate
+  before_action :authorize_creating_project_site
   rescue_from StandardError, with: :handle_api_exception
   rescue_from Errors::ClientError, with: :handle_client_error
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized

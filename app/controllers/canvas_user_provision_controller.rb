@@ -2,7 +2,7 @@ class CanvasUserProvisionController < ApplicationController
   include AllowLti
   include ClassLogger
 
-  before_filter :api_authenticate
+  before_action :api_authenticate
   rescue_from StandardError, with: :handle_api_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 

@@ -1,8 +1,8 @@
 class OecGoogleAuthController < ApplicationController
   include ClassLogger
 
-  before_filter :authenticate
-  before_filter :check_google_access
+  before_action :authenticate
+  before_action :check_google_access
   before_action :authorize_oec_administration
   respond_to :json
 

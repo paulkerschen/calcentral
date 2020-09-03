@@ -2,7 +2,7 @@ class CanvasWebcastRecordingsController < ApplicationController
   include AllowLti
   include SpecificToCourseSite
 
-  before_filter :api_authenticate
+  before_action :api_authenticate
   rescue_from StandardError, with: :handle_api_exception
   rescue_from Errors::ClientError, with: :handle_client_error
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized

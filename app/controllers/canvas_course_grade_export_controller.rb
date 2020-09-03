@@ -49,7 +49,7 @@ class CanvasCourseGradeExportController < ApplicationController
     render json: export_options_json
   end
 
-  before_filter :set_cross_origin_access_control_headers, :only => [:is_official_course]
+  before_action :set_cross_origin_access_control_headers, :only => [:is_official_course]
   def set_cross_origin_access_control_headers
     headers['Access-Control-Allow-Origin'] = "#{Settings.canvas_proxy.url_root}"
     headers['Access-Control-Allow-Methods'] = 'GET'
