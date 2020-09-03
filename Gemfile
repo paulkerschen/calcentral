@@ -44,7 +44,7 @@ gem 'google-api-client', '0.32.1'
 gem 'google_drive', '~> 3.0.5'
 
 # LTI support
-gem 'ims-lti', :git => 'https://github.com/instructure/ims-lti.git'
+gem 'ims-lti', git: 'https://github.com/instructure/ims-lti.git', branch: '1.2.x'
 
 # for memcached connection
 gem 'dalli', '~> 2.7.2'

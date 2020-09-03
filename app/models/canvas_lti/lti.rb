@@ -1,7 +1,7 @@
 module CanvasLti
   require 'ims/lti'
   require 'ims/lti/extensions'
-  require 'oauth/request_proxy/rack_request'
+  require 'oauth/request_proxy/action_controller_request'
 
   class Lti
     extend Cache::Cacheable
