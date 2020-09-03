@@ -49,8 +49,8 @@ gem 'ims-lti', :git => 'https://github.com/instructure/ims-lti.git'
 # for memcached connection
 gem 'dalli', '~> 2.7.2'
 
-# smarter logging
-gem 'log4r', '~> 1.1'
+# We fork Log4r, which is no longer actively maintained at the source.
+gem 'log4r', '~> 1.1', git: 'https://github.com/ets-berkeley-edu/log4r'
 
 # for easier non-DB-backed models
 gem 'active_attr', '~> 0.15.0'
