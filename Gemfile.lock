@@ -21,11 +21,12 @@ GIT
 
 GIT
   remote: https://github.com/instructure/ims-lti.git
-  revision: 016adac413022a451f722b25fb6574cc4f9899ae
+  revision: 7f176e17de742a2645196541361dcba291e1cbe9
+  branch: 1.2.x
   specs:
-    ims-lti (1.1.8)
-      builder
-      oauth (~> 0.4.5)
+    ims-lti (1.2.4)
+      builder (>= 1.0, < 4.0)
+      oauth (>= 0.4.5, < 0.6)
 
 GIT
   remote: https://github.com/sj26/rspec_junit_formatter.git
@@ -258,7 +259,7 @@ GEM
     net-telnet (0.2.0)
     nio4r (2.5.2-java)
     nokogiri (1.10.10-java)
-    oauth (0.4.7)
+    oauth (0.5.4)
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
