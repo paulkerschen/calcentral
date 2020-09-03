@@ -74,15 +74,15 @@ describe CanvasMailingListController do
   let(:make_request) { lookup_request }
 
   context 'in CalCentral context with explicit Canvas course ID' do
-    let(:lookup_request) { get :show, canvas_course_id: canvas_course_id.to_s }
-    let(:create_request) { post :create, canvas_course_id: canvas_course_id.to_s }
+    let(:lookup_request) { get :show, params: {canvas_course_id: canvas_course_id.to_s} }
+    let(:create_request) { post :create, params: {canvas_course_id: canvas_course_id.to_s} }
     it_behaves_like 'a user authenticated api endpoint'
     it_behaves_like 'a protected controller'
   end
 
   context 'in LTI context' do
-    let(:lookup_request) { get :show, canvas_course_id: 'embedded' }
-    let(:create_request) { post :create, canvas_course_id: 'embedded' }
+    let(:lookup_request) { get :show, params: {canvas_course_id: 'embedded'} }
+    let(:create_request) { post :create, params: {canvas_course_id: 'embedded'} }
     before do
       session['canvas_course_id'] = canvas_course_id.to_s
     end

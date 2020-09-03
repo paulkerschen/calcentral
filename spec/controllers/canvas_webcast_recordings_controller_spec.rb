@@ -60,13 +60,13 @@ describe CanvasWebcastRecordingsController do
   let(:canvas_course_id) { rand(99999) }
 
   context 'in CalCentral context with explicit Canvas course ID' do
-    let(:make_request) { get :get_media, canvas_course_id: canvas_course_id.to_s }
+    let(:make_request) { get :get_media, params: {canvas_course_id: canvas_course_id.to_s} }
     it_behaves_like 'a user authenticated api endpoint'
     it_behaves_like 'a protected controller'
   end
 
   context 'in LTI context' do
-    let(:make_request) { get :get_media, canvas_course_id: 'embedded' }
+    let(:make_request) { get :get_media, params: {canvas_course_id: 'embedded'} }
     before do
       session['canvas_course_id'] = canvas_course_id.to_s
     end

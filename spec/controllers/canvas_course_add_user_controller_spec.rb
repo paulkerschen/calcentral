@@ -49,11 +49,11 @@ describe CanvasCourseAddUserController do
 
       it_should_behave_like 'an api endpoint' do
         before { allow(subject).to receive(:course_user_roles).and_raise(RuntimeError, 'Something went wrong') }
-        let(:make_request) { get :course_user_roles, request_params }
+        let(:make_request) { get :course_user_roles, params: request_params }
       end
 
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { get :course_user_roles, request_params }
+        let(:make_request) { get :course_user_roles, params: request_params }
       end
 
       context 'when session with canvas course user present' do
@@ -66,7 +66,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns canvas root url and course id' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['canvasRootUrl']).to eq 'https://ucb.beta.example.com'
@@ -74,7 +74,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns course user details' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             roles = response_json['roles']
@@ -85,7 +85,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns no granting roles' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['grantingRoles']).to eq []
@@ -100,7 +100,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns canvas root url and course id' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['canvasRootUrl']).to eq 'https://ucb.beta.example.com'
@@ -108,7 +108,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns course user details' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             roles = response_json['roles']
@@ -119,7 +119,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns student and observer granting roles' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['grantingRoles']).to_not include('Teacher', 'TA', 'Designer', 'Lead TA', 'Reader')
@@ -135,7 +135,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns canvas root url and course id' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['canvasRootUrl']).to eq 'https://ucb.beta.example.com'
@@ -143,7 +143,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns course user details' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             roles = response_json['roles']
@@ -155,7 +155,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns all granting roles' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['grantingRoles']).to include('Teacher', 'TA', 'Designer', 'Lead TA', 'Reader')
@@ -170,7 +170,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns canvas root url and course id' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['canvasRootUrl']).to eq 'https://ucb.beta.example.com'
@@ -178,7 +178,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns canvas admin user details' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             roles = response_json['roles']
@@ -188,7 +188,7 @@ describe CanvasCourseAddUserController do
           end
 
           it 'returns all granting roles' do
-            get :course_user_roles, request_params
+            get :course_user_roles, params: request_params
             expect(response.status).to eq(200)
             response_json = JSON.parse(response.body)
             expect(response_json['grantingRoles']).to include('Teacher', 'TA', 'Designer', 'Lead TA', 'Reader')
@@ -205,26 +205,26 @@ describe CanvasCourseAddUserController do
 
       it_should_behave_like 'an api endpoint' do
         before { allow(subject).to receive(:search_users).and_raise(RuntimeError, 'Something went wrong') }
-        let(:make_request) { get :search_users, request_params.merge(searchText: 'John Doe', searchType: 'name') }
+        let(:make_request) { get :search_users, params: request_params.merge(searchText: 'John Doe', searchType: 'name') }
       end
 
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { get :search_users, request_params.merge(searchText: 'John Doe', searchType: 'name') }
+        let(:make_request) { get :search_users, params: request_params.merge(searchText: 'John Doe', searchType: 'name') }
       end
 
       it_should_behave_like 'a canvas course admin authorized api endpoint' do
-        let(:make_request) { get :search_users, request_params.merge(searchText: 'John Doe', searchType: 'name') }
+        let(:make_request) { get :search_users, params: request_params.merge(searchText: 'John Doe', searchType: 'name') }
       end
 
       it 'returns error if searchText parameter is blank' do
-        get :search_users, request_params.merge(searchText: '', searchType: 'name')
+        get :search_users, params: request_params.merge(searchText: '', searchType: 'name')
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'Parameter \'searchText\' is blank'
       end
 
       it 'returns error if searchType parameter is not valid' do
-        get :search_users, request_params.merge(searchText: 'John Doe', searchType: 'weight')
+        get :search_users, params: request_params.merge(searchText: 'John Doe', searchType: 'weight')
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'Parameter \'searchType\' is invalid'
@@ -232,7 +232,7 @@ describe CanvasCourseAddUserController do
 
       it 'returns user search results' do
         expect(CanvasLti::CourseAddUser).to receive(:search_users).with('John Doe', 'name').and_return(users_found)
-        get :search_users, request_params.merge(searchText: 'John Doe', searchType: 'name')
+        get :search_users, params: request_params.merge(searchText: 'John Doe', searchType: 'name')
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
         expect(json_response['users']).to be_an_instance_of Array
@@ -246,19 +246,19 @@ describe CanvasCourseAddUserController do
     context 'when obtaining list of course sections' do
       it_should_behave_like 'an api endpoint' do
         before { allow(subject).to receive(:course_sections).and_raise(RuntimeError, 'Something went wrong') }
-        let(:make_request) { get :course_sections, request_params }
+        let(:make_request) { get :course_sections, params: request_params }
       end
 
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { get :course_sections, request_params }
+        let(:make_request) { get :course_sections, params: request_params }
       end
 
       it_should_behave_like 'a canvas course admin authorized api endpoint' do
-        let(:make_request) { get :course_sections, request_params }
+        let(:make_request) { get :course_sections, params: request_params }
       end
 
       it 'returns sections for search' do
-        get :course_sections, request_params
+        get :course_sections, params: request_params
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
         expect(json_response['courseSections']).to be_an_instance_of Array
@@ -277,15 +277,15 @@ describe CanvasCourseAddUserController do
 
       it_should_behave_like 'an api endpoint' do
         before { allow(subject).to receive(:add_user).and_raise(RuntimeError, 'Something went wrong') }
-        let(:make_request) { post :add_user, request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
+        let(:make_request) { post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
       end
 
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { post :add_user, request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
+        let(:make_request) { post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
       end
 
       it_should_behave_like 'a canvas course admin authorized api endpoint' do
-        let(:make_request) { post :add_user, request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
+        let(:make_request) { post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: 202184) }
       end
 
       context 'when role specified is authorized' do
@@ -296,7 +296,7 @@ describe CanvasCourseAddUserController do
         end
 
         it 'adds user to course section' do
-          post :add_user, request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: '202184')
+          post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: '202184')
           expect(response.status).to eq(200)
           json_response = JSON.parse(response.body)
           expect(json_response['userAdded']).to be_an_instance_of Hash
@@ -307,7 +307,7 @@ describe CanvasCourseAddUserController do
 
         context 'when specified section is not in Canvas course' do
           it 'denies the request' do
-            post :add_user, request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: '864215')
+            post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'Student', sectionId: '864215')
             expect(response.status).to eq 403
             expect(response.body).to eq ''
           end
@@ -315,7 +315,7 @@ describe CanvasCourseAddUserController do
 
         context 'when role specified is not authorized' do
           it 'denies unauthorized roles' do
-            post :add_user, request_params.merge(ldapUserId: '260506', role: 'TA', sectionId: '202184')
+            post :add_user, params: request_params.merge(ldapUserId: '260506', role: 'TA', sectionId: '202184')
             expect(response.status).to eq 403
             expect(response.body).to eq ''
           end

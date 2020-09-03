@@ -1,13 +1,13 @@
 describe ActAsController do
 
   def it_succeeds
-    post :start, uid: target_uid
+    post :start, params: {uid: target_uid}
     expect(response).to be_success
     expect(session['user_id']).to eq target_uid
     expect(session[SessionKey.original_user_id]).to eq real_user_id
   end
   def it_fails
-    post :start, uid: target_uid
+    post :start, params: {uid: target_uid}
     expect(response).to_not be_success
     expect(session['user_id']).to_not eq target_uid
     expect(session[SessionKey.original_user_id]).to be_nil
@@ -99,7 +99,7 @@ describe ActAsController do
       let(:target_uid) {real_user_id}
       it 'refuses to budge' do
         session['user_id'] = real_user_id
-        post :start, uid: target_uid
+        post :start, params: {uid: target_uid}
         expect(response).to_not be_success
         expect(session[SessionKey.original_user_id]).to be_nil
       end

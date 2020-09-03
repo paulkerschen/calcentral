@@ -59,7 +59,7 @@ class MailingListsMessageController < ApplicationController
       signature_key = "#{self.class.name}/signature/#{params['signature']}"
       verified = !Rails.cache.fetch(signature_key) && Rails.cache.write(signature_key, true, expires_in: 1.hour)
     end
-    render nothing: true, status: 401 unless verified
+    head 401 unless verified
   end
 
   # Verify Mailgun signature per https://documentation.mailgun.com/user_manual.html#webhooks

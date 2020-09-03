@@ -3,7 +3,7 @@ class RostersController < ApplicationController
 
   def serve_photo
     if (@photo.nil?)
-      render :nothing => true, :status => 401
+      head 401
     elsif (data = @photo[:data])
       send_data(
           data,

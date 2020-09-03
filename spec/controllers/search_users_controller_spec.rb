@@ -22,7 +22,7 @@ describe SearchUsersController do
         ))
       end
       it 'finds one matching user' do
-        get :by_id, id: id
+        get :by_id, params: {id: id}
         expect(response).to be_success
         users = JSON.parse(response.body)['users']
         expect(users).to have(1).item
@@ -38,7 +38,7 @@ describe SearchUsersController do
         expect(search).to receive(:search_users).and_return Set.new
       end
       it 'returns empty set' do
-        get :by_id, id: id
+        get :by_id, params: {id: id}
         expect(response).to be_success
         users = JSON.parse(response.body)['users']
         expect(users).to be_empty

@@ -353,8 +353,6 @@ Fixture files can represent time information by tokens that are substituted with
 
 To view other rake task for the project: `rake -T`
 
-* `rake spec:xml` - Runs rake spec, but pipes the output to xml using the `rspec_junit_formatter` gem, for JUnit compatible test result reports
-
 ## Installing Memcached:
 
 Dev, QA, and Production CalCentral environments use memcached as a cache store in place of the default ActiveSupport cache store.

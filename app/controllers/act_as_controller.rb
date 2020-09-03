@@ -19,7 +19,7 @@ class ActAsController < ApplicationController
 
     # Post-processing
     after_successful_start(session, params)
-    render :nothing => true, :status => 204
+    head 204
   end
 
   def stop
@@ -32,7 +32,7 @@ class ActAsController < ApplicationController
     session[@act_as_session_key] = nil
 
     after_successful_stop session
-    render :nothing => true, :status => 204
+    head 204
   end
 
   private

@@ -1,6 +1,6 @@
 describe MailingListsMessageController do
   let(:message_params) { JSON.parse File.read(Rails.root.join('fixtures', 'json', 'mailgun_incoming_message.json')) }
-  let(:make_request) { post :relay, message_params }
+  let(:make_request) { post :relay, params: message_params }
 
   shared_examples 'verification failed' do
     it 'returns empty 401' do
@@ -69,10 +69,10 @@ describe MailingListsMessageController do
     end
 
     it 'forbids repeated signatures' do
-      post :relay, message_params
+      post :relay, params: message_params
       expect(response.status).to eq 200
 
-      post :relay, message_params
+      post :relay, params: message_params
       expect(response.status).to eq 401
     end
 
