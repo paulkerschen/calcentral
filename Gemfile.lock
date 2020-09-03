@@ -5,6 +5,12 @@ GIT
     jruby-activemq (5.13.0-java)
 
 GIT
+  remote: https://github.com/ets-berkeley-edu/log4r
+  revision: 4b5ce3f171250220695c74e8f6130cb26be18b30
+  specs:
+    log4r (1.1.10)
+
+GIT
   remote: https://github.com/ets-berkeley-edu/omniauth-cas.git
   revision: 8a1b257f952013a9907ee85a6a143e39034a73c0
   specs:
@@ -217,7 +223,6 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
     little-plugger (1.1.4)
-    log4r (1.1.10)
     logging (2.3.0)
       little-plugger (~> 1.1)
       multi_json (~> 1.14)
@@ -436,7 +441,7 @@ DEPENDENCIES
   jruby-openssl (= 0.9.19)
   json (~> 1.8.0)
   link_header (~> 0.0.7)
-  log4r (~> 1.1)
+  log4r (~> 1.1)!
   minitest-reporters (~> 1.0.8)
   net-ldap (~> 0.16.0)
   net-ssh (~> 2.9.2)
