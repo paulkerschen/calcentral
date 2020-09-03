@@ -42,6 +42,7 @@ public/rev-manifest.json
 public/styleguide
 
 # Ignore precompiled assets
+/dist
 /public/assets
 
 # Ignore the coverage directory (for checking in, otherwise useful)

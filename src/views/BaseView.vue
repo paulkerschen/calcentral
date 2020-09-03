@@ -1,14 +1,19 @@
 <template>
-  <div>
-    <Home />
+  <div class="bg-white w-50">
+    <div>
+      <router-view />
+    </div>
+    <div>
+      <Footer />
+    </div>
   </div>
 </template>
 
 <script>
-import Home from '@/views/Home'
+import Footer from '@/components/Footer'
 
 export default {
   name: 'BaseView',
-  components: { Home }
+  components: { Footer }
 }
 </script>

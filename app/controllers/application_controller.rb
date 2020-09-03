@@ -156,10 +156,10 @@ class ApplicationController < ActionController::Base
   end
 
   def set_access_control_headers
-    if Settings.vue.localhost_base_url
+    if Settings.features.vue_js && Settings.vue.localhost_base_url
       logger.warn "Settings.vue.localhost_base_url: #{Settings.vue.localhost_base_url}"
       headers['Access-Control-Allow-Headers'] = 'Content-Type'
-      headers['Access-Control-Allow-Origin'] = "#{Settings.vue.localhost_base_url}"
+      headers['Access-Control-Allow-Origin'] = Settings.vue.localhost_base_url
       headers['Access-Control-Allow-Credentials'] = 'true'
       headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
     end
@@ -224,7 +224,7 @@ class ApplicationController < ActionController::Base
     if (protocol = default_url_options[:protocol])
       protocol + ApplicationController.correct_port(request.host_with_port, env['HTTP_REFERER']) + path
     else
-      path
+      Settings.vue.localhost_base_url ? "#{Settings.vue.localhost_base_url}#{path}" : path
     end
   end
 

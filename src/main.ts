@@ -12,6 +12,7 @@ import Vue from 'vue'
 Vue.config.productionTip = process.env.VUE_APP_DEBUG.toLowerCase() === 'true'
 
 // Mount packages
+Vue.prototype.$_ = _ // eslint-disable-line no-underscore-dangle
 Vue.use(BootstrapVue)
 
 // Axios
