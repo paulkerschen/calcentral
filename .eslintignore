@@ -6,6 +6,7 @@ src/assets/javascripts/angularlib/**
 src/assets/javascripts/lib/**
 public/**
 coverage/**
+dist/**
 node_modules/**
 vendor/**
 babel.config.js

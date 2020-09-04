@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
-import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
 import Router from 'vue-router'
+import Toolbox from '@/views/Toolbox.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -14,12 +14,12 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/toolbox'
     },
     {
       beforeEnter: (to: any, from: any, next: any) => {
         const currentUser = Vue.prototype.$currentUser
-        if (currentUser.isLoggedIn) {
+        if (currentUser && currentUser.isLoggedIn) {
           if (_.trim(to.query.redirect)) {
             next(to.query.redirect)
           } else {
@@ -30,10 +30,16 @@ const router = new Router({
         }
       },
       path: '/login',
-      component: Login,
-      meta: {
-        title: 'Welcome'
-      }
+      component: BaseView,
+      children: [
+        {
+          component: Login,
+          path: '/login',
+          meta: {
+            title: 'Welcome'
+          }
+        }
+      ]
     },
     {
       path: '/',
@@ -41,11 +47,11 @@ const router = new Router({
       component: BaseView,
       children: [
         {
-          component: Home,
-          name: 'home',
-          path: '/home',
+          component: Toolbox,
+          name: 'toolbox',
+          path: '/toolbox',
           meta: {
-            title: 'Home'
+            title: 'Toolbox'
           }
         }
       ]
@@ -66,7 +72,7 @@ const router = new Router({
 
 router.afterEach((to: any) => {
   const title = _.get(to, 'meta.title') || _.capitalize(to.name) || 'Welcome'
-  document.title = `${title} | BOA`
+  document.title = `${title} | Junction`
 })
 
 export default router
