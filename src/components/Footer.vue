@@ -14,7 +14,7 @@
         </div>
       </div>
     </div>
-    <div v-if="$currentUser.isBasicAuthEnabled" class="p-3">
+    <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="p-3">
       <h4 id="basic-auth-header">Basic Auth</h4>
       <b-form @submit="devAuth">
       </b-form>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import Context from '@/mixins/Context';
+import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
 import {devAuthLogIn} from '@/api/auth'
 

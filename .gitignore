@@ -16,6 +16,7 @@
 .env.*.local
 *.local.yml
 *.local.rb
+config/apache*.conf
 
 # Ignore IDE settings.
 .idea/

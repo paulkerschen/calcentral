@@ -16,10 +16,10 @@
     "build": "webpack --config webpack/prod.config.js",
     "build-vue": "vue-cli-service build --modern --dest 'dist/static'",
     "dev": "webpack-serve --config webpack/dev.config.js",
-    "lint": "eslint .",
-    "lint-vue": "vue-cli-service lint --config vue.eslintrc.js --no-fix src/views src/store src/*.ts src/*.vue",
-    "lint-vue-fix": "vue-cli-service lint --config vue.eslintrc.js src/views src/store src/*.ts src/*.vue",
-    "serve-vue": "vue-cli-service --config vue.eslintrc.js serve --open"
+    "lint": "eslint --config .eslintrc.json .",
+    "lint-vue": "vue-cli-service lint --config .eslintrc.vue.js --no-fix src/views src/store src/*.ts src/*.vue",
+    "lint-vue-fix": "vue-cli-service lint --config .eslintrc.vue.js src/views src/store src/*.ts src/*.vue",
+    "serve-vue": "vue-cli-service --config .eslintrc.vue.js serve --open"
   },
   "engines": {
     "node": ">=10.1.0"

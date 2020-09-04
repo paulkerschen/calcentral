@@ -1,9 +1,9 @@
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-vue/dist/bootstrap-vue.min.css'
 import _ from 'lodash'
 import App from './App.vue'
 import axios from 'axios'
-import BootstrapVue from 'bootstrap-vue'
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue'
 import router from './router'
 import store from './store'
 import Vue from 'vue'
@@ -14,6 +14,7 @@ Vue.config.productionTip = process.env.VUE_APP_DEBUG.toLowerCase() === 'true'
 // Mount packages
 Vue.prototype.$_ = _ // eslint-disable-line no-underscore-dangle
 Vue.use(BootstrapVue)
+Vue.use(BootstrapVueIcons)
 
 // Axios
 const apiBaseUrl = process.env.VUE_APP_API_BASE_URL
