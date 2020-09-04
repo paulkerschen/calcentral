@@ -33,8 +33,9 @@ test:
 
 edodb:
   adapter: <%= Settings.edodb.adapter %>
-  driver: <%=Settings.edodb.driver %>
-  url: <%=Settings.edodb.url %>
+  host: <%=Settings.edodb.host %>
+  port: <%=Settings.edodb.port %>
+  database: <%=Settings.edodb.database %>
   username: <%=Settings.edodb.username %>
   password: <%=Settings.edodb.password %>
   pool: <%=Settings.edodb.pool %>
