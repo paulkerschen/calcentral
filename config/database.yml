@@ -41,35 +41,12 @@ edodb:
   pool: <%=Settings.edodb.pool %>
   timeout: <%=Settings.edodb.timeout %>
 
-edodb_test:
-  adapter: postgresql
-  database: <%= Settings.fake_oracle.database %>
-  encoding: unicode
-  pool: <%= Settings.postgres.pool %>
-  timeout: 5000
-  username: <%= Settings.postgres.username %>
-  password: <%= Settings.postgres.password %>
-  host: <%= Settings.postgres.host %>
-  port: <%= Settings.postgres.port %>
-  sslmode: <%= Settings.postgres.sslmode %>
-
 edwdb:
   adapter: <%= Settings.edwdb.adapter %>
-  driver: <%=Settings.edwdb.driver %>
-  url: <%=Settings.edwdb.url %>
+  host: <%=Settings.edwdb.host %>
+  port: <%=Settings.edwdb.port %>
+  database: <%=Settings.edwdb.database %>
   username: <%=Settings.edwdb.username %>
   password: <%=Settings.edwdb.password %>
   pool: <%=Settings.edwdb.pool %>
   timeout: <%=Settings.edwdb.timeout %>
-
-edwdb_test:
-  adapter: postgresql
-  database: <%= Settings.fake_oracle.database %>
-  encoding: unicode
-  pool: <%= Settings.postgres.pool %>
-  timeout: 5000
-  username: <%= Settings.postgres.username %>
-  password: <%= Settings.postgres.password %>
-  host: <%= Settings.postgres.host %>
-  port: <%= Settings.postgres.port %>
-  sslmode: <%= Settings.postgres.sslmode %>

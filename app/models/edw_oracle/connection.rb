@@ -9,13 +9,8 @@ module EdwOracle
 
     # WARNING: Default Rails SQL query caching (done for the lifetime of a controller action) apparently does not apply
     # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
-    if self.fake?
-      establish_connection :edwdb_test
-      Rails.logger.info 'Established fake EDWDB connection'
-    else
-      establish_connection :edwdb
-      Rails.logger.info 'Established non-fake EDWDB connection'
-    end
+    establish_connection :edwdb
+    Rails.logger.info "Established EDWDB connection (fake=#{fake?})"
 
     def self.query(sql, opts={})
       result = []

@@ -14,9 +14,23 @@ canvas_proxy:
 
 edodb:
   fake: true
+  adapter: postgresql
+  database: edodb_test
+  username: calcentral_test
+  password: secret
+  host: localhost
+  port: 5432
+  pool: 3
 
 edwdb:
   fake: true
+  adapter: postgresql
+  database: edodb_test
+  username: calcentral_test
+  password: secret
+  host: localhost
+  port: 5432
+  pool: 3
 
 ldap:
   fake: 'true'

@@ -3,7 +3,7 @@ class PopulateSisedoTestData < ApplicationRecord
   Rails.application.config.after_initialize do
     if Settings.edodb.adapter == 'postgresql'
       logger.warn('Initializing mock SISEDO test data')
-      establish_connection :edodb_test
+      establish_connection :edodb
       sql = <<-SQL
 
       DROP SCHEMA IF EXISTS SISEDO CASCADE;

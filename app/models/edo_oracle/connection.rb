@@ -7,13 +7,8 @@ module EdoOracle
 
     # WARNING: Default Rails SQL query caching (done for the lifetime of a controller action) apparently does not apply
     # to anything but the primary DB connection. Any Oracle query caching needs to be handled explicitly.
-    if self.fake?
-      establish_connection :edodb_test
-      Rails.logger.info 'Established fake EDODB connection'
-    else
-      establish_connection :edodb
-      Rails.logger.info 'Established non-fake EDODB connection'
-    end
+    establish_connection :edodb
+    Rails.logger.info "Established EDODB connection (fake=#{fake?})"
 
     def self.query(sql, opts={})
       result = use_pooled_connection do
