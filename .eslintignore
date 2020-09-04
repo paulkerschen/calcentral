@@ -11,4 +11,4 @@ node_modules/**
 vendor/**
 babel.config.js
 vue.config.js
-vue.eslintrc.js
+.eslintrc.vue.js
