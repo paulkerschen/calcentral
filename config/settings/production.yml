@@ -31,4 +31,3 @@ background_threads:
   min: 10,
   max: 10,
   max_queue: 0  # unbounded work queue
-

@@ -3,7 +3,7 @@ class PopulateSysadmTestData < ApplicationRecord
   Rails.application.config.after_initialize do
     if Settings.edodb.adapter == 'postgresql'
       logger.warn('Initializing mock SYSADM test data')
-      establish_connection :edodb_test
+      establish_connection :edodb
       sql = <<-SQL
 
       DROP SCHEMA IF EXISTS SYSADM CASCADE;

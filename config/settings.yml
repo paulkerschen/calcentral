@@ -48,9 +48,6 @@ edodb:
   adapter: postgresql
   pool: 95
 
-fake_oracle:
-  database: edodb_test
-
 terms:
   # Limit how far back our academic history goes.
   oldest: spring-2010
