@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
   def api_authenticate_401
     if session['user_id'].blank?
       Rails.logger.warn "Authenticated user absent in request to #{controller_name}\##{action_name}"
-      render :nothing => true, :status => 401
+      head 401
     end
   end
 
@@ -72,7 +72,7 @@ class ApplicationController < ActionController::Base
   # reset session AND return 401 when CSRF token validation fails
   def handle_unverified_request
     reset_session
-    render :nothing => true, :status => 401
+    head 401
   end
 
   # Rails url_for defaults the protocol to "request.protocol". But if SSL is being
@@ -121,7 +121,7 @@ class ApplicationController < ActionController::Base
 
   def render_403(error)
     # Subclasses might render JSON including error message.
-    render :nothing => true, :status => 403
+    head 403
   end
 
   def handle_api_exception(error)
@@ -131,7 +131,7 @@ class ApplicationController < ActionController::Base
 
   def handle_exception(error)
     Rails.logger.error "#{error.class} raised with UID: #{session['user_id']} in #{controller_name}\##{action_name}: #{error.message}"
-    render text: error.message, status: 500
+    render plain: error.message, status: 500
   end
 
   def handle_client_error(error)
@@ -222,7 +222,7 @@ class ApplicationController < ActionController::Base
   # first to "http:" and then to "https:". This method makes relative paths safer to use.
   def url_for_path(path)
     if (protocol = default_url_options[:protocol])
-      protocol + ApplicationController.correct_port(request.host_with_port, env['HTTP_REFERER']) + path
+      protocol + ApplicationController.correct_port(request.host_with_port, request.env['HTTP_REFERER']) + path
     else
       Settings.vue.localhost_base_url ? "#{Settings.vue.localhost_base_url}#{path}" : path
     end

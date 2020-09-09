@@ -31,7 +31,7 @@ class UserController < ApplicationController
 
   def record_first_login
     User::Api.from_session(session).record_first_login if current_user.directly_authenticated?
-    render :nothing => true, :status => 204
+    head 204
   end
 
 end

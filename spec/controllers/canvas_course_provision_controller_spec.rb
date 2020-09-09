@@ -25,11 +25,11 @@ describe CanvasCourseProvisionController do
       context 'when an admin' do
         let(:fake_admin) { true }
         it 'allows app-specific acting-as' do
-          make_request({admin_acting_as: admin_acting_as})
+          make_request(admin_acting_as: admin_acting_as)
           assert_response 200
         end
         it 'allows explicit CCNs' do
-          make_request({admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug})
+          make_request(admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug)
           assert_response 200
         end
         it 'does not combine acting-as and CCNs' do
@@ -39,7 +39,7 @@ describe CanvasCourseProvisionController do
         context 'in LTI' do
           include_context 'LTI authenticated'
           it 'succeeds' do
-            make_request({admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug})
+            make_request(admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug)
             assert_response 200
           end
         end
@@ -75,7 +75,7 @@ describe CanvasCourseProvisionController do
             expect(json_response).to eq fake_provisioning_feed
           end
           it 'should not accept a canvas_course_id parameter' do
-            get :get_feed, canvas_course_id: canvas_course_id
+            get :get_feed, params: {canvas_course_id: canvas_course_id}
             assert_response 500
             json_response = JSON.parse(response.body)
             expect(json_response['error']).to be_present
@@ -86,7 +86,7 @@ describe CanvasCourseProvisionController do
           end
           it_should_behave_like 'a consistent admin-mode controller' do
             def make_request(args)
-              get :get_feed, args
+              get :get_feed, params: args
             end
           end
         end
@@ -111,11 +111,11 @@ describe CanvasCourseProvisionController do
 
       it_should_behave_like 'an api endpoint' do
         before { allow_any_instance_of(CanvasLti::CourseProvision).to receive(:create_course_site).and_raise(RuntimeError, 'Something went wrong') }
-        let(:make_request) { post :create_course_site, ccns: ccns }
+        let(:make_request) { post :create_course_site, params: {ccns: ccns} }
       end
 
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { post :create_course_site, ccns: ccns }
+        let(:make_request) { post :create_course_site, params: {ccns: ccns} }
       end
 
       context 'when authorized to create the course site' do
@@ -125,7 +125,7 @@ describe CanvasCourseProvisionController do
         end
 
         it 'responds with success when course provisioning job is created' do
-          post :create_course_site, ccns: ccns, term_slug: term_slug
+          post :create_course_site, params: {ccns: ccns, term_slug: term_slug}
           assert_response :success
           json_response = JSON.parse(response.body)
           json_response['job_request_status'].should == 'Success'
@@ -134,7 +134,7 @@ describe CanvasCourseProvisionController do
 
         it_should_behave_like 'a consistent admin-mode controller' do
           def make_request(args)
-            post :create_course_site, args
+            post :create_course_site, params: args
           end
         end
       end
@@ -149,6 +149,7 @@ describe CanvasCourseProvisionController do
         subject.params['admin_by_ccns'] = admin_by_ccns
         subject.params['admin_term_slug'] = admin_term_slug
         result = subject.create_options_from_params
+        puts result
         expect(result.keys.count).to eq 3
         expect(result).to be_an_instance_of Hash
         expect(result[:admin_acting_as]).to eq admin_acting_as
@@ -163,15 +164,15 @@ describe CanvasCourseProvisionController do
   describe '#job_status' do
     it_should_behave_like 'an api endpoint' do
       before { allow(BackgroundJob).to receive(:find).and_raise(RuntimeError, 'Something went wrong') }
-      let(:make_request) { get :job_status, jobId: 'canvas.courseprovision.12345.1383330151057' }
+      let(:make_request) { get :job_status, params: {jobId: 'canvas.courseprovision.12345.1383330151057'} }
     end
 
     it_should_behave_like 'a user authenticated api endpoint' do
-      let(:make_request) { get :job_status, jobId: 'canvas.courseprovision.12345.1383330151057' }
+      let(:make_request) { get :job_status, params: {jobId: 'canvas.courseprovision.12345.1383330151057'} }
     end
 
     it 'returns error if canvas course provisioning job not found' do
-      get :job_status, jobId: 'canvas.courseprovision.12345.1383330151057'
+      get :job_status, params: {jobId: 'canvas.courseprovision.12345.1383330151057'}
       assert_response :success
       json_response = JSON.parse(response.body)
       json_response['jobId'].should == 'canvas.courseprovision.12345.1383330151057'
@@ -185,7 +186,7 @@ describe CanvasCourseProvisionController do
       cpcs.instance_eval { @background_job_status = 'processing'; @background_job_completed_steps = ['Prepared courses list', 'Identified department sub-account'] }
       cpcs.background_job_save
 
-      get :job_status, jobId: cpcs.background_job_id
+      get :job_status, params: {jobId: cpcs.background_job_id}
       assert_response :success
       json_response = JSON.parse(response.body)
       json_response['jobId'].should == cpcs.background_job_id
@@ -214,7 +215,7 @@ describe CanvasCourseProvisionController do
       end
       let(:fake_course_provision) { instance_double(CanvasLti::CourseProvision, get_feed: fake_sections_feed) }
       it_should_behave_like 'a user authenticated api endpoint' do
-        let(:make_request) { get :get_sections_feed, canvas_course_id: canvas_course_id }
+        let(:make_request) { get :get_sections_feed, params: {canvas_course_id: canvas_course_id} }
       end
       context 'when user authenticated' do
         before do
@@ -224,7 +225,7 @@ describe CanvasCourseProvisionController do
         context 'allowed to view course site official sections' do
           let(:fake_can_view) { true }
           it 'should return sections feed' do
-            get :get_sections_feed, canvas_course_id: canvas_course_id
+            get :get_sections_feed, params: {canvas_course_id: canvas_course_id}
             assert_response :success
             expect(JSON.parse(response.body)).to eq fake_sections_feed
           end
@@ -233,7 +234,7 @@ describe CanvasCourseProvisionController do
               session['canvas_course_id'] = canvas_course_id
             end
             it 'uses the session-stored course ID' do
-              get :get_sections_feed, canvas_course_id: 'embedded'
+              get :get_sections_feed, params: {canvas_course_id: 'embedded'}
               assert_response :success
               expect(JSON.parse(response.body)).to eq fake_sections_feed
             end
@@ -241,23 +242,23 @@ describe CanvasCourseProvisionController do
           context 'allowed to edit official sections' do
             let(:fake_can_edit) { true }
             it 'should return sections feed' do
-              get :get_sections_feed, canvas_course_id: canvas_course_id
+              get :get_sections_feed, params: {canvas_course_id: canvas_course_id}
               assert_response :success
               expect(JSON.parse(response.body)).to eq fake_sections_feed
             end
           end
           it 'requires a canvas_course_id parameter' do
-            get :get_sections_feed, canvas_course_id: ''
+            get :get_sections_feed, params: {canvas_course_id: ''}
             assert_response 500
             json_response = JSON.parse(response.body)
             expect(json_response['error']).to be_present
           end
           it_should_behave_like "an api endpoint" do
             before { allow(fake_course_provision).to receive(:get_feed).and_raise(RuntimeError, "Something went wrong") }
-            let(:make_request) { get :get_sections_feed, canvas_course_id: canvas_course_id }
+            let(:make_request) { get :get_sections_feed, params: {canvas_course_id: canvas_course_id} }
           end
           it 'ignores admin-mode arguments' do
-            get :get_sections_feed, canvas_course_id: canvas_course_id, admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug
+            get :get_sections_feed, params: {canvas_course_id: canvas_course_id, admin_by_ccns: admin_by_ccns, admin_term_slug: admin_term_slug}
             assert_response :success
             expect(JSON.parse(response.body)).to eq fake_sections_feed
           end
@@ -265,7 +266,7 @@ describe CanvasCourseProvisionController do
         context 'not allowed to view official sections' do
           let(:fake_can_view) {false}
           it 'responds with empty 403' do
-            get :get_sections_feed, canvas_course_id: canvas_course_id
+            get :get_sections_feed, params: {canvas_course_id: canvas_course_id}
             assert_response 403
             expect(response.body).to be_blank
           end
@@ -279,7 +280,7 @@ describe CanvasCourseProvisionController do
       let(:ccns_to_update) { ['10287'] }
       it_should_behave_like 'a user authenticated api endpoint' do
         let(:make_request) do
-          post :edit_sections, {
+          post :edit_sections, params: {
             canvas_course_id: canvas_course_id,
             ccns_to_remove: ccns_to_remove,
             ccns_to_add: ccns_to_add,
@@ -295,7 +296,7 @@ describe CanvasCourseProvisionController do
         context 'allowed to edit official sections' do
           let(:fake_can_edit) { true }
           it 'responds with success when section removal job is created' do
-            post :edit_sections, {
+            post :edit_sections, params: {
               canvas_course_id: canvas_course_id,
               ccns_to_remove: ccns_to_remove,
               ccns_to_add: ccns_to_add,
@@ -309,7 +310,7 @@ describe CanvasCourseProvisionController do
           it_should_behave_like 'an api endpoint' do
             before { allow(fake_course_provision).to receive(:edit_sections).and_raise(RuntimeError, "Something went wrong") }
             let(:make_request) do
-              post :edit_sections, {
+              post :edit_sections, params: {
                 canvas_course_id: canvas_course_id,
                 ccns_to_remove: ccns_to_remove,
                 ccns_to_add: ccns_to_add,
@@ -322,7 +323,7 @@ describe CanvasCourseProvisionController do
               session['canvas_course_id'] = canvas_course_id
             end
             it 'uses the session-stored course ID' do
-              get :edit_sections, canvas_course_id: 'embedded'
+              get :edit_sections, params: {canvas_course_id: 'embedded'}
               assert_response :success
               json_response = JSON.parse(response.body)
               json_response['job_request_status'].should == 'Success'
@@ -333,7 +334,7 @@ describe CanvasCourseProvisionController do
         context 'not allowed to edit official sections' do
           let(:fake_can_edit) {false}
           it 'responds with empty 403' do
-            post :edit_sections, {
+            post :edit_sections, params: {
               canvas_course_id: canvas_course_id,
               ccns_to_remove: ccns_to_remove,
               ccns_to_add: ccns_to_add,

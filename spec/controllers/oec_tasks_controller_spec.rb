@@ -48,7 +48,7 @@ describe OecTasksController do
     let(:task_id) { Oec::ApiTaskWrapper.generate_task_id }
     let(:task_name) { 'TermSetupTask' }
     let(:term_name) { 'Summer 2013' }
-    let(:make_request) { post :run, task_name: task_name, term: term_name }
+    let(:make_request) { post :run, params: {task_name: task_name, term: term_name} }
     include_examples 'authorization and error handling'
 
     it_should_behave_like 'an api endpoint' do
@@ -99,7 +99,7 @@ describe OecTasksController do
   end
 
   describe '#task_status' do
-    let(:make_request) { get :task_status, task_id: task_id }
+    let(:make_request) { get :task_status, params: {task_id: task_id} }
     let(:task_id) { Oec::ApiTaskWrapper.generate_task_id }
 
     it_should_behave_like 'an api endpoint' do

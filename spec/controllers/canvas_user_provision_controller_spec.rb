@@ -6,7 +6,7 @@ describe CanvasUserProvisionController do
     context 'if session user not present' do
       before { session['user_id'] = nil }
       it 'returns empty hash' do
-        post :user_import, user_ids: user_id_string
+        post :user_import, params: {user_ids: user_id_string}
         expect(response.status).to eq(200)
         expect(response.body).to eq '{}'
       end
@@ -19,7 +19,7 @@ describe CanvasUserProvisionController do
       end
 
       it 'returns 403 error' do
-        post :user_import, userIds: user_id_string
+        post :user_import, params: {userIds: user_id_string}
         expect(response.status).to eq(403)
         expect(response.body).to eq ''
       end
@@ -33,7 +33,7 @@ describe CanvasUserProvisionController do
       end
 
       it 'returns success response' do
-        post :user_import, userIds: user_id_string
+        post :user_import, params: {userIds: user_id_string}
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
         expect(json_response['status']).to eq 'success'
@@ -43,7 +43,7 @@ describe CanvasUserProvisionController do
       context 'if StandardError exception raised' do
         it 'returns error response' do
           allow_any_instance_of(CanvasCsv::UserProvision).to receive(:import_users).and_raise(RuntimeError, 'User import failed')
-          post :user_import, userIds: user_id_string
+          post :user_import, params: {userIds: user_id_string}
           expect(response.status).to eq(500)
           json_response = JSON.parse(response.body)
           expect(json_response['error']).to eq 'User import failed'

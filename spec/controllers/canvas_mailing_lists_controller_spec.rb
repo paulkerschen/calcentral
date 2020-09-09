@@ -32,7 +32,7 @@ describe CanvasMailingListsController do
   end
 
   describe '#show' do
-    let(:make_request) { get :show, canvas_course_id: course_id }
+    let(:make_request) { get :show, params: {canvas_course_id: course_id} }
     include_examples 'authorization and error handling'
 
     it 'returns a fake unregistered mailing list' do
@@ -45,7 +45,7 @@ describe CanvasMailingListsController do
   end
 
   describe '#create' do
-    let(:make_request) { post :create, canvas_course_id: course_id, listName: 'digression_analysis-sp15' }
+    let(:make_request) { post :create, params: {canvas_course_id: course_id, listName: 'digression_analysis-sp15'} }
     include_examples 'authorization and error handling'
 
     it 'returns a Mailgun list' do
@@ -57,7 +57,7 @@ describe CanvasMailingListsController do
   end
 
   describe '#populate' do
-    let(:make_request) { post :populate, canvas_course_id: course_id  }
+    let(:make_request) { post :populate, params: {canvas_course_id: course_id} }
     include_examples 'authorization and error handling'
 
     it 'returns a fake mailing list with time last populated' do
@@ -73,7 +73,7 @@ describe CanvasMailingListsController do
   end
 
   describe '#delete' do
-    let(:make_request) { delete :destroy, canvas_course_id: course_id  }
+    let(:make_request) { delete :destroy, params: {canvas_course_id: course_id} }
     include_examples 'authorization and error handling'
 
     it 'returns a success response' do

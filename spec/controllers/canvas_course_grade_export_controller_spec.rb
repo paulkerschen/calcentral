@@ -30,19 +30,19 @@ describe CanvasCourseGradeExportController do
     end
 
     it_should_behave_like 'an endpoint' do
-      let(:make_request) { post :prepare_grades_cache, :canvas_course_id => canvas_course_id, :format => :csv }
+      let(:make_request) { post :prepare_grades_cache, params: {canvas_course_id: canvas_course_id, format: :csv} }
       let(:error_text) { 'Something went wrong' }
       before { allow_any_instance_of(CanvasLti::Egrades).to receive(:background_job_initialize).and_raise(RuntimeError, error_text) }
     end
 
     it_should_behave_like 'an authenticated endpoint' do
-      let(:make_request) { post :prepare_grades_cache, :canvas_course_id => canvas_course_id, :format => :csv }
+      let(:make_request) { post :prepare_grades_cache, params: {canvas_course_id: canvas_course_id, format: :csv} }
     end
 
     it 'makes call to load canvas course student grades with forced cacheing' do
       expect(torquebox_fake_background_proxy).to receive(:canvas_course_student_grades).with(true).and_return(nil)
       allow_any_instance_of(CanvasLti::Egrades).to receive(:background).and_return(torquebox_fake_background_proxy)
-      post :prepare_grades_cache, :canvas_course_id => canvas_course_id, :format => :csv
+      post :prepare_grades_cache, params: {canvas_course_id: canvas_course_id, format: :csv}
       expect(response.status).to eq(200)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Hash
@@ -51,7 +51,7 @@ describe CanvasCourseGradeExportController do
 
     it 'returns background job id' do
       allow_any_instance_of(CanvasLti::Egrades).to receive(:background).and_return(torquebox_fake_background_proxy)
-      post :prepare_grades_cache, :canvas_course_id => canvas_course_id, :format => :csv
+      post :prepare_grades_cache, params: {canvas_course_id: canvas_course_id, format: :csv}
       expect(response.status).to eq(200)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Hash
@@ -65,16 +65,16 @@ describe CanvasCourseGradeExportController do
 
     it_should_behave_like 'an endpoint' do
       let(:error_text) { 'Something went wrong' }
-      let(:make_request) { get :job_status, canvas_course_id: canvas_course_id, jobId: background_job_id }
+      let(:make_request) { get :job_status, params: {canvas_course_id: canvas_course_id, jobId: background_job_id} }
       before { allow(BackgroundJob).to receive(:find).and_raise(RuntimeError, 'Something went wrong') }
     end
 
     it_should_behave_like 'an authenticated endpoint' do
-      let(:make_request) { get :job_status, canvas_course_id: canvas_course_id, jobId: background_job_id }
+      let(:make_request) { get :job_status, params: {canvas_course_id: canvas_course_id, jobId: background_job_id} }
     end
 
     it 'returns error if egrades background job not found' do
-      get :job_status, canvas_course_id: canvas_course_id, jobId: background_job_id
+      get :job_status, params: {canvas_course_id: canvas_course_id, jobId: background_job_id}
       assert_response :success
       json_response = JSON.parse(response.body)
       expect(json_response['jobId']).to eq background_job_id
@@ -88,7 +88,7 @@ describe CanvasCourseGradeExportController do
       egrades.background_job_set_total_steps(2)
       egrades.background_job_complete_step('step 1')
 
-      get :job_status, canvas_course_id: canvas_course_id, jobId: egrades.background_job_id
+      get :job_status, params: {canvas_course_id: canvas_course_id, jobId: egrades.background_job_id}
       assert_response :success
       json_response = JSON.parse(response.body)
       expect(json_response['jobId']).to eq egrades.background_job_id
@@ -126,17 +126,17 @@ describe CanvasCourseGradeExportController do
     end
 
     it_should_behave_like 'an endpoint' do
-      let(:make_request) { get :export_options, canvas_course_id: 'embedded', :format => :csv }
+      let(:make_request) { get :export_options, params: {canvas_course_id: 'embedded', format: :csv} }
       let(:error_text) { 'Something went wrong' }
       before { allow_any_instance_of(CanvasLti::Egrades).to receive(:export_options).and_raise(RuntimeError, error_text) }
     end
 
     it_should_behave_like 'an authenticated endpoint' do
-      let(:make_request) { get :export_options, canvas_course_id: 'embedded', :format => :csv }
+      let(:make_request) { get :export_options, params: {canvas_course_id: 'embedded', format: :csv} }
     end
 
     it 'provides export options' do
-      get :export_options, canvas_course_id: 'embedded'
+      get :export_options, params: {canvas_course_id: 'embedded'}
       expect(response.status).to eq(200)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Hash
@@ -156,7 +156,7 @@ describe CanvasCourseGradeExportController do
 
     it 'supports canvas course id parameter when absent in session' do
       session['canvas_course_id'] = nil
-      get :export_options, canvas_course_id: canvas_course_id
+      get :export_options, params: {canvas_course_id: canvas_course_id}
       expect(response.status).to eq(200)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Hash
@@ -171,19 +171,19 @@ describe CanvasCourseGradeExportController do
   describe 'when serving egrades download' do
 
     it_should_behave_like 'an endpoint' do
-      let(:make_request) { get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'C-' }
+      let(:make_request) { get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'C-'} }
       let(:error_text) { 'Something went wrong' }
       before { allow_any_instance_of(CanvasLti::Egrades).to receive(:official_student_grades_csv).and_raise(RuntimeError, error_text) }
     end
 
     it_should_behave_like 'an authenticated endpoint' do
-      let(:make_request) { get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234' }
+      let(:make_request) { get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234'} }
     end
 
     context 'when the canvas course id is not present in the session' do
       before { session['canvas_course_id'] = nil }
       it 'returns 403 error' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234'}
         expect(response.status).to eq(403)
         expect(response.body).to eq ''
       end
@@ -192,7 +192,7 @@ describe CanvasCourseGradeExportController do
     context 'when user is not authorized to download egrades csv' do
       before { allow_any_instance_of(Canvas::CoursePolicy).to receive(:can_export_grades?).and_return(false) }
       it 'returns 403 error' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234'}
         expect(response.status).to eq(403)
         expect(response.body).to eq ''
       end
@@ -210,49 +210,49 @@ describe CanvasCourseGradeExportController do
       end
       before { allow_any_instance_of(CanvasLti::Egrades).to receive(:official_student_grades_csv).and_return(csv_string) }
       it 'raises exception if term code not provided' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'C-'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'term_cd required'
       end
 
       it 'raises exception if term year not provided' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', ccn: '1234', type: 'final', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', ccn: '1234', type: 'final', pnp_cutoff: 'C-'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'term_yr required'
       end
 
       it 'raises exception if course control number not provided' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', type: 'final', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', type: 'final', pnp_cutoff: 'C-'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'ccn required'
       end
 
       it 'raises exception if type not provided' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', pnp_cutoff: 'C-'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'type required'
       end
 
       it 'raises exception if P/NP cutoff not provided' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq 'pnp_cutoff required'
       end
 
       it 'raises exception if P/NP cutoff not parseable' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'XYZ'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'final', pnp_cutoff: 'XYZ'}
         expect(response.status).to eq(400)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq "invalid value for 'pnp_cutoff' parameter"
       end
 
       it 'serves egrades csv file download' do
-        get :download_egrades_csv, canvas_course_id: 'embedded', :format => :csv, :term_cd => 'D', :term_yr => '2014', :ccn => '1234', :type => 'current', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: 'embedded', format: :csv, term_cd: 'D', term_yr: '2014', ccn: '1234', type: 'current', pnp_cutoff: 'C-'}
         expect(response.status).to eq(200)
         expect(response.headers['Content-Type']).to eq 'text/csv'
         expect(response.headers['Content-Disposition']).to eq 'attachment; filename=egrades-current-1234-Fall-2014-1164764.csv'
@@ -286,7 +286,7 @@ describe CanvasCourseGradeExportController do
 
       it 'supports canvas course id parameter when absent in session' do
         session['canvas_course_id'] = nil
-        get :download_egrades_csv, canvas_course_id: canvas_course_id, :format => :csv, :term_cd => 'D', :term_yr => '2014', :ccn => '1234', :type => 'current', pnp_cutoff: 'C-'
+        get :download_egrades_csv, params: {canvas_course_id: canvas_course_id, :format => :csv, :term_cd => 'D', :term_yr => '2014', :ccn => '1234', :type => 'current', pnp_cutoff: 'C-'}
         expect(response.status).to eq(200)
         expect(response.headers['Content-Type']).to eq 'text/csv'
         expect(response.headers['Content-Disposition']).to eq 'attachment; filename=egrades-current-1234-Fall-2014-1164764.csv'
@@ -304,21 +304,21 @@ describe CanvasCourseGradeExportController do
       allow_any_instance_of(CanvasLti::OfficialCourse).to receive(:is_official_course?).and_return(true)
     end
     it_should_behave_like 'an endpoint' do
-      let(:make_request) { get :is_official_course, :format => :csv, :canvas_course_id => '1234' }
+      let(:make_request) { get :is_official_course, params: {format: :csv, canvas_course_id: '1234'} }
       let(:error_text) { 'Something went wrong' }
       before { allow(CanvasLti::OfficialCourse).to receive(:new).and_raise(RuntimeError, error_text) }
     end
 
     context 'when the canvas course id is not present in the params' do
       it 'returns 403 error' do
-        get :is_official_course, :format => :csv
+        get :is_official_course, params: {format: :csv}
         expect(response.status).to eq(403)
         expect(response.body).to eq ''
       end
     end
 
     it 'should set cross origin access control headers' do
-      get :is_official_course, :format => :csv, :canvas_course_id => '1234'
+      get :is_official_course, params: {format: :csv, canvas_course_id: '1234'}
       expect(response.header['Access-Control-Allow-Origin']).to eq "#{Settings.canvas_proxy.url_root}"
       expect(response.header['Access-Control-Allow-Origin']).to_not eq '*'
       expect(response.header['Access-Control-Allow-Methods']).to eq 'GET'
@@ -326,7 +326,7 @@ describe CanvasCourseGradeExportController do
     end
 
     it 'indicates if the course site has official sections' do
-      get :is_official_course, :format => :csv, :canvas_course_id => '1234'
+      get :is_official_course, params: {format: :csv, canvas_course_id: '1234'}
       expect(response.status).to eq(200)
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an_instance_of Hash

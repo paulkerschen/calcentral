@@ -21,7 +21,7 @@ class OecGoogleAuthController < ApplicationController
 
   def remove_authorization
     auth.oauth2_revoke_authorization
-    render nothing: true, status: 204
+    head 204
   end
 
   private

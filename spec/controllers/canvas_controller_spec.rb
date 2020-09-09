@@ -33,18 +33,18 @@ describe CanvasController do
   context 'when identifying if a user can provision course or project sites' do
     it_should_behave_like 'an api endpoint' do
       before { allow_any_instance_of(CanvasLti::PublicAuthorizer).to receive(:can_create_site?).and_raise(RuntimeError, 'Something went wrong') }
-      let(:make_request) { get :user_can_create_site, :canvas_user_id => canvas_user_id }
+      let(:make_request) { get :user_can_create_site, params: {canvas_user_id: canvas_user_id} }
     end
 
     context 'when user is not authorized to create course site' do
       before { allow_any_instance_of(CanvasLti::PublicAuthorizer).to receive(:can_create_site?).and_return(false) }
 
       it_should_behave_like 'a cross-domain endpoint' do
-        let(:make_request) { get :user_can_create_site, :canvas_user_id => canvas_user_id }
+        let(:make_request) { get :user_can_create_site, params: {canvas_user_id: canvas_user_id} }
       end
 
       it 'returns false' do
-        get :user_can_create_site, :canvas_user_id => canvas_user_id
+        get :user_can_create_site, params: {canvas_user_id: canvas_user_id}
         expect(response.status).to eq(200)
         response_json = JSON.parse(response.body)
         expect(response_json['canCreateSite']).to eq false
@@ -55,11 +55,11 @@ describe CanvasController do
       before { allow_any_instance_of(CanvasLti::PublicAuthorizer).to receive(:can_create_site?).and_return(true) }
 
       it_should_behave_like 'a cross-domain endpoint' do
-        let(:make_request) { get :user_can_create_site, :canvas_user_id => canvas_user_id }
+        let(:make_request) { get :user_can_create_site, params: {canvas_user_id: canvas_user_id} }
       end
 
       it 'returns true' do
-        get :user_can_create_site, :canvas_user_id => canvas_user_id
+        get :user_can_create_site, params: {canvas_user_id: canvas_user_id}
         expect(response.status).to eq(200)
         response_json = JSON.parse(response.body)
         expect(response_json['canCreateSite']).to eq true

@@ -13,12 +13,12 @@ describe Berkeley::Term do
         expect(subject.name).to eq 'Summer'
         expect(subject.campus_solutions_id).to eq '2165'
         expect(subject.is_summer).to eq true
-        expect(subject.classes_start).to eq Time.zone.parse('2016-05-23 00:00:00').to_datetime
-        expect(subject.classes_end).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
-        expect(subject.instruction_end).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
-        expect(subject.grades_entered).to eq Time.zone.parse('2016-09-09 23:59:59').to_datetime
-        expect(subject.start).to eq Time.zone.parse('2016-05-23 00:00:00').to_datetime
-        expect(subject.end).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
+        expect(subject.classes_start).to eq get_datetime('2016-05-23 00:00:00')
+        expect(subject.classes_end).to eq get_datetime('2016-08-12 23:59:59')
+        expect(subject.instruction_end).to eq get_datetime('2016-08-12 23:59:59')
+        expect(subject.grades_entered).to eq get_datetime('2016-09-09 23:59:59')
+        expect(subject.start).to eq get_datetime('2016-05-23 00:00:00')
+        expect(subject.end).to eq get_datetime('2016-08-12 23:59:59')
         expect(subject.to_english).to eq 'Summer 2016'
         expect(subject.legacy?).to be_truthy
         expect(subject.sis_current_term?).to be_truthy
@@ -36,12 +36,12 @@ describe Berkeley::Term do
         expect(subject.name).to eq 'Fall'
         expect(subject.campus_solutions_id).to eq '2168'
         expect(subject.is_summer).to eq false
-        expect(subject.classes_start).to eq Time.zone.parse('2016-08-24 00:00:00').to_datetime
-        expect(subject.classes_end).to eq Time.zone.parse('2016-12-02 23:59:59').to_datetime
-        expect(subject.instruction_end).to eq Time.zone.parse('2016-12-09 23:59:59').to_datetime
-        expect(subject.grades_entered).to eq Time.zone.parse('2017-01-13 23:59:59').to_datetime
-        expect(subject.start).to eq Time.zone.parse('2016-08-17 00:00:00').to_datetime
-        expect(subject.end).to eq Time.zone.parse('2016-12-16 23:59:59').to_datetime
+        expect(subject.classes_start).to eq get_datetime('2016-08-24 00:00:00')
+        expect(subject.classes_end).to eq get_datetime('2016-12-02 23:59:59')
+        expect(subject.instruction_end).to eq get_datetime('2016-12-09 23:59:59')
+        expect(subject.grades_entered).to eq get_datetime('2017-01-13 23:59:59')
+        expect(subject.start).to eq get_datetime('2016-08-17 00:00:00')
+        expect(subject.end).to eq get_datetime('2016-12-16 23:59:59')
         expect(subject.to_english).to eq 'Fall 2016'
         expect(subject.legacy?).to be_falsey
         expect(subject.sis_current_term?).to be_falsey
@@ -77,12 +77,12 @@ describe Berkeley::Term do
         expect(subject.to_h[:code]).to eq 'C'
         expect(subject.to_h[:slug]).to eq 'summer-2016'
         expect(subject.to_h[:to_english]).to eq 'Summer 2016'
-        expect(subject.to_h[:start]).to eq Time.zone.parse('2016-05-23 00:00:00').to_datetime
-        expect(subject.to_h[:end]).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
-        expect(subject.to_h[:classes_start]).to eq Time.zone.parse('2016-05-23 00:00:00').to_datetime
-        expect(subject.to_h[:classes_end]).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
-        expect(subject.to_h[:instruction_end]).to eq Time.zone.parse('2016-08-12 23:59:59').to_datetime
-        expect(subject.to_h[:grades_entered]).to eq Time.zone.parse('2016-09-09 23:59:59').to_datetime
+        expect(subject.to_h[:start]).to eq get_datetime('2016-05-23 00:00:00')
+        expect(subject.to_h[:end]).to eq get_datetime('2016-08-12 23:59:59')
+        expect(subject.to_h[:classes_start]).to eq get_datetime('2016-05-23 00:00:00')
+        expect(subject.to_h[:classes_end]).to eq get_datetime('2016-08-12 23:59:59')
+        expect(subject.to_h[:instruction_end]).to eq get_datetime('2016-08-12 23:59:59')
+        expect(subject.to_h[:grades_entered]).to eq get_datetime('2016-09-09 23:59:59')
         expect(subject.to_h[:is_summer]).to eq true
         expect(subject.to_h[:legacy?]).to eq true
         expect(subject.to_h[:end_drop_add]).to eq false
@@ -116,11 +116,11 @@ describe Berkeley::Term do
       its(:campus_solutions_id) {should eq '2145'}
       its(:is_summer) {should eq true}
       its(:legacy_sis_term_status) {should eq 'CS'}
-      its(:classes_start) {should eq Time.zone.parse('2014-05-27 00:00:00').to_datetime}
-      its(:classes_end) {should eq Time.zone.parse('2014-08-15 23:59:59').to_datetime}
-      its(:instruction_end) {should eq Time.zone.parse('2014-08-15 23:59:59').to_datetime}
-      its(:start) {should eq Time.zone.parse('2014-05-27 00:00:00').to_datetime}
-      its(:end) {should eq Time.zone.parse('2014-08-15 23:59:59').to_datetime}
+      its(:classes_start) {should eq get_datetime('2014-05-27 00:00:00')}
+      its(:classes_end) {should eq get_datetime('2014-08-15 23:59:59')}
+      its(:instruction_end) {should eq get_datetime('2014-08-15 23:59:59')}
+      its(:start) {should eq get_datetime('2014-05-27 00:00:00')}
+      its(:end) {should eq get_datetime('2014-08-15 23:59:59')}
       its(:to_english) {should eq 'Summer 2014'}
     end
     context 'Fall' do
@@ -140,11 +140,11 @@ describe Berkeley::Term do
       its(:campus_solutions_id) {should eq '2148'}
       its(:is_summer) {should eq false}
       its(:legacy_sis_term_status) {should eq 'FT'}
-      its(:classes_start) {should eq Time.zone.parse('2014-08-28 00:00:00').to_datetime}
-      its(:classes_end) {should eq Time.zone.parse('2014-12-05 23:59:59').to_datetime}
-      its(:instruction_end) {should eq Time.zone.parse('2014-12-12 23:59:59').to_datetime}
-      its(:start) {should eq Time.zone.parse('2014-08-21 00:00:00').to_datetime}
-      its(:end) {should eq Time.zone.parse('2014-12-19 23:59:59').to_datetime}
+      its(:classes_start) {should eq get_datetime('2014-08-28 00:00:00')}
+      its(:classes_end) {should eq get_datetime('2014-12-05 23:59:59')}
+      its(:instruction_end) {should eq get_datetime('2014-12-12 23:59:59')}
+      its(:start) {should eq get_datetime('2014-08-21 00:00:00')}
+      its(:end) {should eq get_datetime('2014-12-19 23:59:59')}
       its(:to_english) {should eq 'Fall 2014'}
     end
     context 'Spring' do
@@ -164,12 +164,18 @@ describe Berkeley::Term do
       its(:campus_solutions_id) {should eq '2142'}
       its(:is_summer) {should eq false}
       its(:legacy_sis_term_status) {should eq 'CT'}
-      its(:classes_start) {should eq Time.zone.parse('2014-01-21 00:00:00').to_datetime}
-      its(:classes_end) {should eq Time.zone.parse('2014-05-02 23:59:59').to_datetime}
-      its(:instruction_end) {should eq Time.zone.parse('2014-05-09 23:59:59').to_datetime}
-      its(:start) {should eq Time.zone.parse('2014-01-14 00:00:00').to_datetime}
-      its(:end) {should eq Time.zone.parse('2014-05-16 23:59:59').to_datetime}
+      its(:classes_start) {should eq get_datetime('2014-01-21 00:00:00')}
+      its(:classes_end) {should eq get_datetime('2014-05-02 23:59:59')}
+      its(:instruction_end) {should eq get_datetime('2014-05-09 23:59:59')}
+      its(:start) {should eq get_datetime('2014-01-14 00:00:00')}
+      its(:end) {should eq get_datetime('2014-05-16 23:59:59')}
       its(:to_english) {should eq 'Spring 2014'}
     end
   end
+end
+
+def get_datetime(str)
+  # It seems that Rails .end_of_day is now precise to the nanosecond. 
+  str.sub! '23:59:59', '23:59:59.999999999'
+  Time.zone.parse(str).to_datetime
 end

@@ -49,7 +49,7 @@ describe StoredUsersController do
 
   describe '#store_saved_uid' do
     it 'should return error_response on invalid uid' do
-      post :store_saved_uid, { format: 'json', uid: 'not_numeric' }
+      post :store_saved_uid, params: { format: 'json', uid: 'not_numeric' }
       expect(response.status).to eq 400
       json_response = JSON.parse response.body
       expect(json_response['success']).to be false
@@ -59,7 +59,7 @@ describe StoredUsersController do
     it 'should return success_response on valid uid' do
       User::StoredUsers.should_receive(:store_saved_uid).with(session_user_id, '100').and_return success_response
 
-      post :store_saved_uid, { format: 'json', uid: '100' }
+      post :store_saved_uid, params: { format: 'json', uid: '100' }
       expect(response).to be_success
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
@@ -68,7 +68,7 @@ describe StoredUsersController do
 
   describe '#store_recent_uid' do
     it 'should return error_response on invalid uid' do
-      post :store_recent_uid, { format: 'json', uid: 'not_numeric' }
+      post :store_recent_uid, params: { format: 'json', uid: 'not_numeric' }
       expect(response.status).to eq 400
       json_response = JSON.parse response.body
       expect(json_response['success']).to be false
@@ -78,7 +78,7 @@ describe StoredUsersController do
     it 'should return success_response on valid uid' do
       User::StoredUsers.should_receive(:store_recent_uid).with(session_user_id, '100').and_return success_response
 
-      post :store_recent_uid, { format: 'json', uid: '100' }
+      post :store_recent_uid, params: { format: 'json', uid: '100' }
       expect(response).to be_success
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
@@ -87,7 +87,7 @@ describe StoredUsersController do
 
   describe '#delete_saved_uid' do
     it 'should return error_response on invalid uid' do
-      post :delete_saved_uid, { format: 'json', uid: 'not_numeric' }
+      post :delete_saved_uid, params: { format: 'json', uid: 'not_numeric' }
       expect(response.status).to eq 400
       json_response = JSON.parse response.body
       expect(json_response['success']).to be false
@@ -97,7 +97,7 @@ describe StoredUsersController do
     it 'should return success_response on valid uid' do
       User::StoredUsers.should_receive(:delete_saved_uid).with(session_user_id, '100').and_return success_response
 
-      post :delete_saved_uid, { format: 'json', uid: '100' }
+      post :delete_saved_uid, params: { format: 'json', uid: '100' }
       expect(response).to be_success
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
@@ -108,7 +108,7 @@ describe StoredUsersController do
     it 'should return success_response' do
       User::StoredUsers.should_receive(:delete_all_recent).with(session_user_id).and_return success_response
 
-      post :delete_all_recent, { format: 'json' }
+      post :delete_all_recent, params: { format: 'json' }
       expect(response).to be_success
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
@@ -119,7 +119,7 @@ describe StoredUsersController do
     it 'should return success_response' do
       User::StoredUsers.should_receive(:delete_all_saved).with(session_user_id).and_return success_response
 
-      post :delete_all_saved, { format: 'json' }
+      post :delete_all_saved, params: { format: 'json' }
       expect(response).to be_success
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true

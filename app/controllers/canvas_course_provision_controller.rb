@@ -64,11 +64,11 @@ class CanvasCourseProvisionController < ApplicationController
   end
 
   def create_options_from_params
-    params.select {|k, v| [
-      'admin_acting_as',
-      'admin_by_ccns',
-      'admin_term_slug'
-    ].include?(k)}.symbolize_keys
+    {
+      admin_acting_as: params['admin_acting_as'],
+      admin_by_ccns: params['admin_by_ccns'],
+      admin_term_slug: params['admin_term_slug']
+    }
   end
 
   def validate_admin_mode
