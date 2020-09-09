@@ -6,7 +6,10 @@ import {mapActions, mapGetters} from 'vuex'
 export default {
   name: 'Context',
   computed: {
-    ...mapGetters('context', ['loading', 'screenReaderAlert'])
+    ...mapGetters('context', [
+      'loading',
+      'screenReaderAlert'
+    ])
   },
   methods: {
     alertScreenReader(message) {
