@@ -2,7 +2,7 @@ class CsvExport
 
   def initialize(export_dir)
     @export_dir = export_dir
-    unless File.exists? @export_dir
+    unless File.exist? @export_dir
       FileUtils.mkdir_p @export_dir
     end
   end

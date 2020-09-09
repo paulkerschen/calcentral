@@ -2,19 +2,19 @@ source 'https://rubygems.org'
 
 # The core framework
 # https://github.com/rails/rails
-gem 'rails', '5.1.7'
+gem 'rails', '5.2.4.3'
 
 # The backing band
 gem 'rack', '~> 2.2.3'
 gem 'rake', '~> 13.0.1'
 
 # DB adapters
-gem 'activerecord-jdbc-adapter', '~> 51.7'
-gem 'activerecord-jdbcpostgresql-adapter', '~> 51.7'
+gem 'activerecord-jdbc-adapter', '~> 52.6'
+gem 'activerecord-jdbcpostgresql-adapter', '~> 52.6'
 # Oracle adapter requires ojdb7.jar; exclude from test environments.
-gem 'activerecord-oracle_enhanced-adapter', '~> 1.8.2', group: [:development, :production]
+gem 'activerecord-oracle_enhanced-adapter', '~> 5.2.8', group: [:development, :production]
 
-gem 'responders', '~> 2.0'
+gem 'responders', '~> 3.0.1'
 
 # http://flori.github.com/json/
 gem 'json', '~> 2.3.1-java'
@@ -27,7 +27,7 @@ gem 'omniauth-cas', '~> 1.1.0', git: 'https://github.com/ets-berkeley-edu/omniau
 gem 'net-ldap', '~> 0.16.3'
 
 # secure_headers provides x-frame, csp and other http headers
-gem 'secure_headers', '~> 5.1.0'
+gem 'secure_headers', '~> 5.2.0'
 
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', '~> 0.9.1'
@@ -123,7 +123,7 @@ group :development do
 end
 
 group :test do
-  gem 'activerecord-jdbcsqlite3-adapter', '~> 51.7'
+  gem 'activerecord-jdbcsqlite3-adapter', '~> 52.6'
   gem 'page-object', '~> 2.2.6'
 end
 

@@ -11,7 +11,7 @@ class TopHParser
   def self.run(top_h_filename)
     # Output CSV file to the same directory as the input 'top -H' log.
     top_h_path = File.expand_path top_h_filename
-    raise RuntimeError, "top-H logfile does not exist: #{top_h_path}" unless File.exists? top_h_path
+    raise RuntimeError, "top-H logfile does not exist: #{top_h_path}" unless File.exist? top_h_path
     top_h_lines = File.open(top_h_path).read.split /\r\n?|\n/
     parsed = TopHParser.new.parse_lines top_h_lines
     unless parsed.empty?

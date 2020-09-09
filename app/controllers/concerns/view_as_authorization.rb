@@ -10,6 +10,6 @@ module ViewAsAuthorization
 
   def authorize_query_stored_users(current_user)
     return if current_user.directly_authenticated? && current_user.policy.can_view_as?
-    raise Pundit::NotAuthorizedError.new("User (UID: #{uid}) is not authorized to View As")
+    raise Pundit::NotAuthorizedError.new("User (UID: #{current_user.user_id}) is not authorized to View As")
   end
 end

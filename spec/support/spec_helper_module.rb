@@ -124,7 +124,7 @@ module SpecHelperModule
 
   def delete_files_if_exists(filepaths)
     filepaths.to_a.each do |filepath|
-      File.delete(filepath) if File.exists?(filepath)
+      File.delete(filepath) if File.exist?(filepath)
     end
   end
 

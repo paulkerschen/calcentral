@@ -70,7 +70,7 @@ module DataLoch
     end
 
     def self.staging_path(basename)
-      FileUtils.mkdir_p STAGING_DIRECTORY unless File.exists? STAGING_DIRECTORY
+      FileUtils.mkdir_p STAGING_DIRECTORY unless File.exist? STAGING_DIRECTORY
       STAGING_DIRECTORY.join(basename).to_s
     end
 

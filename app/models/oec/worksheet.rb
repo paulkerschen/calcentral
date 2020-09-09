@@ -69,7 +69,7 @@ module Oec
 
     def initialize(opts={})
       @export_directory = opts[:export_path] || DEFAULT_EXPORT_PATH
-      FileUtils.mkdir_p @export_directory unless File.exists? @export_directory
+      FileUtils.mkdir_p @export_directory unless File.exist? @export_directory
       @opts = opts
       @rows = ActiveSupport::OrderedHash.new
     end

@@ -86,7 +86,7 @@ describe CanvasCsv::AddNewUsers do
       result = subject.get_canvas_user_report_file
       expect(result).to be_an_instance_of String
       expect(result).to eq 'tmp/canvas/canvas-2014-07-23_09-00-06-users-report.csv'
-      expect(File.exists?(result)).to be_truthy
+      expect(File.exist?(result)).to be_truthy
     end
 
     it 'inserts all users into csv file' do

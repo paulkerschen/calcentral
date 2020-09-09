@@ -13,11 +13,11 @@ describe Canvas::SectionEnrollments do
 
   context 'when enrolling user into canvas course section' do
     it 'raises exception if user id is not an integer' do
-      expect { subject.enroll_user('not_an_integer', ta_role_id) }.to raise_error(ArgumentError, 'User ID must be a Fixnum')
+      expect { subject.enroll_user('not_an_integer', ta_role_id) }.to raise_error(ArgumentError, 'User ID must be a Integer')
     end
 
     it 'raises exception if role ID is not an integer' do
-      expect { subject.enroll_user(user_id, 'TaEnrollment') }.to raise_error(ArgumentError, 'Role ID must be a Fixnum')
+      expect { subject.enroll_user(user_id, 'TaEnrollment') }.to raise_error(ArgumentError, 'Role ID must be a Integer')
     end
 
     it 'returns confirmation of enrollment' do

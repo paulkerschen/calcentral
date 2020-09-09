@@ -15,8 +15,8 @@ module Canvas
     # Interface to Enroll a User in Canvas
     # See https://canvas.instructure.com/doc/api/enrollments.html#method.enrollments_api.create
     def enroll_user(user_id, role_id)
-      raise ArgumentError, 'User ID must be a Fixnum' if user_id.class != Fixnum
-      raise ArgumentError, 'Role ID must be a Fixnum' if role_id.class != Fixnum
+      raise ArgumentError, 'User ID must be a Integer' if user_id.class != Integer
+      raise ArgumentError, 'Role ID must be a Integer' if role_id.class != Integer
       wrapped_post request_path, {
         'enrollment' => {
           'user_id' => user_id,

@@ -5,7 +5,7 @@ module Canvas
     def initialize(options = {})
       super(options)
       account_id = options[:account_id] || settings.account_id
-      raise ArgumentError, 'Account ID option must be a String or Fixnum' unless [String,Fixnum].include? account_id.class
+      raise ArgumentError, 'Account ID option must be a String or Integer' unless [String, Integer].include? account_id.class
       @account_id = account_id
     end
 
@@ -38,7 +38,7 @@ module Canvas
 
     def mock_interactions
       # Point 'sis_account_id' strings at our main fake Account.
-      account_id = @account_id.is_a?(Fixnum) ? @account_id : 128847
+      account_id = @account_id.is_a?(Integer) ? @account_id : 128847
       mock_paged_interaction("canvas_account_roles_#{account_id}", uri_matching: request_path, method: :get)
     end
 

@@ -144,9 +144,6 @@ describe CanvasCsv::ProvideCourseSite do
       before do
         # The class isn't particularly test-friendly.
         allow(subject).to receive(:section_definitions).and_return(ccns_to_add)
-        task_steps.each do |step|
-          allow(subject).to receive(step).ordered
-        end
       end
       it 'sets job type to edit_sections' do
         subject.bg_edit_sections(canvas_course_info, ccns_to_remove, ccns_to_add, ccns_to_update)
