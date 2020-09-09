@@ -15,7 +15,7 @@ module CanvasLti
     }
 
     def initialize(options = {})
-      raise ArgumentError, 'Course ID must be a Fixnum' if options[:canvas_course_id].class != Fixnum
+      raise ArgumentError, 'Course ID must be a Integer' if options[:canvas_course_id].class != Integer
       @user_id = options[:user_id]
       @canvas_course_id = options[:canvas_course_id]
       canvas_user_profile = Canvas::SisUserProfile.new(user_id: @user_id).get

@@ -23,7 +23,7 @@ describe Canvas::CourseUser do
     end
 
     it 'raises exception if user id option is not an integer' do
-      expect { Canvas::CourseUser.new(:user_id => '#{user_id}', :course_id => course_id) }.to raise_error(ArgumentError, 'User ID option must be a Fixnum')
+      expect { Canvas::CourseUser.new(:user_id => '#{user_id}', :course_id => course_id) }.to raise_error(ArgumentError, 'User ID option must be a Integer')
     end
 
     it 'raises exception if course id option not present' do
@@ -31,7 +31,7 @@ describe Canvas::CourseUser do
     end
 
     it 'raises exception if course id option is not an integer' do
-      expect { Canvas::CourseUser.new(:user_id => user_id, :course_id => '#{course_id}') }.to raise_error(ArgumentError, 'Course ID option must be a Fixnum')
+      expect { Canvas::CourseUser.new(:user_id => user_id, :course_id => '#{course_id}') }.to raise_error(ArgumentError, 'Course ID option must be a Integer')
     end
   end
 

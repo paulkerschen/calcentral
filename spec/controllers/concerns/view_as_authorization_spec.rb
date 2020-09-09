@@ -10,7 +10,7 @@ describe ViewAsAuthorization do
     subject { filter.authorize_query_stored_users current_user }
     context 'ordinary user' do
       it 'should fail' do
-        expect{ subject }.to raise_error
+        expect{ subject }.to raise_error(Pundit::NotAuthorizedError)
       end
     end
     context 'super-user' do
@@ -21,7 +21,7 @@ describe ViewAsAuthorization do
       context 'when already viewing-as' do
         let(:directly_authenticated) { false }
         it 'should fail' do
-          expect{ subject }.to raise_error
+          expect{ subject }.to raise_error(Pundit::NotAuthorizedError)
         end
       end
     end

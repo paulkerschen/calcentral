@@ -29,7 +29,7 @@ module Oec
       # If local_write then our work is done; the staged CSVs will not be removed.
       unless @opts[:local_write]
         # SFTP stdout and stderr will go to a log file.
-        FileUtils.mkdir_p LOG_DIRECTORY unless Dir.exists? LOG_DIRECTORY
+        FileUtils.mkdir_p LOG_DIRECTORY unless Dir.exist? LOG_DIRECTORY
         pattern = "#{Oec::Task.date_format}_#{Oec::Task.timestamp_format}"
         filename = "#{self.class.name.demodulize.underscore}_sftp_#{DateTime.now.strftime pattern}.log"
         sftp_stdout = LOG_DIRECTORY.join(filename).expand_path
@@ -43,7 +43,7 @@ module Oec
           # Write files to archive ('exports' folder at Google Drive). No need to use fancy Sheets format.
           files_to_publish.each do |file_name|
             path = "#{csv_staging_dir.expand_path}/#{file_name}"
-            raise RuntimeError, "file_to_publish does not exist: #{path}" unless File.exists? path
+            raise RuntimeError, "file_to_publish does not exist: #{path}" unless File.exist? path
             upload_file(path, file_name, 'text/csv', exports_now)
           end
         else
@@ -71,7 +71,7 @@ module Oec
     end
 
     def sftp_stdout_to_log(sftp_output)
-      if File.exists? sftp_output
+      if File.exist? sftp_output
         log = File.open(sftp_output, 'rb').read.gsub(/\r\n?/, "\n")
         log.each_line { |line| log(:info, line) }
       else

@@ -37,7 +37,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:get).with(session_user_id).and_return users_found
 
       get :get
-      expect(response).to be_success
+      expect(response).to be_successful
       users = JSON.parse(response.body)['users']
       expect(users).to be_a Hash
       expect(users['saved']).to be_an Array
@@ -60,7 +60,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:store_saved_uid).with(session_user_id, '100').and_return success_response
 
       post :store_saved_uid, params: { format: 'json', uid: '100' }
-      expect(response).to be_success
+      expect(response).to be_successful
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
     end
@@ -79,7 +79,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:store_recent_uid).with(session_user_id, '100').and_return success_response
 
       post :store_recent_uid, params: { format: 'json', uid: '100' }
-      expect(response).to be_success
+      expect(response).to be_successful
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
     end
@@ -98,7 +98,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:delete_saved_uid).with(session_user_id, '100').and_return success_response
 
       post :delete_saved_uid, params: { format: 'json', uid: '100' }
-      expect(response).to be_success
+      expect(response).to be_successful
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
     end
@@ -109,7 +109,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:delete_all_recent).with(session_user_id).and_return success_response
 
       post :delete_all_recent, params: { format: 'json' }
-      expect(response).to be_success
+      expect(response).to be_successful
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
     end
@@ -120,7 +120,7 @@ describe StoredUsersController do
       User::StoredUsers.should_receive(:delete_all_saved).with(session_user_id).and_return success_response
 
       post :delete_all_saved, params: { format: 'json' }
-      expect(response).to be_success
+      expect(response).to be_successful
       json_response = JSON.parse response.body
       expect(json_response['success']).to be true
     end

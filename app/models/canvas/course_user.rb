@@ -8,9 +8,9 @@ module Canvas
     def initialize(options = {})
       super(options)
       raise ArgumentError, 'User ID option required' unless options.has_key?(:user_id)
-      raise ArgumentError, 'User ID option must be a Fixnum' if options[:user_id].class != Fixnum
+      raise ArgumentError, 'User ID option must be a Integer' if options[:user_id].class != Integer
       raise ArgumentError, 'Course ID option required' unless options.has_key?(:course_id)
-      raise ArgumentError, 'Course ID option must be a Fixnum' if options[:course_id].class != Fixnum
+      raise ArgumentError, 'Course ID option must be a Integer' if options[:course_id].class != Integer
       @user_id = options[:user_id]
       @course_id = options[:course_id]
     end

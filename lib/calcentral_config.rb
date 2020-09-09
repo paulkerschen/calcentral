@@ -3,7 +3,7 @@ module CalcentralConfig
 
   def load_ruby_configs
     calcentral_settings_files('environments', 'rb').each do |file|
-      if file && File.exists?(file.to_s)
+      if file && File.exist?(file.to_s)
         require file
       end
     end
@@ -38,7 +38,7 @@ module CalcentralConfig
   def load_yaml_settings
     loaded_settings = {}
     calcentral_settings_files('settings', 'yml').each do |file|
-      if file && File.exists?(file.to_s)
+      if file && File.exist?(file.to_s)
         result = YAML.load(ERB.new(IO.read(file.to_s)).result)
         if result
           loaded_settings.deep_merge!(result)
@@ -50,7 +50,7 @@ module CalcentralConfig
 
   def local_dir
     dir = ENV['CALCENTRAL_CONFIG_DIR'] || File.join(ENV['HOME'], '.calcentral_config')
-    File.exists?(dir) ? File.expand_path(dir) : nil
+    File.exist?(dir) ? File.expand_path(dir) : nil
   end
 
   private

@@ -80,7 +80,7 @@ describe GoogleApps::CredentialStore do
       context 'blank refresh_token' do
         let(:refresh_token) { ' ' }
         it 'should raise error' do
-          expect{ store.store(uid, '{}') }.to raise_error
+          expect{ store.store(uid, '{}') }.to raise_error ArgumentError
         end
       end
     end

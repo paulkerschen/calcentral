@@ -9,7 +9,7 @@ require 'capybara/rails'
 require 'webmock/rspec'
 
 # create tmp/cache directory if necessary, otherwise the Rails.cache.clear statement before each test may fail
-FileUtils.mkdir_p("tmp/cache") unless File.exists?("tmp/cache")
+FileUtils.mkdir_p("tmp/cache") unless File.exist?("tmp/cache")
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

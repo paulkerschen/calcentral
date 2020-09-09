@@ -10,7 +10,7 @@ describe Webcast::CourseSiteLog do
     it 'should deny per uniqueness constraint' do
       expect {
         Webcast::CourseSiteLog.create params(1, Time.zone.yesterday)
-      }.to raise_exception
+      }.to raise_exception ActiveRecord::RecordNotUnique
     end
 
     it 'should not find matching record' do

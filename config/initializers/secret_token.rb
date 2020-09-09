@@ -10,9 +10,7 @@ if Rails.env.production?
   if Settings.secret_token.blank? || Settings.secret_token == "some 128 char random hex string"
     raise "Secret_token must be specified in settings for production environments!"
   end
-  Rails.application.config.secret_token = Settings.secret_token
+  Rails.application.config.secret_key_base = Settings.secret_token
 else
-  Rails.application.config.secret_token = Settings.secret_token || SecureRandom.hex(128)
+  Rails.application.config.secret_key_base = Settings.secret_token || SecureRandom.hex(128)
 end
-
-Rails.application.config.secret_key_base = Rails.application.config.secret_token

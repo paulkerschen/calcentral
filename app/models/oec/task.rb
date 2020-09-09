@@ -249,7 +249,7 @@ module Oec
       now = DateTime.now
       log_name = "#{timestamp now} #{self.class.name.demodulize.underscore.tr('_', ' ')}.log"
       log :debug, "Exporting log file '#{log_name}'"
-      FileUtils.mkdir_p LOG_DIRECTORY unless File.exists? LOG_DIRECTORY
+      FileUtils.mkdir_p LOG_DIRECTORY unless File.exist? LOG_DIRECTORY
       # Local files need colons taken out of the timestamp, but remote sheets are happy to include them.
       log_path = LOG_DIRECTORY.join log_name.gsub(':', '')
       File.open(log_path, 'wb') { |f| f.puts @log }

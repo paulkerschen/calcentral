@@ -11,7 +11,7 @@ describe CanvasMailingListsController do
     it_should_behave_like 'an api endpoint' do
       before do
         allow(MailingLists::SiteMailingList).to receive(:find_by).and_raise(RuntimeError, 'Something went wrong')
-        allow_any_instance_of(MailingLists::SiteMailingList).to receive(:initialize).and_raise(RuntimeError, 'Something went wrong')
+        allow(MailingLists::SiteMailingList).to receive(:new).and_raise(RuntimeError, 'Something went wrong')
       end
     end
 
