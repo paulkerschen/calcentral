@@ -17,29 +17,26 @@
     <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="p-3">
       <h4 id="basic-auth-header">Basic Auth</h4>
       <b-form @submit="devAuth">
+        <div class="p-1">
+          <b-form-input
+            id="basic-auth-uid"
+            v-model="uid"
+            placeholder="UID"
+            required></b-form-input>
+        </div>
+        <div class="p-1">
+          <b-form-input
+            id="basic-auth-password"
+            v-model="password"
+            autocomplete="off"
+            type="password"
+            placeholder="Password"
+            required></b-form-input>
+        </div>
+        <div class="p-1">
+          <b-button id="basic-auth-submit-button" variant="primary" @click="devAuth">Login</b-button>
+        </div>
       </b-form>
-      <div class="p-1">
-        <b-form-input
-          id="basic-auth-uid"
-          v-model="uid"
-          placeholder="UID"
-          required></b-form-input>
-      </div>
-      <div class="p-1">
-        <b-form-input
-          id="basic-auth-password"
-          v-model="password"
-          autocomplete="off"
-          type="password"
-          placeholder="Password"
-          required></b-form-input>
-      </div>
-      <div class="p-1">
-        <b-button id="basic-auth-submit-button" variant="primary" @click="devAuth">Login</b-button>
-      </div>
-      <b-popover :show.sync="showError" target="basic-auth-header" title="Error">
-        <span class="text-danger">{{ error }}</span>
-      </b-popover>
     </div>
   </div>
 </template>
@@ -80,10 +77,10 @@ export default {
         )
       } else if (uid) {
         this.reportError('Password required')
-        this.putFocusNextTick('basic-auth-uid')
+        this.$putFocusNextTick('basic-auth-uid')
       } else {
         this.reportError('Both UID and password are required')
-        this.putFocusNextTick('basic-auth-password')
+        this.$putFocusNextTick('basic-auth-password')
       }
     },
     reportError(message) {

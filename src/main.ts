@@ -3,18 +3,41 @@ import 'bootstrap-vue/dist/bootstrap-vue.min.css'
 import _ from 'lodash'
 import App from './App.vue'
 import axios from 'axios'
-import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue'
+import BootstrapVue from 'bootstrap-vue'
 import router from './router'
 import store from './store'
 import Vue from 'vue'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
 
+library.add(far, fas, faSpinner, faUserSecret)
 
 Vue.config.productionTip = process.env.VUE_APP_DEBUG.toLowerCase() === 'true'
+Vue.use(BootstrapVue)
+Vue.component('fa', FontAwesomeIcon)
+
+const putFocusNextTick = (id, cssSelector) => {
+  const callable = () => {
+    let el = document.getElementById(id)
+    el = el && cssSelector ? el.querySelector(cssSelector) : el
+    el && el.focus()
+    return !!el
+  }
+  Vue.prototype.$nextTick(() => {
+    let counter = 0
+    const job = setInterval(() => (callable() || ++counter > 3) && clearInterval(job), 500)
+  })
+}
 
 // Mount packages
-Vue.prototype.$_ = _ // eslint-disable-line no-underscore-dangle
-Vue.use(BootstrapVue)
-Vue.use(BootstrapVueIcons)
+Vue.prototype.$_ = _
+Vue.prototype.$loading = () => store.dispatch('context/loadingStart')
+Vue.prototype.$ready = label => store.dispatch('context/loadingComplete', label)
+Vue.prototype.$putFocusNextTick = putFocusNextTick
 
 // Axios
 const apiBaseUrl = process.env.VUE_APP_API_BASE_URL

@@ -17,6 +17,7 @@ module.exports = {
     'multiline-html-element-content-newline': 0,
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-underscore-dangle': 0,
     'no-unexpected-multiline': 2,
     'quotes': [2, 'single'],
     'semi': [2, 'never'],
