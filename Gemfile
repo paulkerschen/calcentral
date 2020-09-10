@@ -2,17 +2,18 @@ source 'https://rubygems.org'
 
 # The core framework
 # https://github.com/rails/rails
-gem 'rails', '5.2.4.3'
+gem 'rails', '6.0.3.3'
 
 # The backing band
 gem 'rack', '~> 2.2.3'
 gem 'rake', '~> 13.0.1'
 
 # DB adapters
-gem 'activerecord-jdbc-adapter', '~> 52.6'
-gem 'activerecord-jdbcpostgresql-adapter', '~> 52.6'
+gem 'activerecord-jdbc-adapter', '~> 60.2'
+gem 'activerecord-jdbcpostgresql-adapter', '~> 60.2'
+gem 'activerecord-jdbcsqlite3-adapter', '~> 60.2', group: [:test]
 # Oracle adapter requires ojdb7.jar; exclude from test environments.
-gem 'activerecord-oracle_enhanced-adapter', '~> 5.2.8', group: [:development, :production]
+gem 'activerecord-oracle_enhanced-adapter', '~> 6.0.4', group: [:development, :production]
 
 gem 'responders', '~> 3.0.1'
 
@@ -85,8 +86,8 @@ gem 'rubyzip', '~> 1.3.0'
 gem 'aws-sdk-s3', '~> 1.8.2'
 
 group :development, :production do
-  gem 'rvm-capistrano', '~> 1.3.1'
-  gem 'capistrano', '~> 2.15.4'
+  gem 'rvm-capistrano', '~> 1.5.6'
+  gem 'capistrano', '~> 2.15.9'
 end
 
 group :development, :test do
@@ -97,7 +98,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.0.1'
   gem 'rspec-mocks', '~> 3.9.1'
   gem 'rspec-support', '~> 3.9.3'
-  gem 'rspec-its', '~> 1.1.0'
+  gem 'rspec-its', '~> 1.3.0'
   gem 'rspec-collection_matchers', '~> 1.2.0'
   gem 'minitest-reporters', '~> 1.0.8'
 
@@ -123,7 +124,6 @@ group :development do
 end
 
 group :test do
-  gem 'activerecord-jdbcsqlite3-adapter', '~> 52.6'
   gem 'page-object', '~> 2.2.6'
 end
 

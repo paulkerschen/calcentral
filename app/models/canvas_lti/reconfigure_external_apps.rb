@@ -115,8 +115,11 @@ module CanvasLti
 
     def render_local_xml_config(app_host, xml_name)
       app_code = xml_name_to_app_code(xml_name)
-      output_buffer = ActionView::Base.new('app/views/canvas_lti').render(file: xml_name, format: 'xml',
-        locals: {:@launch_url_for_app => launch_url_for_host_and_code(app_host, app_code)})
+      output_buffer = CanvasLtiController.render(
+        template: "canvas_lti/#{xml_name}",
+        formats: [:xml],
+        locals: {:@launch_url_for_app => launch_url_for_host_and_code(app_host, app_code)}
+      )
       # A simple ".to_s" will leave the ActionView::OutputBuffer as is and cause an exception to be thrown when
       # Faraday attempts to encode the parameter.
       String.new(output_buffer)

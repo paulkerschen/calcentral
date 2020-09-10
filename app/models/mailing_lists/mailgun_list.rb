@@ -52,7 +52,7 @@ module MailingLists
     end
 
     def update_member(member, course_user_data)
-      member.update_attributes course_user_data.slice(:first_name, :last_name, :can_send)
+      member.update course_user_data.slice(:first_name, :last_name, :can_send)
     end
 
     def update_required?(member, course_user_data)
