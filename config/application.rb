@@ -24,21 +24,29 @@ end
 
 require_relative 'boot'
 
-require 'rails/all'
-require 'log4r'
-include Log4r
+# Instead of requiring 'rails/all', pull in the subset of what we actually use.
+require 'rails'
+require 'active_record/railtie'
+require 'action_controller/railtie'
+require 'action_view/railtie'
 # Let configuration use Rails core extensions like "1.day" and "hash.deep_merge"
 require 'active_support/core_ext'
 
-if defined?(Bundler)
-  # If you precompile assets before deploying to production, use this line
-  Bundler.require(*Rails.groups(:assets => %w(development test)))
-  # If you want your assets lazily compiled in production, use this line
-  # Bundler.require(:default, :assets, Rails.env)
-end
+# Pick up those gems.
+require 'log4r'
+include Log4r
+Bundler.require(:default, Rails.env)
 
 module Calcentral
   class Application < Rails::Application
+    # Manually require the library classes we'll be using during initialization, as Rails now discourages autoload
+    # at this stage.
+    require_relative '../lib/class_logger'
+    require_relative '../lib/server_runtime'
+    require_relative '../lib/calcentral_config'
+    require_relative '../lib/calcentral_logging'
+    require_relative '../lib/cache/config'
+
     initializer :amend_yaml_config, :before => :load_environment_config do
       # Log4r has the quirk that its logging level constants (referred to
       # by our configuration files) are not available until a Log4r instance
@@ -72,9 +80,6 @@ module Calcentral
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
-    # Activate observers that should always be running.
-    # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
-
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     config.time_zone = 'Pacific Time (US & Canada)'
@@ -91,17 +96,6 @@ module Calcentral
 
     # Enable escaping HTML in JSON.
     config.active_support.escape_html_entities_in_json = true
-
-    # Use SQL instead of Active Record's schema dumper when creating the database.
-    # This is necessary if your schema can't be completely dumped by the schema dumper,
-    # like if you have constraints or database-specific column types
-    # config.active_record.schema_format = :sql
-
-    # Enable the asset pipeline
-    config.assets.enabled = true
-
-    # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
 
     # always be caching
     config.action_controller.perform_caching = true

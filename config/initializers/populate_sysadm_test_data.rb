@@ -1,4 +1,4 @@
-class PopulateSysadmTestData < ApplicationRecord
+class PopulateSysadmTestData < ActiveRecord::Base
   include ClassLogger
   Rails.application.config.after_initialize do
     if Settings.edodb.adapter == 'postgresql'

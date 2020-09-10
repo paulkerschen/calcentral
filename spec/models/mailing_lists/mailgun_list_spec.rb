@@ -111,7 +111,7 @@ describe MailingLists::MailgunList do
 
           expect(MailingLists::Member).to receive(:create!).exactly(3).times.and_call_original
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update_attributes)
+          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
           list.populate
 
           expect(list.population_results[:add][:success]).to eq 3
@@ -219,7 +219,7 @@ describe MailingLists::MailgunList do
           expect(list.members.count).to eq 3
           expect(MailingLists::Member).not_to receive(:create!)
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update_attributes)
+          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
           list.populate
           expect(list.members.count).to eq 3
         end
@@ -258,7 +258,7 @@ describe MailingLists::MailgunList do
             mailing_list_id: list.id
           ).and_call_original
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update_attributes)
+          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
 
           list.populate
 
@@ -283,7 +283,7 @@ describe MailingLists::MailgunList do
           expect(list.members.count).to eq 3
 
           expect(MailingLists::Member).not_to receive(:create!)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update_attributes)
+          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
           expect_any_instance_of(MailingLists::Member).to receive(:destroy).exactly(1).times.and_call_original
 
           list.populate
@@ -313,7 +313,7 @@ describe MailingLists::MailgunList do
 
           expect(MailingLists::Member).not_to receive(:create!)
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).to receive(:update_attributes).exactly(1).times.and_call_original
+          expect_any_instance_of(MailingLists::Member).to receive(:update).exactly(1).times.and_call_original
 
           list.populate
 

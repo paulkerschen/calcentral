@@ -160,7 +160,7 @@ module MailingLists
 
     def name_available?
       return if list_name.blank?
-      MailingLists::SiteMailingList.find_by(list_name: self.list_name).nil?
+      MailingLists::SiteMailingList.default_scoped.find_by(list_name: self.list_name).nil?
     end
 
     def parse_term(term)

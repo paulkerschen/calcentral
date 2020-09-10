@@ -8,7 +8,7 @@ describe MailingLists::OutgoingMessage do
     )
   end
 
-  let(:member) { list.members.find_by(can_send: true) }
+  let(:member) { list.members.find_by(email_address: 'monty@berkeley.edu') }
 
   let(:message_opts) do
     {
