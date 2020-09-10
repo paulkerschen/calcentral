@@ -70,7 +70,6 @@ jobs:
         - bundle config --delete without
         - bundle install --deployment --retry 3
         - bundle package --all
-        - bundle exec rake assets:precompile
         - bundle exec rake fix_assets
         - bundle exec warble NAME=junction 2>&1 1>/dev/null
         - echo -n "${S3_PATH}/junction.war" > latest.txt
