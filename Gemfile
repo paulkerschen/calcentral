@@ -28,7 +28,7 @@ gem 'omniauth-cas', '~> 1.1.0', git: 'https://github.com/ets-berkeley-edu/omniau
 gem 'net-ldap', '~> 0.16.3'
 
 # secure_headers provides x-frame, csp and other http headers
-gem 'secure_headers', '~> 5.2.0'
+gem 'secure_headers', '~> 6.3.1'
 
 gem 'faraday', '~> 0.9.0'
 gem 'faraday_middleware', '~> 0.9.1'
