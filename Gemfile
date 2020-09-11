@@ -51,10 +51,7 @@ gem 'log4r', '~> 1.1', git: 'https://github.com/ets-berkeley-edu/log4r'
 # for easier non-DB-backed models
 gem 'active_attr', '~> 0.15.0'
 
-# To support SSL TLSv1.2.
-# jruby-openssl versions 0.9.8 through 0.9.16 trigger runaway memory consumption in CalCentral.
-# Track progress at https://github.com/jruby/jruby-openssl/issues/86 and SISRP-18781.
-gem 'jruby-openssl', '0.9.19'
+gem 'jruby-openssl', '0.10.4'
 
 # for parsing formatted html
 gem 'nokogiri', '~> 1.10.8', platforms: :jruby
@@ -75,7 +72,10 @@ gem 'retriable', '~> 2.0'
 # authorization abstraction layer
 gem 'pundit', '~> 0.3.0'
 
-gem 'net-ssh', '5.1.0'
+# 5.0.2 seems to be as high as we can presently go on JRuby.
+# https://github.com/net-ssh/net-ssh/issues/655
+gem 'net-ssh', '5.0.2'
+
 gem 'net-telnet', '~> 0.2.0'
 
 gem 'icalendar', '~> 2.2.2'
