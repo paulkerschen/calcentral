@@ -6,12 +6,8 @@ class BootstrapController < ApplicationController
   before_action :check_databases_alive
   layout false
 
-  # View code is public/index-junction.html (compiled by webpack build).
-  # We don't want to serve index-junction statically because that would skip the check_databases_alive and
-  # check_reauthentication code.
   def index
-    index_file = Settings.features.vue_js ? 'public/index-vue-js.html' : 'public/index-junction.html'
-    render file: index_file, formats: [:html]
+    render file: 'public/index.html', formats: [:html]
   end
 
   # CalCentral cannot fully trust a user session which was initiated via an LTI embedded app,

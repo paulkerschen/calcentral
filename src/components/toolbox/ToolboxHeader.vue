@@ -4,14 +4,23 @@
       bCourses Utilities
     </div>
     <div class="text-white">
-      Log out
+      <b-button variant="link" @click="exit">Log out</b-button>
     </div>
   </div>
 </template>
 
 <script>
+import {logOut} from '@/api/auth'
+
 export default {
-  name: 'ToolboxHeader'
+  name: 'ToolboxHeader',
+  methods: {
+    exit() {
+      logOut().then(() => {
+        window.location.href = '/'
+      })
+    }
+  }
 }
 </script>
 

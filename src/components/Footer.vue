@@ -1,40 +1,55 @@
 <template>
   <div>
     <div class="d-flex justify-content-between">
-      <div>
+      <div class="pl-3">
         Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
       </div>
       <div>
-        <div class="d-flex">
-          <div>Return to bCourses</div>
-          <div>|</div>
-          <div>Usage Policy</div>
-          <div>|</div>
-          <div>About</div>
+        <div class="d-flex flex-wrap">
+          <div>
+            <a href="https://bcourses.berkeley.edu" target="_blank">Return to bCourses<span class="sr-only"> (link opens new browser tab)</span></a>
+          </div>
+          <div class="pl-1 pr-1">|</div>
+          <div>
+            <a href="https://security.berkeley.edu/policy" target="_blank">Usage Policy<span class="sr-only"> (link opens new browser tab)</span></a>
+          </div>
+          <div class="pl-1 pr-1">|</div>
+          <div class="pr-3">
+            <a href="https://www.ets.berkeley.edu/services-facilities/bcourses" target="_blank">About<span class="sr-only"> bCourses (link opens new browser tab)</span></a>
+          </div>
         </div>
       </div>
     </div>
-    <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="p-3">
-      <h4 id="basic-auth-header">Basic Auth</h4>
+    <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="d-inline-flex p-3">
       <b-form @submit="devAuth">
+        <h4 id="basic-auth-header">Basic Auth</h4>
         <div class="p-1">
           <b-form-input
             id="basic-auth-uid"
             v-model="uid"
             placeholder="UID"
-            required></b-form-input>
+            size="sm"
+            required
+          ></b-form-input>
         </div>
         <div class="p-1">
           <b-form-input
             id="basic-auth-password"
             v-model="password"
             autocomplete="off"
-            type="password"
+            class="mb-2"
             placeholder="Password"
-            required></b-form-input>
-        </div>
-        <div class="p-1">
-          <b-button id="basic-auth-submit-button" variant="primary" @click="devAuth">Login</b-button>
+            required
+            size="sm"
+            type="password"
+          ></b-form-input>
+          <b-button
+            id="basic-auth-submit-button"
+            variant="primary"
+            @click="devAuth"
+          >
+            Login
+          </b-button>
         </div>
       </b-form>
     </div>
@@ -61,7 +76,7 @@ export default {
       let password = this.$_.trim(this.password)
       if (uid && password) {
         const redirect = this.$_.get(this.$router, 'currentRoute.query.redirect')
-        devAuthLogIn(uid, password, redirect || `/toolbox`).then(
+        devAuthLogIn(uid, password, redirect || '/toolbox').then(
           data => {
             if (data.isAuthenticated) {
               this.$router.push({ path: redirect || '/toolbox' }, this.$_.noop)

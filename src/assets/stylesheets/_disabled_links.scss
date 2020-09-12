@@ -1,9 +1,0 @@
-a[disabled] {
-  color: $body-font-color;
-  pointer-events: none;
-
-  &:hover, &:focus {
-    cursor: default;
-    text-decoration: none;
-  }
-}

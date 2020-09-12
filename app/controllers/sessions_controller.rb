@@ -80,6 +80,17 @@ class SessionsController < ApplicationController
     end
   end
 
+  def dev_auth
+    uid = params.require 'uid'
+    password = params.require 'password'
+
+    if uid && password == Settings.developer_auth.password
+      continue_login_success uid
+    else
+      failure
+    end
+  end
+
   def destroy
     logout
     url = request.protocol + ApplicationController.correct_port(request.host_with_port, request.env['HTTP_REFERER'])

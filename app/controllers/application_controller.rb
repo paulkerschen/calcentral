@@ -156,8 +156,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_access_control_headers
-    if Settings.features.vue_js && Settings.vue.localhost_base_url
-      logger.warn "Settings.vue.localhost_base_url: #{Settings.vue.localhost_base_url}"
+    if Settings.vue.localhost_base_url
       headers['Access-Control-Allow-Headers'] = 'Content-Type'
       headers['Access-Control-Allow-Origin'] = Settings.vue.localhost_base_url
       headers['Access-Control-Allow-Credentials'] = 'true'

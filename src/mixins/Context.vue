@@ -1,7 +1,7 @@
 <script>
 import store from '@/store'
 import Vue from 'vue'
-import {mapActions, mapGetters} from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Context',

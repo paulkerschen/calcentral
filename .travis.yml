@@ -1,7 +1,7 @@
 language: ruby
 bundler_args: --without development production --deployment --jobs=4 --retry=5
 jdk: openjdk8
-node_js: 10.1.0
+node_js: 12.18.2
 os: linux
 rvm: jruby-9.2.13.0
 
@@ -44,15 +44,8 @@ jobs:
       if: type = pull_request
       script:
         - npm install
-        - npm run lint
         - npm run lint-vue
-        - npm run build
-    - # Lint SCSS
-      if: type = pull_request
-      script:
-        - gem cleanup scss_lint
-        - gem install scss_lint --version 0.49.0
-        - scss-lint src/assets/stylesheets
+        - npm run build-vue
     - # RSpec
       if: type = pull_request
       script:
@@ -61,7 +54,7 @@ jobs:
       if: type = push OR env(DEPLOY_JUNCTION_WAR) = true
       script:
         - npm install --production
-        - npm run build
+        - npm run build-vue
         - pip install --user awscli
         - aws configure list
         - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc7.jar .

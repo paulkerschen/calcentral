@@ -389,14 +389,6 @@ features:
   neato: true
 ```
 
-After server restart, these properties will appear in each users' status feed. You can now use `data-ng-if` in Angular to wrap the feature:
-
-```html
-<div data-ng-if="user.profile.features.neato">
-  Some neato feature...
-</div>
-```
-
 ## Keeping developer seed data updated
 
 `seeds.rb` is intended for use only on developer machines, so they have a semi-realistic copy of production lists of

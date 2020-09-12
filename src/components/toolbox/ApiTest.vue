@@ -7,7 +7,7 @@
     <b-card-text>
       <div v-if="results">
         <ul>
-          <li v-for="row in results">
+          <li v-for="row in results" :key="row.api">
             <span v-if="$_.isNil(row.status)">
               <b-icon icon="arrow-clockwise" animation="spin" variant="warning"></b-icon> {{ row.api }}
             </span>
@@ -25,8 +25,8 @@
 
 <script>
 import {ping, serverInfo} from '@/api/config'
-import {isUserLoggedIn, myStatus} from "@/api/user";
-import {canUserCreateSite, externalTools} from "@/api/canvas";
+import {isUserLoggedIn, myStatus} from '@/api/user'
+import {canUserCreateSite, externalTools} from '@/api/canvas'
 
 export default {
   name: 'ApiTest',
