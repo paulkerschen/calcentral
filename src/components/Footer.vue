@@ -20,85 +20,29 @@
         </div>
       </div>
     </div>
-    <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="d-inline-flex p-3">
-      <b-form @submit="devAuth">
-        <h4 id="basic-auth-header">Basic Auth</h4>
-        <div class="p-1">
-          <b-form-input
-            id="basic-auth-uid"
-            v-model="uid"
-            placeholder="UID"
-            size="sm"
-            required
-          ></b-form-input>
-        </div>
-        <div class="p-1">
-          <b-form-input
-            id="basic-auth-password"
-            v-model="password"
-            autocomplete="off"
-            class="mb-2"
-            placeholder="Password"
-            required
-            size="sm"
-            type="password"
-          ></b-form-input>
-          <b-button
-            id="basic-auth-submit-button"
-            variant="primary"
-            @click="devAuth"
-          >
-            Login
-          </b-button>
-        </div>
-      </b-form>
+    <div class="pl-5 pt-3">
+      <h4 id="junction-build-summary">Build Summary</h4>
+      <BuildSummary />
+    </div>
+    <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="pl-5">
+      <h4 id="basic-auth-header">DevAuth</h4>
+      <DevAuth />
     </div>
   </div>
 </template>
 
 <script>
-import Context from '@/mixins/Context'
-import Utils from '@/mixins/Utils'
-import {devAuthLogIn} from '@/api/auth'
+import BuildSummary from '@/components/util/BuildSummary'
+import DevAuth from '@/components/util/DevAuth'
 
 export default {
   name: 'Footer',
-  data: () => ({
-    error: undefined,
-    uid: undefined,
-    password: undefined,
-    showError: false
-  }),
-  mixins: [Context, Utils],
-  methods: {
-    devAuth() {
-      let uid = this.$_.trim(this.uid)
-      let password = this.$_.trim(this.password)
-      if (uid && password) {
-        devAuthLogIn(uid, password).then(
-          data => {
-            if (data.isLoggedIn) {
-              this.$router.push({ path: '/' })
-            } else {
-              const message = this.$_.get(data, 'response.data.message') || this.$_.get(data, 'message') || 'Authentication failed'
-              this.reportError(message)
-            }
-          },
-          error => {
-            this.reportError(error)
-          }
-        )
-      } else if (uid) {
-        this.reportError('Password required')
-        this.$putFocusNextTick('basic-auth-uid')
-      } else {
-        this.reportError('Both UID and password are required')
-        this.$putFocusNextTick('basic-auth-password')
-      }
-    },
-    reportError(message) {
-      this.error = message
-    }
-  }
+  components: {DevAuth, BuildSummary}
 }
 </script>
+
+<style scoped>
+h4 {
+  font-size: 18px;
+}
+</style>

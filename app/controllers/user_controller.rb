@@ -23,8 +23,7 @@ class UserController < ApplicationController
     status.merge!({
       :isBasicAuthEnabled => Settings.developer_auth.enabled,
       :isLoggedIn => !!user_id,
-      :features => features,
-      :youtubeSplashId => Settings.youtube_splash_id
+      :features => features
     })
     render :json => status.to_json
   end
