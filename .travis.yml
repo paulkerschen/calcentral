@@ -1,7 +1,6 @@
 language: ruby
 bundler_args: --without development production --deployment --jobs=4 --retry=5
 jdk: openjdk8
-node_js: 12.18.2
 os: linux
 rvm: jruby-9.2.13.0
 
@@ -28,6 +27,7 @@ addons:
   postgresql: "9.6"
 
 before_install:
+  - nvm install 12
   - gem uninstall bundler --force -x
   - gem install bundler -v '1.17.3'
   - npm config set strict-ssl false

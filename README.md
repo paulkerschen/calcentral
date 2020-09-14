@@ -222,7 +222,7 @@ rspec
 Front-end linting can be done by running the following commands:
 
 ```bash
-npm run lint
+npm run lint-vue
 ```
 
 This will check for any potential JavaScript issues and whether you formatted the code correctly.
@@ -338,10 +338,6 @@ Logging behavior and destination can be controlled from the command line or shel
     ```
 
 1. If you want to explore the Oracle database on Mac OS X, use [SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/overview/index.html).
-
-### Styleguide
-
-See [docs/styleguide.md](docs/styleguide.md).
 
 ## Creating timeshifted fake data feeds
 

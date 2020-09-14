@@ -73,6 +73,10 @@ cache:
     default: <%= 35.minutes %>
     User::Api: <%= 1.day %>
 
+vue:
+  index_html: 'public/index.html'
+  lti_html: 'public/lti.html'
+
 features:
   cal1card: true
   videos: true

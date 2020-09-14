@@ -7,7 +7,7 @@ class BootstrapController < ApplicationController
   layout false
 
   def index
-    render file: 'public/index.html', formats: [:html]
+    render file: Settings.vue.index_html, formats: [:html]
   end
 
   # CalCentral cannot fully trust a user session which was initiated via an LTI embedded app,

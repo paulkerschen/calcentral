@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   if Settings.developer_auth.enabled
     # the backdoor for http basic auth (bypasses CAS) only on development environments.
     get '/basic_auth_login' => 'sessions#basic_lookup'
-    post '/auth/dev_auth' => 'sessions#dev_auth'
+    post '/api/auth/dev_auth' => 'sessions#dev_auth'
     get '/logout' => 'sessions#destroy', :as => :logout
     post '/logout' => 'sessions#destroy', :as => :logout_post
   else
