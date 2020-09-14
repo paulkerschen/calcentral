@@ -5,7 +5,7 @@ const goToLogin = (to: any, next: any) => {
     path: '/login',
     query: {
       error: to.query.error,
-      redirect: to.name === 'toolbox' ? undefined : to.fullPath
+      redirect: to.fullPath
     }
   })
 }
@@ -13,7 +13,7 @@ const goToLogin = (to: any, next: any) => {
 export default {
   requiresAdmin: (to: any, from: any, next: any) => {
     const currentUser = Vue.prototype.$currentUser
-    if (currentUser.isLoggedIn && currentUser.isSuperuser) {
+    if (currentUser.isLoggedIn) {
       next()
     } else {
       goToLogin(to, next)

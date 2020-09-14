@@ -75,12 +75,10 @@ export default {
       let uid = this.$_.trim(this.uid)
       let password = this.$_.trim(this.password)
       if (uid && password) {
-        const redirect = this.$_.get(this.$router, 'currentRoute.query.redirect')
-        devAuthLogIn(uid, password, redirect || '/toolbox').then(
+        devAuthLogIn(uid, password).then(
           data => {
-            if (data.isAuthenticated) {
-              this.$router.push({ path: redirect || '/toolbox' }, this.$_.noop)
-              this.alertScreenReader('Welcome to Junction')
+            if (data.isLoggedIn) {
+              this.$router.push({ path: '/' })
             } else {
               const message = this.$_.get(data, 'response.data.message') || this.$_.get(data, 'message') || 'Authentication failed'
               this.reportError(message)

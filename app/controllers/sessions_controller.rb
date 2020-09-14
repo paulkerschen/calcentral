@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
   include AllowLti
 
   skip_before_action :check_reauthentication, :only => [:lookup, :destroy]
+  skip_before_action :verify_authenticity_token, :only => [:dev_auth]
 
   def lookup
     auth = request.env['omniauth.auth']
@@ -82,12 +83,22 @@ class SessionsController < ApplicationController
 
   def dev_auth
     uid = params.require 'uid'
-    password = params.require 'password'
 
-    if uid && password == Settings.developer_auth.password
-      continue_login_success uid
+    if (Integer(uid, 10) rescue nil).nil?
+      redirect_to url_for_path('/uid_error')
     else
-      failure
+      password = params.require 'password'
+      if password == Settings.developer_auth.password
+        session.try(:delete, :_csrf_token)
+        session['user_id'] = uid
+        render :json => {
+          isLoggedIn: true
+        }.to_json
+      else
+        render :json => {
+          isLoggedIn: false
+        }.to_json, status: 401
+      end
     end
   end
 
