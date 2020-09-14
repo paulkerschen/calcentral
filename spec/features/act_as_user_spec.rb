@@ -82,7 +82,7 @@ feature 'act_as_user' do
     # html = page.body
     # page.body.should =~ /You're currently viewing as.+first logged in on/m
     # Note: it's possible to check for hardcoded text with regular expressions on the
-    # rendered html, but there's no apparent way to detect the text rendered by angular
+    # rendered html, but there's no apparent way to detect the text rendered by the front-end
   end
 
   scenario 'check the footer message for a user that has never logged in' do
@@ -102,7 +102,7 @@ feature 'act_as_user' do
     # html = page.body
     # page.body.should =~ /You're currently viewing as.+who has never logged in to CalCentral/m
     # Note: it's possible to check for hardcoded text with regular expressions on the
-    # rendered html, but there's no apparent way to detect the text rendered by angular
+    # rendered html, but there's no apparent way to detect the text rendered by the front-end
   end
 
   scenario 'check the act-as footer text' do

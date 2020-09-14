@@ -293,7 +293,9 @@ edwdb:
   pool: 5
 
 vue:
+  index_html: 'dist/static/index.html'
   localhost_base_url: null
+  lti_html: 'dist/static/lti.html'
 
 # A feature will be disabled if the corresponding feature-flag is false or nil.
 features:

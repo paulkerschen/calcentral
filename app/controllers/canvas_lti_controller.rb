@@ -6,9 +6,9 @@ class CanvasLtiController < ApplicationController
   # Since LTI provider views are in an iframe, we need to skip the iframe buster.
   # Since the LTI session is initiated by a POST, to receive the request we also need to skip the CSRF check.
   before_action :get_settings, :initialize_calcentral_config
-  
+
   skip_before_action :verify_authenticity_token
-  
+
   before_action :disable_xframe_options
   layout false
   helper_method :launch_url
@@ -57,7 +57,7 @@ class CanvasLtiController < ApplicationController
     if lti
       authenticate_by_lti(lti)
       logger.warn "Session authenticated by LTI: #{session_message}"
-      render file: 'public/bcourses_embedded.html', formats: [:html]
+      render file: Settings.vue.lti_html, formats: [:html]
     else
       logger.error 'Error parsing LTI request; returning error message'
       # TODO Test the result of a redirect or an error status return.
