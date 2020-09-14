@@ -6,6 +6,7 @@ gem 'rails', '6.0.3.3'
 
 # The backing band
 gem 'rack', '~> 2.2.3'
+gem 'rack-cors', '~> 1.1.1'
 gem 'rake', '~> 13.0.1'
 
 # DB adapters

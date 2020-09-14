@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_action :check_reauthentication
   before_action :deny_if_filtered
-  before_action :set_access_control_headers
   after_action :access_log
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
@@ -152,15 +151,6 @@ class ApplicationController < ActionController::Base
       host_with_port.sub(':3000', ':3001')
     else
       host_with_port
-    end
-  end
-
-  def set_access_control_headers
-    if Settings.vue.localhost_base_url
-      headers['Access-Control-Allow-Headers'] = 'Content-Type'
-      headers['Access-Control-Allow-Origin'] = Settings.vue.localhost_base_url
-      headers['Access-Control-Allow-Credentials'] = 'true'
-      headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
     end
   end
 
