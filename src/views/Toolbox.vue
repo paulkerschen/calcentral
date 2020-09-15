@@ -1,25 +1,20 @@
 <template>
   <b-container fluid>
-    <b-row>
+    <ToolboxHeader />
+    <b-row class="p-3">
       <b-col>
-        <ToolboxHeader />
+        <h1 class="text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col sm="9">
-        {{ $currentUser.firstName }}'s Toolbox
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
+    <b-row class="pl-3 pr-3" sm="6">
+      <b-col v-if="canActAs" sm="6">
         <ActAs />
       </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <Footer />
+      <b-col :sm="canActAs ? 6 : 12">
+        OEC
       </b-col>
     </b-row>
+    <Footer />
   </b-container>
 </template>
 
@@ -30,6 +25,18 @@ import ToolboxHeader from '@/components/toolbox/ToolboxHeader'
 
 export default {
   name: 'Toolbox',
-  components: {ActAs, Footer, ToolboxHeader}
+  components: {ToolboxHeader, ActAs, Footer},
+  data: () => ({
+    canActAs: undefined
+  }),
+  created() {
+    this.canActAs = this.$currentUser.isSuperuser || this.$currentUser.isViewer
+  }
 }
 </script>
+
+<style scoped>
+h1 {
+  font-size: 24px;
+}
+</style>
