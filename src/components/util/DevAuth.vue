@@ -36,7 +36,9 @@
 <script>
 import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
+import Vue from 'vue'
 import {devAuthLogIn} from '@/api/auth'
+import {myStatus} from '@/api/user'
 
 export default {
   name: 'DevAuth',
@@ -55,7 +57,10 @@ export default {
         devAuthLogIn(uid, password).then(
           data => {
             if (data.isLoggedIn) {
-              this.$router.push({ path: '/' })
+              myStatus().then(data => {
+                Vue.prototype.$currentUser = data
+                this.$router.push({ path: '/' })
+              })
             } else {
               const message = this.$_.get(data, 'response.data.message') || this.$_.get(data, 'message') || 'Authentication failed'
               this.reportError(message)
