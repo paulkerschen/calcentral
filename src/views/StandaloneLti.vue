@@ -1,20 +1,12 @@
 <template>
   <b-container fluid>
-    <b-row>
-      <b-col>
-        <ToolboxHeader />
-      </b-col>
-    </b-row>
+    <ToolboxHeader />
     <b-row>
       <b-col class="text-center">
         <router-view />
       </b-col>
     </b-row>
-    <b-row>
-      <b-col>
-        <Footer />
-      </b-col>
-    </b-row>
+    <Footer />
   </b-container>
 </template>
 

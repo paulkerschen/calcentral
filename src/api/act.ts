@@ -11,11 +11,11 @@ export function getMyStoredUsers() {
   return utils.get('/api/view_as/my_stored_users')
 }
 
-export function removeAllSavedUser() {
+export function removeAllSavedUsers() {
   return axios.post(`${utils.apiBaseUrl()}/delete_users/saved`).then(response => response.data, () => null)
 }
 
-export function removeRecentUser(uid) {
+export function removeAllRecentUsers(uid) {
   return axios.post(`${utils.apiBaseUrl()}/delete_users/recent`, {
     uid
   }).then(response => response.data, () => null)
