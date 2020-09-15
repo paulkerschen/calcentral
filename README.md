@@ -13,14 +13,14 @@ Looking for the CalCentral web application? That code is maintained by Student I
 * [Git](https://help.github.com/articles/set-up-git)
 * [JDBC Oracle driver](http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html)
 * [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [JRuby 9.2.13.0](http://jruby.org/)
-* [Node.js >=8.9.4](http://nodejs.org/)
+* [JRuby](http://jruby.org/) (version per [.ruby-version](.ruby-version))
+* [Node.js](http://nodejs.org/) (version per [.nvmrc](.nvmrc))
 * [PostgreSQL](http://www.postgresql.org/)
 * [Rubygems 2.7.10](https://rubygems.org/pages/download)
 * [RVM](https://rvm.io/rvm/install/) - Ruby version managers
 * [xvfb](http://xquartz.macosforge.org/landing/) - xvfb headless browser, included for Macs with XQuartz
 
-## Installation
+## Developer Setup
 
 1. Install Java 8 JDK ([8u172](http://www.oracle.com/technetwork/java/javase/downloads/index.html)):
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -103,13 +103,13 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     # Answer "yes" if it asks you to trust a new .rvmrc file.
     ```
 
-1. Install JRuby (requires ):
+1. Install JRuby (see [.ruby-version](.ruby-version) for required version):
 
      **Note**: To install JRuby, you must first install [rvm](https://rvm.io/rvm/install/).
 
     ```bash
     rvm get head
-    rvm install jruby-9.2.13.0
+    rvm install jruby-[put-version-here]
     cd ..
     cd calcentral
     # Answer "yes" again if it asks you to trust a new .rvmrc file.
@@ -127,9 +127,8 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
     ```bash
     cd ~
-    rvm use jruby-9.2.13.0 --default # This may output 'Unknown ruby string (do not know how to handle): jruby-9.2.13.0.', which can be ignored.
+    rvm use --default # This may output 'Unknown ruby string...', which can be ignored.
     rvm gemset use global
-
     ```
 
 1. Download and install xvfb. On a Mac, you get xvfb by [installing XQuartz](http://xquartz.macosforge.org/landing/).
@@ -154,10 +153,23 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     mkdir ~/.calcentral_config
     ```
 
-    Default settings are loaded from your source code in `config/settings.yml` and `config/settings/ENVIRONMENT_NAME.yml`. For example, the configuration used when running tests with `RAILS_ENV=test` is determined by the combination of `config/settings/test.yml` and `config/settings.yml`.
-    Because we don't store passwords and other sensitive data in source code, any RAILS_ENV other than `test` requires overriding some default settings.
-    Do this by creating `ENVIRONMENT.local.yml` files in your `~/.calcentral_config` directory. For example, your `~/.calcentral_config/development.local.yml` file may include access tokens and URLs for a locally running Canvas server.
-    You can also create Ruby configuration files like "settings.local.rb" and "development.local.rb" to amend the standard `config/environments/*.rb` files.
+    Default settings are loaded from your source code in `config/settings.yml` and `config/settings/ENVIRONMENT_NAME.yml`.
+    For example, the configuration used when running tests with `RAILS_ENV=test` is determined by the combination of
+    `config/settings/test.yml` and `config/settings.yml`. Because we don't store passwords and other sensitive data in source code,
+    any RAILS_ENV other than `test` requires overriding some default settings. Do this by creating `ENVIRONMENT.local.yml` files
+    in your `~/.calcentral_config` directory.
+
+    *development.local configs*
+
+    Your `~/.calcentral_config/development.local.yml` file may include access tokens and URLs for a locally running
+    Canvas server. You can also create Ruby configuration files like "settings.local.rb" and "development.local.rb" to
+    amend the standard `config/environments/*.rb` files.
+
+    Your `development.local` config must have:
+    ```yaml
+    vue:
+      localhost_base_url: 'http://localhost:8080'
+    ```
 
 1. Install JDBC driver (for Oracle connection)
     * Download [ojdbc7_g.jar](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html)
@@ -183,18 +195,17 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     ```bash
     brew install node
     npm install
-    npm install -g gulp
+    nvm use
     ```
 
-1. Start the front-end development server, or kick off a Webpack build:
+1. Start the front-end development server
 
     ```bash
     # starts development server
-    npm run dev
-
-    # starts build process
-    npm run build
+    npm run serve-vue
     ```
+
+    Your browser will automatically load the Junction front-end on **_localhost:8080_**.
 
 1. Start the server:
 
@@ -202,10 +213,7 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     rails s
     ```
 
-1. Access your rails server at [localhost:3000](http://localhost:3000/), or the Webpack development server at [localhost:3001](http://localhost:3001/).
-Do not use [127.0.0.1:3000](http://127.0.0.1:3000), as you will not be able to grant access to bApps.
-
-**Note**: Usually you won't have to do any of the following steps when you're developing on CalCentral.
+    Access Rails server at **_localhost:3000_**.
 
 ## Back-end Testing
 
@@ -241,12 +249,11 @@ This will check for any potential JavaScript issues and whether you formatted th
 
 1. In calcentral_config/production.local.yml, you'll need the following entries:
 
-    ```yml
-    secret_token: "Some random 30-char string"
-    postgres: [credentials for your separate production db (copy/modify from development.local.yml)]
-    google_proxy: and canvas_proxy: [copy from development.local.yml]
-      application:
-        serve_static_assets: true
+    ```yaml
+    secret_token: 'Some random 30-char string'
+    postgres: '...'
+    application:
+      serve_static_assets: true
     ```
 
 1. Populate the production db by invoking your production settings:
@@ -258,7 +265,7 @@ This will check for any potential JavaScript issues and whether you formatted th
 1. Precompile the front-end assets
 
     ```bash
-    npm run build
+    npm run build-vue
     ```
 
 1. Start the server in production mode:
@@ -359,7 +366,7 @@ To set this up locally, perform the following steps:
 
 1. Add the following lines to development.local.yml:
 
-```yml
+```yaml
 cache:
   store: "memcached"
 ```
@@ -379,7 +386,7 @@ A few rake tasks to help monitor statistics and more:
 
 To selectively enable/disable a feature, add a property to the `features` section of settings.yml, e.g.:
 
-```yml
+```yaml
 features:
   wizbang: false
   neato: true
