@@ -12,6 +12,11 @@
     </b-row>
     <b-row>
       <b-col>
+        <ActAs />
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
         <Footer />
       </b-col>
     </b-row>
@@ -19,11 +24,12 @@
 </template>
 
 <script>
+import ActAs from '@/components/toolbox/ActAs'
 import Footer from '@/components/Footer'
 import ToolboxHeader from '@/components/toolbox/ToolboxHeader'
 
 export default {
   name: 'Toolbox',
-  components: {Footer, ToolboxHeader}
+  components: {ActAs, Footer, ToolboxHeader}
 }
 </script>
