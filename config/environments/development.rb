@@ -20,6 +20,10 @@ Rails.application.configure do
   # Turn off all page, action, fragment caching
   config.action_controller.perform_caching = false
 
+  if Settings.vue.localhost_base_url
+    config.action_controller.allow_forgery_protection = false
+  end
+
   Cache::Config.setup_cache_store config
 
 end
