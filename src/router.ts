@@ -5,7 +5,9 @@ import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
 import Oec from '@/views/Oec.vue'
 import Router from 'vue-router'
+import StandaloneLti from '@/views/StandaloneLti.vue'
 import Toolbox from '@/views/Toolbox.vue'
+import UserProvision from '@/components/bcourses/UserProvision.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -61,6 +63,19 @@ const router = new Router({
           meta: {
             title: 'Toolbox'
           }
+        },
+        {
+          component: StandaloneLti,
+          path: '/canvas',
+          children: [
+            {
+              component: UserProvision,
+              path: '/canvas/user_provision',
+              meta: {
+                title: 'bCourses User Provision'
+              }
+            }
+          ]
         }
       ]
     },
