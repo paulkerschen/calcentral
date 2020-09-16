@@ -34,14 +34,23 @@
     </div>
     <div v-if="$_.size(savedUsers)" class="pl-1 pt-3">
       <ActAsSaved
+        :action="deleteSavedUser"
+        action-icon="trash-alt"
+        action-verb="remove"
         :clear-users="clearSavedUsers"
-        :delete-user="deleteSavedUser"
         list-type="saved"
         :users="savedUsers"
       />
     </div>
     <div v-if="$_.size(recentUsers)" class="pl-1 pt-3">
-      <ActAsSaved :clear-users="clearRecentUsers" list-type="recent" :users="recentUsers" />
+      <ActAsSaved
+        :action="saveUser"
+        action-icon="plus"
+        action-verb="save"
+        :clear-users="clearRecentUsers"
+        list-type="recent"
+        :users="recentUsers"
+      />
     </div>
   </div>
 </template>
@@ -49,7 +58,14 @@
 <script>
 import ActAsSaved from '@/components/toolbox/ActAsSaved'
 import Context from '@/mixins/Context'
-import {actAs, getMyStoredUsers, removeAllRecentUsers, removeAllSavedUsers, removeSavedUser} from '@/api/act'
+import {
+  actAs,
+  getMyStoredUsers,
+  removeAllRecentUsers,
+  removeAllSavedUsers,
+  removeSavedUser, storeUserAsRecent,
+  storeUserAsSaved
+} from '@/api/act'
 
 export default {
   name: 'ActAs',
@@ -90,8 +106,20 @@ export default {
         this.savedUsers = data.users.saved
       })
     },
+    saveUser(uid) {
+      storeUserAsSaved(uid).then(() => {
+        this.refresh().then(() => {
+          this.alertScreenReader(`User ${uid} saved.`)
+        })
+      })
+    },
     actAsUser() {
-      actAs(this.uid).then(() => window.location.href = '/')
+      actAs(this.uid).then(() => {
+        this.alertScreenReader(`Prepare to act as user ${this.uid}.`)
+        storeUserAsRecent(this.uid).then(() => {
+          window.location.href = '/'
+        })
+      })
     }
   }
 }

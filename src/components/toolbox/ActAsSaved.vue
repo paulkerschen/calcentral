@@ -26,21 +26,21 @@
           {{ data.item.ldapUid }}
         </template>
         <template v-slot:cell(sid)="data">
-          {{ data.item.studentId }}
+          {{ data.item.studentId || '&mdash;' }}
         </template>
         <template v-slot:cell(name)="data">
           {{ data.item.firstName }} {{ data.item.lastName }}
         </template>
-        <template v-slot:cell(delete)="data">
+        <template v-slot:cell(action)="data">
           <b-button
-            :id="`delete-${listType}-user-${data.item.ldapUid}`"
-            :aria-label="`Remove user ${data.item.ldapUid} from list of ${listType} users`"
+            :id="`${actionVerb}-user-${data.item.ldapUid}`"
+            :aria-label="`${actionVerb} user ${data.item.ldapUid}`"
             class="p-0"
             size="sm"
             variant="link"
-            @click="deleteRow(data.item.ldapUid)"
+            @click="performAction(data.item.ldapUid)"
           >
-            <fa icon="trash-alt" />
+            <fa :icon="actionIcon" />
           </b-button>
         </template>
       </b-table>
@@ -52,13 +52,20 @@
 export default {
   name: 'ActAsSaved',
   props: {
-    clearUsers: {
+    action: {
       required: true,
       type: Function
     },
-    deleteUser: {
-      default: undefined,
-      required: false,
+    actionIcon: {
+      required: true,
+      type: String
+    },
+    actionVerb: {
+      required: true,
+      type: String
+    },
+    clearUsers: {
+      required: true,
       type: Function
     },
     listType: {
@@ -84,23 +91,19 @@ export default {
         {
           key: 'name',
           sortable: this.users.length > 2
+        },
+        {
+          class: 'center',
+          key: 'action',
+          label: '',
+          sortable: false
         }
       ]
     }
   },
-  created() {
-    if (this.deleteUser) {
-      this.fields.push({
-        class: 'center',
-        key: 'delete',
-        label: '',
-        sortable: false
-      })
-    }
-  },
   methods: {
-    deleteRow(uid) {
-      this.deleteUser(uid)
+    performAction(uid) {
+      this.action(uid)
     }
   }
 }
