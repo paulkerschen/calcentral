@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h2>View As</h2>
+      <h2 class="cc-text-big">View As</h2>
     </div>
     <div>
       <b-form @submit="actAsUser">
@@ -77,27 +77,28 @@ export default {
     uid: undefined
   }),
   created() {
-    this.refresh().then(() => {
-      this.$ready('Act As')
-    })
+    this.refresh()
   },
   methods: {
     clearRecentUsers() {
       removeAllRecentUsers().then(() => {
-        this.refresh()
-        this.alertScreenReader('Recent users cleared.')
+        this.refresh().then(() => {
+          this.alertScreenReader('Recent users cleared.')
+        })
       })
     },
     clearSavedUsers() {
       removeAllSavedUsers().then(() => {
-        this.refresh()
-        this.alertScreenReader('Saved users cleared.')
+        this.refresh().then(() => {
+          this.alertScreenReader('Saved users cleared.')
+        })
       })
     },
     deleteSavedUser(uid) {
       removeSavedUser(uid).then(() => {
-        this.refresh()
-        this.alertScreenReader(`User ${uid} removed.`)
+        this.refresh().then(() => {
+          this.alertScreenReader(`User ${uid} removed.`)
+        })
       })
     },
     refresh() {
@@ -124,9 +125,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-h2 {
-  font-size: 18px;
-}
-</style>
