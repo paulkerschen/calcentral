@@ -3,7 +3,6 @@ import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
-import Oec from '@/views/Oec.vue'
 import Router from 'vue-router'
 import StandaloneLti from '@/views/StandaloneLti.vue'
 import Toolbox from '@/views/Toolbox.vue'
@@ -49,13 +48,6 @@ const router = new Router({
       beforeEnter: auth.requiresAdmin,
       component: BaseView,
       children: [
-        {
-          component: Oec,
-          path: '/oec',
-          meta: {
-            title: 'OEC'
-          }
-        },
         {
           component: Toolbox,
           name: 'toolbox',

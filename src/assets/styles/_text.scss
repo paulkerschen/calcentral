@@ -20,6 +20,9 @@
 .cc-text-light {
   color: $cc-color-nobel;
 }
+.cc-text-medium {
+  font-size: 14px;
+}
 .cc-text-pre-line {
   white-space: pre-line;
 }
@@ -34,4 +37,7 @@
 }
 .cc-text-uppercase {
   text-transform: uppercase;
+}
+.cc-text-xl {
+  font-size: 24px;
 }

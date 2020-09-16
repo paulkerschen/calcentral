@@ -6,7 +6,7 @@
           Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
         </div>
         <div class="pt-3">
-          <div class="d-flex">
+          <div class="d-flex pb-2">
             <div class="pt-2">
               <h4>Build Summary</h4>
             </div>
@@ -26,7 +26,7 @@
           </b-collapse>
         </div>
         <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="pt-2">
-          <div class="d-flex">
+          <div class="d-flex pb-2">
             <div class="pt-2">
               <h4>DevAuth</h4>
             </div>
