@@ -30,7 +30,7 @@ export default {
     canActAs: undefined
   }),
   created() {
-    this.canActAs = this.$currentUser.isSuperuser || this.$currentUser.isViewer
+    this.canActAs = this.$currentUser.isDirectlyAuthenticated && (this.$currentUser.isSuperuser || this.$currentUser.isViewer)
   }
 }
 </script>

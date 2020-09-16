@@ -9,3 +9,7 @@ export default {
   name: 'App'
 }
 </script>
+
+<style>
+@import './assets/styles/junction-global.css';
+</style>
