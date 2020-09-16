@@ -10,6 +10,6 @@ export default {
 }
 </script>
 
-<style>
-@import './assets/styles/junction-global.css';
+<style lang="scss">
+@import './assets/styles/junction-global.scss';
 </style>

@@ -1,0 +1,191 @@
+// Useful mixins
+@mixin cc-column-sameheight {
+  margin-bottom: -99969px;
+  padding-bottom: 99999px;
+}
+@mixin cc-column-sameheight-nopadding {
+  margin-bottom: -99999px;
+  padding-bottom: 99999px;
+}
+
+// Useful classes
+.cc-alert {
+  color: $cc-color-harley-davidson-orange !important;
+}
+.cc-alert-box {
+  background-color: $cc-color-harley-davidson-orange;
+  color: $cc-color-white;
+  padding: 15px;
+}
+.cc-break-word {
+  hyphens: auto;
+  word-wrap: break-word;
+}
+.cc-capitalize {
+  text-transform: capitalize;
+}
+.cc-clearfix {
+  clear: both;
+}
+.cc-clearfix-container::before,
+.cc-clearfix-container::after {
+  content: " ";
+  display: table;
+}
+.cc-clearfix-container::after {
+  clear: both;
+}
+@supports (display: flow-root) {
+  .cc-clearfix {
+    display: flow-root;
+    &::after {
+      content: none;
+    }
+  }
+}
+.cc-clickable {
+  cursor: pointer;
+}
+.cc-ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cc-image-responsive {
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.cc-image-responsive-square {
+  padding-bottom: 100%;
+}
+.cc-inherit-font-size {
+  &, &:hover, &:focus {
+    font-size: inherit;
+  }
+}
+.cc-inline-block {
+  display: inline-block;
+}
+// As distinct from cc-visuallyhidden, this does not display but takes up space; useful for show/hide without layout jitters.
+.cc-invisible {
+  cursor: default;
+  visibility: hidden;
+}
+.cc-italic {
+  font-style: italic;
+}
+.cc-left {
+  float: left;
+}
+.cc-loading {
+  i {
+    margin-right: 5px;
+  }
+}
+.cc-non-anchored-link {
+  color: $cc-color-curious-blue;
+  cursor: pointer;
+}
+.cc-nowrap {
+  white-space: nowrap;
+}
+.cc-required-field-indicator {
+  color: $cc-color-harley-davidson-orange;
+}
+.cc-right {
+  float: right;
+}
+.cc-strikethrough {
+  color: $cc-color-very-light-grey !important;
+  text-decoration: line-through !important;
+}
+.cc-strong {
+  font-weight: bold;
+}
+.cc-uppercase {
+  text-transform: uppercase;
+}
+
+// Spinner
+@keyframes spin-normal {
+  from {
+    transform: rotate(0turn) scale(.47);
+  }
+  to {
+    transform: rotate(1turn) scale(.47);
+  }
+}
+
+$cc-spinner-even: 12px;
+$cc-spinner-uneven: 17px;
+
+.cc-spinner {
+  display: block;
+  font-size: 8px;
+  height: 50px;
+  position: relative;
+  text-align: center;
+  * {
+    display: none !important;
+  }
+  &::before {
+    animation: spin-normal 1s infinite steps(8);
+    border-radius: 50%;
+    box-shadow: 0 (-$cc-spinner-uneven) $cc-color-very-light-grey, // Top
+      $cc-spinner-even (-$cc-spinner-even $cc-color-very-light-grey), // Top right
+      $cc-spinner-uneven 0 $cc-color-nobel, // Right
+      $cc-spinner-even $cc-spinner-even $cc-color-night-rider, // Bottom right
+      0 $cc-spinner-uneven $cc-color-black, // Bottom
+      (-$cc-spinner-even) $cc-spinner-even $cc-color-very-light-grey, // Bottom left
+      (-$cc-spinner-uneven) 0 $cc-color-very-light-grey, // Left
+      (-$cc-spinner-even) (-$cc-spinner-even) $cc-color-very-light-grey; // Top left
+    content: "";
+    display: inline-block;
+    height: 10px;
+    left: 50%;
+    position: absolute;
+    top: 40%;
+    width: 10px;
+  }
+}
+
+.cc-spinner-message {
+  margin: 15px 0;
+  text-align: center;
+}
+
+// Image replacement
+.cc-ir {
+  background-color: transparent;
+  border: 0;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    display: block;
+    height: 150%;
+    width: 0;
+  }
+}
+.cc-hidden {
+  display: none;
+}
+// Hide only visually, but have it available for screenreaders / accessibility: h5bp.com/v
+.cc-visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@media #{$small-only} {
+  .cc-hide-for-small {
+    display: none !important;
+  }
+}

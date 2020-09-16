@@ -1,0 +1,37 @@
+body {
+  // Masthead
+  .cc-masthead {
+    background: $cc-color-prussian-blue;
+    height: 40px;
+    margin: 0 auto;
+    max-width: 1200px;
+    position: relative;
+
+    > div > a img {
+      padding: 10px 10px 0;
+    }
+  }
+}
+
+// Header logo
+.cc-header-logo {
+  float: left;
+  a {
+    display: block;
+    height: 40px;
+    padding-top: 6px;
+    width: 195px;
+    &:focus, &:hover {
+      border-bottom: 2px solid $cc-color-dark-tangerine;
+      opacity: .9;
+    }
+  }
+  @media print {
+    a[href]::after {
+      content: "";
+    }
+  }
+  svg {
+    margin: 0 10px;
+  }
+}
