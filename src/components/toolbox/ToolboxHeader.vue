@@ -1,8 +1,8 @@
 <template>
-  <b-row class="bg-header p-3">
+  <b-row class="bg-header p-3 cc-masthead" no-gutters>
     <b-col sm="8">
       <div class="header-text pt-1">
-        bCourses Utilities
+        ETS bCourses Utilities
       </div>
     </b-col>
     <b-col sm="4">

@@ -1,15 +1,14 @@
 <template>
   <div class="bc-canvas-application cc-page-user-provision">
     <b-container fluid>
-      <b-row>
+      <b-row no-gutters>
         <h1 class="cc-page-user-provision-heading">Add Users to bCourses</h1>
       </b-row>
       <form name="userImportForm" :submit="importUsers(rawUids)">
-        <b-row>
-          <b-col cols="1"></b-col>
+        <b-row no-gutters>
           <b-col cols="10">
             <b-container fluid>
-              <b-row>
+              <b-row no-gutters>
                 <b-col cols="2">
                   <label for="cc-page-user-provision-uid-list" class="bc-form-label">
                     <span aria-hidden="true">UID</span>
@@ -20,10 +19,10 @@
                 <b-col cols="10">
                   <textarea
                     id="cc-page-user-provision-uid-list"
+                    v-model="rawUids"
                     class="cc-page-user-provision-uid-list-input"
                     rows="4"
                     name="uids"
-                    :value="rawUids"
                     placeholder="Paste your list of UIDs here organized one UID per a line, or separated by spaces or commas."
                   >
                   </textarea>
@@ -41,10 +40,16 @@
                   </small>
                 </b-col>
               </b-row>
-              <b-row>
+              <b-row no-gutters>
                 <b-col cols="2"></b-col>
                 <b-col cols="2">
-                  <button type="submit" class="bc-canvas-button bc-canvas-button-primary" data-ng-disabled="importButtonDisabled()">Import Users</button>
+                  <button
+                    type="submit"
+                    class="bc-canvas-button bc-canvas-button-primary d-block"
+                    :disabled="importButtonDisabled"
+                  >
+                    Import Users
+                  </button>
                 </b-col>
                 <b-col v-if="displayImportResult" cols="8">
                   <div data-cc-spinner-directive>
@@ -67,7 +72,6 @@
               </b-row>
             </b-container>
           </b-col>
-          <b-col cols="1"></b-col>
         </b-row>
       </form>
     </b-container>
@@ -82,14 +86,19 @@ export default {
     error: null,
     importUsers: () => {},
     invalidValues: [],
-    rawUids: [],
+    rawUids: '',
     status: null,
     validationErrors: {}
   }),
+  computed: {
+    importButtonDisabled() {
+      return !this.rawUids.length
+    }
+  }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .cc-page-user-provision {
   color: $bc-color-off-black;
   font-family: $bc-base-font-family;

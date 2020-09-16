@@ -1,13 +1,15 @@
 <template>
-  <b-container fluid>
+  <div>
     <ToolboxHeader />
-    <b-row>
-      <b-col class="text-center">
-        <router-view />
+    <b-row class="cc-off-canvas-container" no-gutters>
+      <b-col class="cc-offcanvas-right">
+        <div id="cc-main-content" class="cc-container-main cc-container-standalone" role="main">
+          <router-view />
+        </div>
       </b-col>
     </b-row>
     <Footer />
-  </b-container>
+  </div>
 </template>
 
 <script>
