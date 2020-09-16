@@ -2,3 +2,12 @@
 .cc-container-main {
   background-color: $cc-color-white-smoke;
 }
+
+.cc-container-standalone {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    max-width: 1200px;
+}
