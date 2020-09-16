@@ -4,31 +4,33 @@
       <h2>View As</h2>
     </div>
     <div>
-      <div>
-        <b-form-input
-          id="basic-auth-uid"
-          v-model="userId"
-          placeholder="Enter UID or SID"
-          size="sm"
-          required
-        ></b-form-input>
-      </div>
-      <div class="d-flex justify-content-between pl-2 pt-2">
+      <b-form @submit="actAsUser">
         <div>
-          <b-button
-            id="view-as-submit"
-            :disabled="!userId"
+          <b-form-input
+            id="basic-auth-uid"
+            v-model="uid"
+            placeholder="Enter UID or SID"
             size="sm"
-            variant="primary"
-            @click="submit"
-          >
-            Submit
-          </b-button>
+            required
+          ></b-form-input>
         </div>
-        <div class="pt-1">
-          <a href="https://www.berkeley.edu/directory" target="_blank">Campus Directory<span class="sr-only"> will open in a new tab</span></a>
+        <div class="d-flex justify-content-between pl-2 pt-2">
+          <div>
+            <b-button
+              id="view-as-submit"
+              :disabled="!uid || uid === $currentUser.uid"
+              size="sm"
+              variant="primary"
+              @click="actAsUser"
+            >
+              Submit
+            </b-button>
+          </div>
+          <div class="pt-1">
+            <a href="https://www.berkeley.edu/directory" target="_blank">Campus Directory<span class="sr-only"> will open in a new tab</span></a>
+          </div>
         </div>
-      </div>
+      </b-form>
     </div>
     <div v-if="$_.size(savedUsers)" class="pl-1 pt-3">
       <ActAsSaved
@@ -47,7 +49,7 @@
 <script>
 import ActAsSaved from '@/components/toolbox/ActAsSaved'
 import Context from '@/mixins/Context'
-import {getMyStoredUsers, removeAllRecentUsers, removeAllSavedUsers, removeSavedUser} from '@/api/act'
+import {actAs, getMyStoredUsers, removeAllRecentUsers, removeAllSavedUsers, removeSavedUser} from '@/api/act'
 
 export default {
   name: 'ActAs',
@@ -56,7 +58,7 @@ export default {
   data: () => ({
     recentUsers: undefined,
     savedUsers: undefined,
-    userId: undefined
+    uid: undefined
   }),
   created() {
     this.refresh().then(() => {
@@ -88,8 +90,8 @@ export default {
         this.savedUsers = data.users.saved
       })
     },
-    submit() {
-      console.log('foo')
+    actAsUser() {
+      actAs(this.uid).then(() => window.location.href = '/')
     }
   }
 }

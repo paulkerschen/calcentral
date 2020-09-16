@@ -4,6 +4,8 @@ import _ from 'lodash'
 import App from './App.vue'
 import axios from 'axios'
 import BootstrapVue from 'bootstrap-vue'
+import moment from 'moment-timezone'
+import VueMoment from 'vue-moment'
 import router from './router'
 import store from './store'
 import Vue from 'vue'
@@ -18,6 +20,7 @@ library.add(far, fas, faSpinner, faUserSecret)
 
 Vue.config.productionTip = process.env.VUE_APP_DEBUG.toLowerCase() === 'true'
 Vue.use(BootstrapVue)
+Vue.use(VueMoment, { moment })
 Vue.component('fa', FontAwesomeIcon)
 
 const putFocusNextTick = (id, cssSelector) => {
