@@ -1,6 +1,6 @@
 <template>
-  <b-row class="fixed pl-3 w-100">
-    <b-row v-if="$currentUser.isDirectlyAuthenticated">
+  <b-row class="bg-white fixed pl-3 w-100 z-max">
+    <b-row v-if="$currentUser.isDirectlyAuthenticated || !$currentUser.isLoggedIn" class="border-top pl-3 pt-3 text-secondary w-100">
       <b-col sm="6">
         <div>
           Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
@@ -62,7 +62,7 @@
         </div>
       </b-col>
     </b-row>
-    <b-row v-if="!$currentUser.isDirectlyAuthenticated" class="border-top pl-3 pt-3 text-secondary w-100">
+    <b-row v-if="$currentUser.isLoggedIn && !$currentUser.isDirectlyAuthenticated" class="border-top pl-3 pt-3 text-secondary w-100">
       <b-col class="pt-1" sm="10">
         You are viewing as {{ $currentUser.fullName }} ({{ $currentUser.uid }}),
         <span v-if="$currentUser.firstLoginAt">first logged in on {{ $currentUser.firstLoginAt | moment('M/D/YY') }}</span>
@@ -112,12 +112,14 @@ h4 {
   bottom: 0;
   left: 0;
   position: fixed;
-  z-index: 9999;
   @media print {
     position: relative;
     p {
       border-top: 2px solid #000;
     }
   }
+}
+.z-max {
+  z-index: 9999;
 }
 </style>
