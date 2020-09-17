@@ -5,7 +5,7 @@
         <div>
           Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
         </div>
-        <div class="pt-3">
+        <div class="pb-2 pt-3">
           <div class="d-flex pb-2">
             <div>
               <h4>Build Summary</h4>
@@ -21,7 +21,7 @@
               </b-button>
             </div>
           </div>
-          <b-collapse id="build-summary-collapse" v-model="showBuildSummary" class="mt-2">
+          <b-collapse id="build-summary-collapse" v-model="showBuildSummary" class="ml-3">
             <BuildSummary />
           </b-collapse>
         </div>

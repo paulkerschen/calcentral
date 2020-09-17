@@ -93,9 +93,9 @@ export default {
           sortable: this.users.length > 2
         },
         {
-          class: 'center',
+          class: 'text-center',
           key: 'action',
-          label: '',
+          label: this.$_.capitalize(this.actionVerb) + '?',
           sortable: false
         }
       ]
