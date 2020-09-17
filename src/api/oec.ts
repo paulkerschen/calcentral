@@ -9,7 +9,7 @@ export function getStatus(taskId) {
   return utils.get(`/api/oec/tasks/status/${taskId}`)
 }
 
-export function runTask(taskName: string, termName: string, departmentCode: string) {
+export function runTask(taskName: string, termName: string, departmentCode) {
   return axios.post(`${utils.apiBaseUrl()}/api/oec/tasks/${taskName}`, {
     departmentCode,
     term: termName
