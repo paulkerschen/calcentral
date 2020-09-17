@@ -10,15 +10,19 @@
       >your Google Drive account<span class="sr-only"> (link will open a new browser tab)</span></a>.
     </div>
     <b-alert
-      v-if="$_.size(output)"
       id="log-output"
       class="alert-box m-2 overflow-auto"
       show
-      :variant="isInProgress ? 'info' : isError ? 'danger' : 'success'"
+      :variant="(!status || isInProgress) ? 'info' : isError ? 'danger' : 'success'"
     >
-      <div v-for="(row, index) in output" :key="index">
-        <span v-if="index < output.length - 1">{{ row }}</span>
-        <span v-if="index === output.length - 1" aria-live="polite" role="alert">{{ row }}</span>
+      <div v-if="$_.size(output)">
+        <div v-for="(row, index) in output" :key="index">
+          <span v-if="index < output.length - 1">{{ row }}</span>
+          <span v-if="index === output.length - 1" aria-live="polite" role="alert">{{ row }}</span>
+        </div>
+      </div>
+      <div v-if="!$_.size(output)">
+        Loading...
       </div>
     </b-alert>
     <div v-if="!isInProgress" class="pt-2">
