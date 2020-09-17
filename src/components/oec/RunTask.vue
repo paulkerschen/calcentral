@@ -9,10 +9,19 @@
         target="_blank"
       >your Google Drive account<span class="sr-only"> (link will open a new browser tab)</span></a>.
     </div>
-    <div v-if="log">
-      {{ log }}
-    </div>
-    <div>
+    <b-alert
+      v-if="$_.size(output)"
+      id="log-output"
+      class="alert-box m-2 overflow-auto"
+      show
+      :variant="isInProgress ? 'info' : isError ? 'danger' : 'success'"
+    >
+      <div v-for="(row, index) in output" :key="index">
+        <span v-if="index < output.length - 1">{{ row }}</span>
+        <span v-if="index === output.length - 1" aria-live="polite" role="alert">{{ row }}</span>
+      </div>
+    </b-alert>
+    <div v-if="!isInProgress" class="pt-2">
       <b-button size="sm" variant="primary" @click="done">Back</b-button>
     </div>
   </div>
@@ -25,7 +34,8 @@ export default {
   name: 'RunTask',
   props: {
     departmentCode: {
-      required: true,
+      default: undefined,
+      required: false,
       type: Object
     },
     done: {
@@ -43,11 +53,19 @@ export default {
   },
   data: () => ({
     googleDriveUrl: undefined,
-    log: undefined,
+    output: undefined,
     status: undefined,
     taskId: undefined,
     taskMonitor: undefined
   }),
+  computed: {
+    isError() {
+      return this.status === 'Error'
+    },
+    isInProgress() {
+      return this.status === 'In progress'
+    }
+  },
   created() {
     runTask(this.task.name, this.term, this.departmentCode).then(data => {
       this.googleDriveUrl = data.oecDriveUrl
@@ -59,14 +77,27 @@ export default {
   methods: {
     getTaskStatus() {
       getStatus(this.taskId).then(data => {
-        this.log = data.oecTaskStatus.log
-        if (data.oecTaskStatus.status === 'In Progress') {
-          this.taskMonitor = setTimeout(this.getTaskStatus, 2000)
-        } else {
-          this.done()
+        this.output = data.oecTaskStatus.log
+        this.status = data.oecTaskStatus.status
+        if (this.isInProgress) {
+          this.taskMonitor = setTimeout(this.getTaskStatus, 1500)
+        } else if (this.status === 'Error') {
+          // this.done()
         }
+        setTimeout(() => {
+          let element = document.getElementById('log-output')
+          if (element) {
+            element.scrollTop = element.scrollHeight
+          }
+        }, 100)
       })
     }
   }
 }
 </script>
+
+<style scoped>
+.alert-box {
+  height: 300px;
+}
+</style>

@@ -3,8 +3,9 @@
     <h2 class="cc-text-big pb-2">OEC</h2>
     <div v-if="isTaskRunning">
       <RunTask
+        :key="taskName"
         :department-code="departmentCode"
-        :done="isTaskRunning = false"
+        :done="taskRunDone"
         :task="getTaskObject(taskName)"
         :term="term"
       />
@@ -101,6 +102,7 @@ import {getTasks} from '@/api/oec'
 export default {
   name: 'Oec',
   data: () => ({
+    currentTerm: null,
     departmentCode: null,
     departmentsParticipating: undefined,
     taskName: null,
@@ -115,7 +117,7 @@ export default {
   created() {
     getTasks().then(data => {
       this.departments = data.oecDepartments
-      this.term = data.currentTerm
+      this.term = this.currentTerm = data.currentTerm
       this.terms = data.oecTerms
       this.tasks = data.oecTasks
 
@@ -133,6 +135,12 @@ export default {
     },
     run() {
       this.isTaskRunning = true
+    },
+    taskRunDone() {
+      this.departmentCode = null
+      this.isTaskRunning = false
+      this.taskName = null
+      this.term = this.currentTerm
     }
   }
 }

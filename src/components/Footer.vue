@@ -7,7 +7,7 @@
         </div>
         <div class="pt-3">
           <div class="d-flex pb-2">
-            <div class="pt-2">
+            <div>
               <h4>Build Summary</h4>
             </div>
             <div>
@@ -27,7 +27,7 @@
         </div>
         <div v-if="$currentUser.isBasicAuthEnabled && !$currentUser.isLoggedIn" class="pt-2">
           <div class="d-flex pb-2">
-            <div class="pt-2">
+            <div>
               <h4>DevAuth</h4>
             </div>
             <div>
@@ -94,7 +94,7 @@ export default {
   components: {DevAuth, BuildSummary},
   data: () => ({
     showBuildSummary: false,
-    showDevAuth: false
+    showDevAuth: true
   }),
   methods: {
     stopActAs() {
