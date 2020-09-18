@@ -5,7 +5,7 @@
         <div>
           Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
         </div>
-        <div v-if="showBuildSummary" class="pt-3">
+        <div v-if="includeBuildSummary" class="pt-3">
           <div class="d-flex">
             <div>
               <h4>Build Summary</h4>
@@ -93,12 +93,13 @@ export default {
   name: 'Footer',
   components: {DevAuth, BuildSummary},
   props: {
-    showBuildSummary: {
+    includeBuildSummary: {
       required: false,
       type: Boolean
     }
   },
   data: () => ({
+    showBuildSummary: false,
     showDevAuth: true
   }),
   methods: {

@@ -8,7 +8,7 @@
         </div>
       </b-col>
     </b-row>
-    <Footer :show-build-summary="true" />
+    <Footer :include-build-summary="true" />
   </div>
 </template>
 

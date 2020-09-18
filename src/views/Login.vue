@@ -20,7 +20,7 @@
       </div>
     </div>
     <div>
-      <Footer :show-build-summary="true" />
+      <Footer :include-build-summary="true" />
     </div>
   </div>
 </template>
