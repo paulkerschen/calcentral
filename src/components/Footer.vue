@@ -1,12 +1,12 @@
 <template>
-  <b-row class="bg-white fixed pl-3 w-100 z-max">
-    <b-row v-if="$currentUser.isDirectlyAuthenticated || !$currentUser.isLoggedIn" class="border-top pl-3 pt-3 text-secondary w-100">
+  <b-row class="bg-white fixed pb-3 pl-3 pr-4 w-100 z-max" no-gutters>
+    <b-row v-if="$currentUser.isDirectlyAuthenticated || !$currentUser.isLoggedIn" class="border-top pl-2 pt-3 text-secondary w-100" no-gutters>
       <b-col sm="6">
         <div>
           Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
         </div>
-        <div class="pb-2 pt-3">
-          <div class="d-flex pb-2">
+        <div v-if="showBuildSummary" class="pt-3">
+          <div class="d-flex">
             <div>
               <h4>Build Summary</h4>
             </div>
@@ -56,7 +56,7 @@
             <a href="https://security.berkeley.edu/policy" target="_blank">Usage Policy<span class="sr-only"> (link opens new browser tab)</span></a>
           </div>
           <div class="pl-1 pr-1">|</div>
-          <div class="pr-3">
+          <div>
             <a href="https://www.ets.berkeley.edu/services-facilities/bcourses" target="_blank">About<span class="sr-only"> bCourses (link opens new browser tab)</span></a>
           </div>
         </div>
@@ -92,8 +92,13 @@ import {stopActAs} from '@/api/act'
 export default {
   name: 'Footer',
   components: {DevAuth, BuildSummary},
+  props: {
+    showBuildSummary: {
+      required: false,
+      type: Boolean
+    }
+  },
   data: () => ({
-    showBuildSummary: false,
     showDevAuth: true
   }),
   methods: {

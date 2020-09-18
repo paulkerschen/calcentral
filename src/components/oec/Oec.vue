@@ -49,7 +49,7 @@
             </template>
           </b-form-select>
         </div>
-        <div>
+        <div v-if="departmentsParticipating.length">
           <b-button
             id="show-participating-departments"
             v-b-toggle.participating-collapse
@@ -60,9 +60,11 @@
             Show participating departments
           </b-button>
           <b-collapse id="participating-collapse" class="mt-2">
-            <ul class="cc-text-small participating-list">
-              <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
-            </ul>
+            <b-alert class="alert-box m-2 overflow-auto" show variant="info">
+              <ul class="cc-text-small participating-list">
+                <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
+              </ul>
+            </b-alert>
           </b-collapse>
         </div>
       </div>
@@ -104,7 +106,7 @@ export default {
   data: () => ({
     currentTerm: null,
     departmentCode: null,
-    departmentsParticipating: undefined,
+    departmentsParticipating: [],
     taskName: null,
     term: undefined,
     departments: undefined,
@@ -121,10 +123,10 @@ export default {
       this.terms = data.oecTerms
       this.tasks = data.oecTasks
 
-      this.departmentCode = []
+      this.departmentsParticipating = []
       this.$_.each(this.departments, department => {
         if (department.participating) {
-          this.departmentCode.push(department)
+          this.departmentsParticipating.push(department)
         }
       })
     })
@@ -149,5 +151,8 @@ export default {
 <style scoped>
 li {
   list-style-type: none;
+}
+.alert-box {
+  height: 300px;
 }
 </style>

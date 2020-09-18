@@ -1,0 +1,23 @@
+.btn-cc-blue {
+  background: #3b7ea1;
+  border: 1px solid #265269;
+  color: #fff;
+}
+
+// Base colors definitions
+$cc-blue: #007bff !default;
+$cc-light-grey: #f7f7f7 !default;
+
+// Theme color default definitions
+$cc-light: $cc-light-grey !default;
+$cc-primary: $cc-blue !default;
+
+// This table defines the theme colors (variant names)
+$theme-colors: () !default;
+$theme-colors: map-merge(
+    (
+      'cc-light': $cc-light,
+      'cc-primary': $cc-primary
+    ),
+    $theme-colors
+);

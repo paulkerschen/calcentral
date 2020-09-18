@@ -14,7 +14,7 @@
         <Oec />
       </b-col>
     </b-row>
-    <Footer />
+    <Footer :show-build-summary="true" />
   </b-container>
 </template>
 

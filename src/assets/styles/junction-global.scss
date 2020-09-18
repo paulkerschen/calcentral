@@ -1,6 +1,9 @@
 // Read more about why we're using @import instead of require at
 // http://stackoverflow.com/questions/6269420
 
+// Bootstrap overrides
+@import "bootstrap_variables";
+
 // Foundation Overrides
 @import "foundation_overrides";
 
