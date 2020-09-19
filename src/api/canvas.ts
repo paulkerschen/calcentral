@@ -1,4 +1,3 @@
-import axios from 'axios'
 import utils from '@/api/api-utils'
 
 export function externalTools() {
@@ -10,7 +9,5 @@ export function canUserCreateSite() {
 }
 
 export function importUsers(userIds: string[]) {
-  return axios.post(`${utils.apiBaseUrl()}/api/academics/canvas/user_provision/user_import`, {
-    userIds
-  }).then(response => response.data, () => null)
+  return utils.post('/api/academics/canvas/user_provision/user_import', {userIds})
 }

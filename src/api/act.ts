@@ -1,10 +1,7 @@
-import axios from 'axios'
 import utils from '@/api/api-utils'
 
 export function actAs(uid) {
-  return axios.post(`${utils.apiBaseUrl()}/act_as`, {
-    uid
-  }).then(response => response.data, () => null)
+  return utils.post('/act_as', {uid})
 }
 
 export function getMyStoredUsers() {
@@ -12,19 +9,15 @@ export function getMyStoredUsers() {
 }
 
 export function removeAllSavedUsers() {
-  return axios.post(`${utils.apiBaseUrl()}/delete_users/saved`).then(response => response.data, () => null)
+  return utils.post('/delete_users/saved')
 }
 
 export function removeAllRecentUsers(uid) {
-  return axios.post(`${utils.apiBaseUrl()}/delete_users/recent`, {
-    uid
-  }).then(response => response.data, () => null)
+  return utils.post('/delete_users/recent', {uid})
 }
 
 export function removeSavedUser(uid) {
-  return axios.post(`${utils.apiBaseUrl()}/delete_user/saved`, {
-    uid
-  }).then(response => response.data, () => null)
+  return utils.post('/delete_user/saved', {uid})
 }
 
 export function searchUsers(id) {
@@ -32,17 +25,13 @@ export function searchUsers(id) {
 }
 
 export function stopActAs() {
-  return axios.post(`${utils.apiBaseUrl()}/stop_act_as`).then(response => response.data, () => null)
+  return utils.post('/stop_act_as')
 }
 
 export function storeUserAsRecent(uid) {
-  return axios.post(`${utils.apiBaseUrl()}/api/view_as/store_user_as_recent`, {
-    uid
-  }).then(response => response.data, () => null)
+  return utils.post('/api/view_as/store_user_as_recent', {uid})
 }
 
 export function storeUserAsSaved(uid) {
-  return axios.post(`${utils.apiBaseUrl()}/api/view_as/store_user_as_saved`, {
-    uid
-  }).then(response => response.data, () => null)
+  return utils.post('/api/view_as/store_user_as_saved', {uid})
 }

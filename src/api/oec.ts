@@ -1,4 +1,3 @@
-import axios from 'axios'
 import utils from '@/api/api-utils'
 
 export function getTasks() {
@@ -10,8 +9,8 @@ export function getStatus(taskId) {
 }
 
 export function runTask(taskName: string, termName: string, departmentCode) {
-  return axios.post(`${utils.apiBaseUrl()}/api/oec/tasks/${taskName}`, {
+  return utils.post('/api/oec/tasks/${taskName}', {
     departmentCode,
     term: termName
-  }).then(response => response.data, () => null)
+  })
 }

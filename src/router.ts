@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
+import Error from '@/views/Error.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
 import RosterPhotos from '@/views/RosterPhotos.vue'
@@ -80,11 +81,28 @@ const router = new Router({
       ]
     },
     {
-      path: '/404',
-      component: NotFound,
-      meta: {
-        title: 'Page not found'
-      }
+      path: '/',
+      component: BaseView,
+      children: [
+        {
+          beforeEnter: (to: any, from: any, next: any) => {
+            to.params.m = to.redirectedFrom
+            next()
+          },
+          path: '/404',
+          component: NotFound,
+          meta: {
+            title: 'Page not found'
+          }
+        },
+        {
+          path: '/error',
+          component: Error,
+          meta: {
+            title: 'Error'
+          }
+        }
+      ]
     },
     {
       path: '*',

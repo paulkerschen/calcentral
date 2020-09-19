@@ -48,18 +48,17 @@ axios.defaults.withCredentials = true
 
 const axiosErrorHandler = error => {
   const errorStatus = _.get(error, 'response.status')
-  if (_.get(Vue.prototype.$currentUser, 'isAuthenticated')) {
-    if (errorStatus === 404) {
-      router.push({ path: '/404' })
-    } else if (errorStatus >= 400) {
-      const message = _.get(error, 'response.data.message') || error.message
-      console.error(message)
+  if (_.get(Vue.prototype.$currentUser, 'isLoggedIn')) {
+    if (!errorStatus || errorStatus >= 400) {
+      const message = _.get(error, 'response.data.error') || _.get(error, 'response.data.message') || error.message
       router.push({
         path: '/error',
         query: {
           m: message
         }
       })
+    } else if (errorStatus === 404) {
+      router.push({ path: '/404' })
     }
   } else {
     router.push({
@@ -72,13 +71,13 @@ const axiosErrorHandler = error => {
 }
 
 axios.interceptors.response.use(
-  response => response.headers['content-type'] === 'application/json' ? response.data : response,
+  response => response,
   error => {
     const errorStatus = _.get(error, 'response.status')
     if (_.includes([401, 403], errorStatus)) {
       // Refresh user in case his/her session expired.
-      return axios.get(`${apiBaseUrl}/api/my/status`).then(data => {
-        Vue.prototype.$currentUser = data
+      return axios.get(`${apiBaseUrl}/api/my/status`).then(response => {
+        Vue.prototype.$currentUser = response.data
         axiosErrorHandler(error)
         return Promise.reject(error)
       })

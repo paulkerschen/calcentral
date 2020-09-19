@@ -8,22 +8,19 @@
             <fa class="text-warning" icon="exclamation-triangle" size="2x" />
           </div>
           <div>
-            <h1 class="cc-text-xl text-secondary">404</h1>
+            <h1 class="cc-text-xl text-secondary">Error</h1>
           </div>
         </div>
       </b-col>
     </b-row>
     <b-row class="cc-text-big ml-4 mt-4">
       <b-col>
-        <span id="error-message" aria-live="polite" role="alert">
-          <span v-if="$route.redirectedFrom">
-            The requested URL {{ this.$route.redirectedFrom }} was not found.
-          </span>
-          <span v-if="!$route.redirectedFrom">
-            Page not found.
-          </span>
-          If you need assistance then please <a id="contact-us" href="https://dls.berkeley.edu/services/bcourses-0" target="_blank">contact us</a>.
-        </span>
+        <span id="error-message" aria-live="polite" role="alert">{{ message || 'Uh oh, there was a problem.' }}</span>
+      </b-col>
+    </b-row>
+    <b-row class="cc-text-big ml-4 mt-4">
+      <b-col>
+        If you need assistance then please <a id="contact-us" href="https://dls.berkeley.edu/services/bcourses-0" target="_blank">contact us</a>.
       </b-col>
     </b-row>
     <Footer :include-build-summary="true" />
@@ -35,10 +32,14 @@ import Footer from '@/components/Footer'
 import ToolboxHeader from '@/components/toolbox/ToolboxHeader'
 
 export default {
-  name: 'NotFound',
+  name: 'Error',
   components: {Footer, ToolboxHeader},
+  data: () => ({
+    message: undefined
+  }),
   mounted() {
-    this.$ready('404')
+    this.message = this.$route.query.m
+    this.$ready('Error')
   }
 }
 </script>
