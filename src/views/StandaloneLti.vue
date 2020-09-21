@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bc-main">
     <ToolboxHeader />
     <b-row class="cc-off-canvas-container" no-gutters>
       <b-col class="cc-offcanvas-right">
