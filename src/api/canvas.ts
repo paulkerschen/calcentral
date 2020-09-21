@@ -19,3 +19,15 @@ export function getRoster(courseId: number) {
 export function getRosterCsv(courseId: number) {
   return utils.get(`/api/academics/rosters/canvas/csv/${courseId}`)
 }
+
+export function getSiteMailingList(canvasCourseId: string) {
+  return utils.get(`/api/academics/canvas/mailing_lists/${canvasCourseId}`)
+}
+
+export function populateSiteMailingList(canvasCourseId: string) {
+  return utils.post(`/api/academics/canvas/mailing_lists/${canvasCourseId}/populate`)
+}
+
+export function registerSiteMailingList(canvasCourseId: string, list: any) {
+  return utils.post(`/api/academics/canvas/mailing_lists/${canvasCourseId}/create`, {listName: list.name})  	
+}

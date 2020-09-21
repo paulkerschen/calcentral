@@ -15,6 +15,9 @@
           default: return _.join(_.concat(_.initial(arr), ` and ${_.last(arr)}`), ', ')
         }
       },
+      pluralize: (noun, count, substitutions = {}, pluralSuffix = 's') => {
+        return (`${substitutions[count] || substitutions['other'] || count} ` + (count !== 1 ? `${noun}${pluralSuffix}` : noun))
+      },
       toInt: (value, defaultValue = null) => {
         const parsed = parseInt(value, 10)
         return Number.isInteger(parsed) ? parsed : defaultValue
