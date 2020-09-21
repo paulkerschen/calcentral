@@ -22,13 +22,20 @@
         small
         sort-icon-left
       >
-        <template v-slot:cell(uid)="data">
-          {{ data.item.ldapUid }}
+        <template v-slot:cell(ldapUid)="data">
+          <b-button
+            id="act-as-by-uid"
+            class="p-0"
+            variant="link"
+            @click="actAs(data.item.ldapUid)"
+          >
+            {{ data.item.ldapUid }}
+          </b-button>
         </template>
-        <template v-slot:cell(sid)="data">
+        <template v-slot:cell(studentId)="data">
           {{ data.item.studentId || '&mdash;' }}
         </template>
-        <template v-slot:cell(name)="data">
+        <template v-slot:cell(firstName)="data">
           {{ data.item.firstName }} {{ data.item.lastName }}
         </template>
         <template v-slot:cell(action)="data">
@@ -52,6 +59,10 @@
 export default {
   name: 'ActAsSaved',
   props: {
+    actAs: {
+      required: true,
+      type: Function
+    },
     action: {
       required: true,
       type: Function
@@ -81,15 +92,15 @@ export default {
     fields() {
       return [
         {
-          key: 'UID',
+          key: 'ldapUid',
           sortable: this.users.length > 2
         },
         {
-          key: 'SID',
+          key: 'studentId',
           sortable: this.users.length > 2
         },
         {
-          key: 'name',
+          key: 'firstName',
           sortable: this.users.length > 2
         },
         {

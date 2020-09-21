@@ -4,11 +4,11 @@
       <h2 class="cc-text-big">View As</h2>
     </div>
     <div>
-      <b-form @submit="actAsUser">
+      <b-form @submit="actAsUser(uidInput)">
         <div>
           <b-form-input
             id="basic-auth-uid"
-            v-model="uid"
+            v-model="uidInput"
             placeholder="Enter UID or SID"
             size="sm"
             required
@@ -18,7 +18,7 @@
           <div>
             <b-button
               id="view-as-submit"
-              :disabled="!uid || uid === $currentUser.uid"
+              :disabled="!uidInput || uidInput === $currentUser.uid"
               size="sm"
               variant="primary"
               @click="actAsUser"
@@ -34,6 +34,7 @@
     </div>
     <div v-if="$_.size(savedUsers)" class="pl-1 pt-3">
       <ActAsSaved
+        :act-as="actAsUser"
         :action="deleteSavedUser"
         action-icon="trash-alt"
         action-verb="remove"
@@ -44,6 +45,7 @@
     </div>
     <div v-if="$_.size(recentUsers)" class="pl-1 pt-3">
       <ActAsSaved
+        :act-as="actAsUser"
         :action="saveUser"
         action-icon="plus"
         action-verb="save"
@@ -74,7 +76,7 @@ export default {
   data: () => ({
     recentUsers: undefined,
     savedUsers: undefined,
-    uid: undefined
+    uidInput: undefined
   }),
   created() {
     this.refresh()
@@ -114,12 +116,10 @@ export default {
         })
       })
     },
-    actAsUser() {
-      actAs(this.uid).then(() => {
-        this.alertScreenReader(`Prepare to act as user ${this.uid}.`)
-        storeUserAsRecent(this.uid).then(() => {
-          window.location.href = '/'
-        })
+    actAsUser(uid) {
+      actAs(uid).then(() => {
+        this.alertScreenReader(`Prepare to act as user ${uid}.`)
+        storeUserAsRecent(uid).then(() => window.location.href = '/')
       })
     }
   }

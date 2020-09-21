@@ -14,6 +14,10 @@
           case 2: return `${_.head(arr)} and ${_.last(arr)}`
           default: return _.join(_.concat(_.initial(arr), ` and ${_.last(arr)}`), ', ')
         }
+      },
+      toInt: (value, defaultValue = null) => {
+        const parsed = parseInt(value, 10)
+        return Number.isInteger(parsed) ? parsed : defaultValue
       }
     }
   }

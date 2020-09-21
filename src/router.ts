@@ -4,7 +4,7 @@ import BaseView from '@/views/BaseView.vue'
 import Error from '@/views/Error.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
-import RosterPhotos from '@/views/RosterPhotos.vue'
+import Roster from '@/views/Roster.vue'
 import Router from 'vue-router'
 import SiteMailingLists from '@/components/bcourses/SiteMailingLists.vue'
 import StandaloneLti from '@/views/StandaloneLti.vue'
@@ -64,8 +64,8 @@ const router = new Router({
           path: '/canvas',
           children: [
             {
-              component: RosterPhotos,
-              path: '/canvas/roster_photos',
+              component: Roster,
+              path: '/canvas/rosters/:id',
               meta: {
                 title: 'bCourses Roster Photos'
               }
