@@ -5,7 +5,7 @@ module.exports = {
   	loaderOptions: {
   	  scss: {
   	  	// Make global SCSS variables available to scoped styles in individual components.
-  	  	additionalData: `@import "~@/assets/styles/colors.scss"; @import "~@/assets/styles/_canvas_colors.scss"; @import "~@/assets/styles/_canvas_base.scss";`
+  	  	additionalData: `@import "~@/assets/styles/colors.scss"; @import "~@/assets/styles/_canvas_colors.scss"; @import "~@/assets/styles/_canvas_base.scss"; @import "~@/assets/styles/_bootstrap_variables.scss";`
   	  }
   	}
   }
