@@ -11,3 +11,11 @@ export function canUserCreateSite() {
 export function importUsers(userIds: string[]) {
   return utils.post('/api/academics/canvas/user_provision/user_import', {userIds})
 }
+
+export function getRoster(courseId: number) {
+  return utils.get(`/api/academics/rosters/canvas/${courseId}`)
+}
+
+export function getRosterCsv(courseId: number) {
+  return utils.get(`/api/academics/rosters/canvas/csv/${courseId}`)
+}
