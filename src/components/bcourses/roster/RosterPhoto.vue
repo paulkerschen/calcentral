@@ -1,20 +1,14 @@
 <template>
   <div>
     <img
-      v-if="student.photo && !student.loadError"
+      v-if="student.photo"
       :alt="`Photo of ${student.first_name} ${student.last_name}`"
       :aria-label="`Photo of ${student.first_name} ${student.last_name}`"
-      data-cc-load-error-directive="student"
-      :src="student.photo"
+      class="photo"
+      :src="photoUrl"
+      tabindex="0"
+      @error="imageError"
     />
-    <div
-      v-if="!student.photo || student.loadError"
-      class="cc-image-responsive cc-page-roster-image-unavailable"
-      :title="`Photo of ${student.first_name} ${student.last_name}`"
-    >
-      <span class="sr-only">{{ `No photo available for ${student.first_name} ${student.last_name}` }}</span>
-    </div>
-    {{ student }}
   </div>
 </template>
 
@@ -26,6 +20,17 @@ export default {
       required: true,
       type: Object
     }
+  },
+  data: () => ({
+    photoUrl: undefined
+  }),
+  mounted() {
+    this.photoUrl = (this.$config.apiBaseUrl ? `${this.$config.apiBaseUrl}${this.student.photo}` : this.student.photo) || this.imageError()
+  },
+  methods: {
+    imageError() {
+      this.photoUrl = require('@/assets/images/svg/photo_unavailable_official_72x96.svg')
+    }
   }
 }
 </script>
@@ -34,5 +39,15 @@ export default {
 img {
   height: 96px;
   width: 72px;
+}
+</style>
+<style scoped>
+.photo {
+  background-image: url('~@/assets/images/svg/photo_unavailable_official_72x96.svg');
+  background-size: cover;
+  height: 96px;
+  margin: 0 auto;
+  max-width: 72px;
+  object-fit: cover;
 }
 </style>
