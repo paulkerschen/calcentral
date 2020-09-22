@@ -9,10 +9,10 @@ module EdoOracle
     def initialize
       # Build a map to restore subject-area formatting lost in Campus Solutions stripping of non-alphanumeric characters.
       @decompression_map = EdoOracle::Queries.get_subject_areas.inject({}) do |map, row|
-        compressed = self.class.compress row['subjectarea']
+        compressed = self.class.compress row['subjectArea']
         # If multiple decompressions are available, prefer the longest.
-        if !map[compressed] || (map[compressed].length < row['subjectarea'].length)
-          map[compressed] = row['subjectarea']
+        if !map[compressed] || (map[compressed].length < row['subjectArea'].length)
+          map[compressed] = row['subjectArea']
         end
         map
       end
