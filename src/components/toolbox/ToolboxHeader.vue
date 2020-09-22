@@ -1,14 +1,14 @@
 <template>
-  <b-row class="bg-header p-3 cc-masthead" no-gutters>
+  <b-row class="bg-header cc-masthead" no-gutters>
     <b-col sm="8">
-      <div class="header-text pt-1">
+      <div class="header-text mt-1 pl-3 pt-2">
         ETS bCourses Utilities
       </div>
     </b-col>
-    <b-col sm="4">
+    <b-col cols="auto" sm="4">
       <b-button
         id="log-out"
-        class="float-right p-0 text-white"
+        class="float-right text-white"
         variant="link"
         @click="exit"
       >

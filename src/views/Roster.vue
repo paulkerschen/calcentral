@@ -54,48 +54,30 @@
           </div>
         </b-col>
       </b-row>
+      <b-row :class="{'sr-only': !$config.isVueAppDebugMode}" no-gutters>
+        <b-col sm="12">
+          <div class="float-right pb-2">
+            <b-form-radio-group
+              id="toggle-view-mode"
+              v-model="viewMode"
+              :options="[
+                { text: 'Photos', value: 'photos' },
+                { text: 'List', value: 'list' }
+              ]"
+              name="radio-options"
+              size="lg"
+            ></b-form-radio-group>
+          </div>
+        </b-col>
+      </b-row>
       <b-row no-gutters>
         <b-col class="pt-5" sm="12">
-          <ul v-if="studentsFiltered.length" class="align-content-start d-flex flex-wrap">
-            <li v-for="student in studentsFiltered" :key="student.student_id" class="pl-5 pr-5 text-center">
-              <div v-if="student.profile_url">
-                <a :id="`student-profile-url-${student.student_id}`" :href="student.profile_url" target="_top">
-                  <RosterPhoto :student="student" />
-                </a>
-              </div>
-              <div v-if="!student.profile_url">
-                <a :id="`student-profile-url-${student.student_id}`" :href="`/${context}/${courseId}/profile/${student.login_id}`" target="_top">
-                  <RosterPhoto :student="student" />
-                </a>
-              </div>
-              <div v-if="!student.email">
-                <div class="cc-page-roster-student-name">{{ student.first_name }}</div>
-                <div class="cc-page-roster-student-name font-weight-bolder">
-                  {{ student.last_name }}
-                </div>
-              </div>
-              <div v-if="student.email">
-                <div class="cc-page-roster-student-name">
-                  <a :href="`mailto:${student.email}`">
-                    {{ student.first_name }}
-                  </a>
-                </div>
-                <div class="cc-page-roster-student-name font-weight-bolder">
-                  <a :id="`student-email-${student.student_id}`" :href="`mailto:${student.email}`">{{ student.last_name }}</a>
-                </div>
-              </div>
-              <div :id="`student-id-${student.student_id}`" class="cc-print-hide">
-                <span class="sr-only">Student ID: </span>
-                {{ student.student_id }}
-              </div>
-              <div v-if="student.terms_in_attendance" class="cc-page-roster-student-terms cc-print-hide">
-                Terms: {{ student.terms_in_attendance }}
-              </div>
-              <div v-if="student.majors" class="cc-page-roster-student-majors cc-print-hide">
-                {{ $_.truncate(student.majors.join(', '), {length: 50}) }}
-              </div>
-            </li>
-          </ul>
+          <div v-if="viewMode === 'list'">
+            <RosterList :course-id="courseId" :students="studentsFiltered" />
+          </div>
+          <div v-if="viewMode === 'photos'">
+            <RosterPhotos :course-id="courseId" :students="studentsFiltered" />
+          </div>
         </b-col>
       </b-row>
     </b-container>
@@ -112,26 +94,30 @@
 
 <script>
 import Context from '@/mixins/Context'
-import RosterPhoto from '@/components/bcourses/roster/RosterPhoto'
+import RosterList from '@/components/bcourses/roster/RosterList'
+import RosterPhotos from '@/components/bcourses/roster/RosterPhotos'
 import Util from '@/mixins/Utils'
 import {getRoster, getRosterCsv} from '@/api/canvas'
 
 export default {
-  name: 'RosterPhotos',
+  name: 'Roster',
   mixins: [Context, Util],
-  components: {RosterPhoto},
+  components: {RosterList, RosterPhotos},
   watch: {
     search() {
       this.updateStudentsFiltered()
+    },
+    viewMode(value) {
+      this.alertScreenReader(`View mode is '${value}'.`)
     }
   },
   data: () => ({
-    context: 'canvas',
     courseId: undefined,
     search: undefined,
     roster: undefined,
     section: null,
-    studentsFiltered: undefined
+    studentsFiltered: undefined,
+    viewMode: 'photos'
   }),
   mounted() {
     this.courseId = this.toInt(this.$_.get(this.$route, 'params.id'))
@@ -165,6 +151,11 @@ export default {
         return idxMatch && (!this.section || this.$_.includes(student.section_ccns, this.section.toString()))
       })
       this.studentsFiltered = this.sort(students)
+      let alert = this.section ? `Showing the ${this.studentsFiltered.length} students of section ${this.section}` : 'Showing all students'
+      if (snippet) {
+        alert += ` with '${snippet}' in name.`
+      }
+      this.alertScreenReader(alert)
     }
   }
 }
