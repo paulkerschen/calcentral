@@ -165,7 +165,7 @@ export default {
 }
 </script>
 
-<style scope>
+<style scoped>
 button {
   height: 38px;
   width: 76px;

@@ -35,7 +35,13 @@
               required
               aria-required="true"
             >
-            <button class="bc-canvas-button bc-canvas-button-primary" :disabled="isProcessing || !canvasSite.canvasCourseId" @click="findSiteMailingList">
+            <button 
+              id="btn-get-mailing-list"
+              type="button"
+              class="bc-canvas-button bc-canvas-button-primary"
+              :disabled="isProcessing || !canvasSite.canvasCourseId"
+              @click="findSiteMailingList"
+            >
               <span v-if="!isProcessing">Get Mailing List</span>
               <span v-if="isProcessing"><i class="fa fa-spinner fa-spin"></i> Finding ...</span>
             </button>
@@ -45,24 +51,28 @@
     </div>
 
     <div v-if="siteSelected">
-      <div class="bc-page-site-mailing-list-info-box">
-        <h2 class="bc-header bc-page-site-mailing-list-header2">
+      <div id="mailing-list-details" class="bc-page-site-mailing-list-info-box">
+        <h2 id="mailing-list-details-header" class="bc-header bc-page-site-mailing-list-header2">
           <span v-if="!listCreated" class="cc-ellipsis">{{ canvasSite.name }}</span>
           <span v-if="listCreated" class="cc-ellipsis">{{ mailingList.name }}@{{ mailingList.domain }}</span>
         </h2>
         <div v-if="listCreated">
-          <div>{{ pluralize('member', mailingList.membersCount, {'other': 'No'}) }} </div>
-          <div>Membership last updated: <strong>{{ listLastPopulated }}</strong></div>
+          <div id="mailing-list-member-count">{{ pluralize('member', mailingList.membersCount, {'other': 'No'}) }} </div>
+          <div>Membership last updated: <strong id="mailing-list-membership-last-updated">{{ listLastPopulated }}</strong></div>
           <div>
             Course site:
-            <a :href="canvasSite.url" @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)">
+            <a 
+              id="mailing-list-court-site-name"
+              :href="canvasSite.url"
+              @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)"
+            >
               {{ canvasSite.name }}  
             </a>
           </div>
         </div>
         <b-row no-gutters>
-          <b-col sm="12" md="4">{{ canvasSite.codeAndTerm }}</b-col>
-          <b-col sm="12" md="6">Site ID: {{ canvasSite.canvasCourseId }}</b-col>
+          <b-col id="mailing-list-canvas-code-and-term" sm="12" md="4">{{ canvasSite.codeAndTerm }}</b-col>
+          <b-col id="mailing-list-canvas-course-id" sm="12" md="6">Site ID: {{ canvasSite.canvasCourseId }}</b-col>
         </b-row>
         <a v-if="!listCreated" :href="canvasSite.url" @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)">
           View course site
@@ -95,6 +105,7 @@
         <div class="bc-form-actions">
           <button
             v-if="!listCreated"
+            id="btn-create-mailing-list"
             type="button"
             class="bc-canvas-button bc-canvas-button-primary"
             aria-controls="cc-page-reader-alert"
@@ -104,15 +115,23 @@
           </button>
           <button
             v-if="listCreated"
+            id="btn-populate-mailing-list"
             type="button"
             class="bc-canvas-button bc-canvas-button-primary"
             aria-controls="cc-page-reader-alert"
             @click="populateMailingList"
           >
             <span v-if="!isProcessing">Update membership from course site</span>
-            <span v-if="isProcessing"><i class="fa fa-spinner fa-spin"></i> Updating ...</span>
+            <span v-if="isCreating"><fa icon="spinner" class="mr-2 fa-spin"></fa> Creating ...</span>
           </button>
-          <button type="button" class="bc-canvas-button" @click="resetForm">Cancel</button>
+          <button 
+            id="btn-cancel"
+            type="button"
+            class="bc-canvas-button"
+            @click="resetForm"
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </div>
