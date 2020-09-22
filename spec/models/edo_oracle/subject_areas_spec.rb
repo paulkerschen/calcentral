@@ -2,7 +2,7 @@ describe EdoOracle::SubjectAreas do
 
   subject { described_class.fetch }
   before do
-    allow(EdoOracle::Queries).to receive(:get_subject_areas).and_return subject_areas.map { |area| {'subjectarea' => area} }
+    allow(EdoOracle::Queries).to receive(:get_subject_areas).and_return subject_areas.map { |area| {'subjectArea' => area} }
   end
 
   context 'a variety of subject areas' do

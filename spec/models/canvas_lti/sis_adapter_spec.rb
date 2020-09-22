@@ -66,10 +66,10 @@ describe CanvasLti::SisAdapter do
       before do
         allow(EdoOracle::Queries).to receive(:get_sections_by_ids).and_return(dummy_sections)
         allow(EdoOracle::Queries).to receive(:get_subject_areas).and_return([
-          {'subjectarea' => 'ENE,RES'},
-          {'subjectarea' => 'L & S'},
-          {'subjectarea' => 'L&S'},
-          {'subjectarea' => 'MEC ENG'}
+          {'subjectArea' => 'ENE,RES'},
+          {'subjectArea' => 'L & S'},
+          {'subjectArea' => 'L&S'},
+          {'subjectArea' => 'MEC ENG'}
         ])
       end
       let(:results) { CanvasLti::SisAdapter.get_sections_by_ids(section_ids, term_year, term_code) }
