@@ -2,14 +2,14 @@
   <div class="bc-canvas-application bc-page-site-mailing-list">
     <h1 class="bc-header bc-header1">Manage a Site Mailing List</h1>
     <div v-if="alerts.error.length" role="alert" class="bc-alert bc-alert-error">
-      <i class="fa fa-error fa-exclamation-triangle cc-left bc-icon-red bc-canvas-notice-icon"></i>
+      <fa icon="exclamation-triangle" class="cc-icon cc-left bc-icon-red bc-canvas-notice-icon"></fa>
       <div class="bc-page-site-mailing-list-notice-message">
         <div v-for="error in alerts.error" :key="error">{{ error }}</div>
       </div>
     </div>
 
     <div v-if="alerts.success.length" role="alert" class="bc-alert bc-alert-success">
-      <fa icon="check-circle" class="cc-left bc-icon-green bc-canvas-notice-icon"></fa>
+      <fa icon="check-circle" class="cc-icon cc-left bc-icon-green bc-canvas-notice-icon"></fa>
       <div class="bc-page-site-mailing-list-notice-message">
         <div v-for="success in alerts.success" :key="success">{{ success }}</div>
       </div>
@@ -51,7 +51,7 @@
           <span v-if="listCreated" class="cc-ellipsis">{{ mailingList.name }}@{{ mailingList.domain }}</span>
         </h2>
         <div v-if="listCreated">
-          <div>{{ mailingList.membersCount || 0 }} member(s)</div>
+          <div>{{ pluralize('member', mailingList.membersCount, {'other': 'No'}) }} </div>
           <div>Membership last updated: <strong>{{ listLastPopulated }}</strong></div>
           <div>
             Course site:
@@ -95,6 +95,7 @@
         <div class="bc-form-actions">
           <button
             v-if="!listCreated"
+            type="button"
             class="bc-canvas-button bc-canvas-button-primary"
             aria-controls="cc-page-reader-alert"
             @click="registerMailingList"
@@ -103,6 +104,7 @@
           </button>
           <button
             v-if="listCreated"
+            type="button"
             class="bc-canvas-button bc-canvas-button-primary"
             aria-controls="cc-page-reader-alert"
             @click="populateMailingList"
@@ -110,7 +112,7 @@
             <span v-if="!isProcessing">Update membership from course site</span>
             <span v-if="isProcessing"><i class="fa fa-spinner fa-spin"></i> Updating ...</span>
           </button>
-          <button class="bc-canvas-button" @click="resetForm">Cancel</button>
+          <button type="button" class="bc-canvas-button" @click="resetForm">Cancel</button>
         </div>
       </form>
     </div>
@@ -118,8 +120,12 @@
 </template>
 
 <script>
+import {getSiteMailingList, populateSiteMailingList, registerSiteMailingList} from '@/api/canvas'
+import Utils from '@/mixins/Utils'
+
 export default {
   name: 'SiteMailingLists',
+  mixins: [Utils],
   data: () => ({
     alerts: {
       error: [],
@@ -134,19 +140,82 @@ export default {
   }),
   methods: {
     findSiteMailingList() {
-      // TODO implement
+      this.isProcessing = true
+      getSiteMailingList(this.canvasSite.canvasCourseId).then(response => {
+        this.updateDisplay(response)
+      })
     },
     populateMailingList() {
-      // TODO implement
+      this.isProcessing = true
+      populateSiteMailingList(this.canvasSite.canvasCourseId).then(response => {
+        this.updateDisplay(response)
+        if (!response || !response.populationResults) {
+          this.alerts.error.push('The mailing list could not be populated.')
+        }
+      })
     },
     registerMailingList() {
-      // TODO implement
+      this.isProcessing = true
+      registerSiteMailingList(this.canvasSite.canvasCourseId, this.mailingList).then(response => {
+        this.updateDisplay(response)
+      })
     },
     resetForm() {
-      // TODO implement
+      this.canvasSite = {}
+      this.mailingList = {}
+      this.updateDisplay({})
     },
     trackExternalLink() {
-      // TODO implement
+      // TODO implement CLC-7512
+    },
+    updateCodeAndTerm(canvasSite) {
+      const codeAndTermArray = []
+      if (canvasSite.courseCode !== canvasSite.name) {
+        codeAndTermArray.push(canvasSite.courseCode)
+      }
+      if (canvasSite.term && canvasSite.term.name) {
+        codeAndTermArray.push(canvasSite.term.name)
+      }
+      canvasSite.codeAndTerm = codeAndTermArray.join(', ')
+    },
+    updateDisplay(data) {
+      this.alerts.success = []
+      this.alerts.error = data.errorMessages || []
+      this.canvasSite = data.canvasSite || {}
+      this.mailingList = data.mailingList || {}
+      this.siteSelected = !!this.$_.get(data, 'canvasSite.canvasCourseId')
+      this.listCreated = (this.$_.get(data, 'mailingList.state') === 'created')
+      if (this.siteSelected) {
+        this.updateCodeAndTerm(this.canvasSite)
+      }
+      if (this.listCreated) {
+        this.updateListLastPopulated(this.mailingList)
+      }
+      if (data.populationResults) {
+        this.updatePopulationResults(data.populationResults)
+      }
+      this.isProcessing = false
+    },
+    updateListLastPopulated(mailingList) {
+      if (mailingList.timeLastPopulated) {
+        this.listLastPopulated = this.$moment.unix(mailingList.timeLastPopulated.epoch).format('MMM D, YYYY')
+      } else {
+        this.listLastPopulated = 'never'
+      }
+    },
+    updatePopulationResults(populationResults) {
+      if (populationResults.success) {
+        this.alerts.success.push('Memberships were successfully updated.')
+        if (populationResults.messages.length) {
+          this.alerts.success = this.alerts.success.concat(populationResults.messages)
+        } else {
+          this.alerts.success.push('No changes in membership were found.')
+        }
+      } else {
+        this.alerts.error.push('There were errors during the last membership update.')
+        this.alerts.error = this.alerts.error.concat(populationResults.messages)
+        this.alerts.error.push('You can attempt to correct the errors by running the update again.')
+      }
     }
   }
 }
