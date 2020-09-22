@@ -11,7 +11,7 @@
         <ActAs />
       </b-col>
       <b-col :sm="canActAs ? 6 : 12">
-        <div v-if="$currentUser.isSuperUser">
+        <div v-if="$currentUser.isSuperuser">
           <Oec />
         </div>
       </b-col>

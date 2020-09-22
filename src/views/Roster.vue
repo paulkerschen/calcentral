@@ -1,6 +1,6 @@
 <template>
-  <div v-if="roster" class="cc-page-roster">
-    <b-container>
+  <div class="cc-page-roster">
+    <b-container v-if="roster">
       <b-row class="cc-page-roster cc-roster-search" no-gutters>
         <b-col sm="6">
           <div class="d-flex flex-wrap">
@@ -14,7 +14,7 @@
                 :options="roster.sections"
                 text-field="name"
                 value-field="ccn"
-                @change="onSectionChange"
+                @change="updateStudentsFiltered"
               >
                 <template v-slot:first>
                   <b-form-select-option :value="null">All sections</b-form-select-option>
@@ -81,6 +81,14 @@
         </b-col>
       </b-row>
     </b-container>
+    <div v-if="!roster">
+      <b-alert show>Downloading rosters. This may take a minute for larger classes.</b-alert>
+      <b-card>
+        <b-skeleton animation="fade" width="85%"></b-skeleton>
+        <b-skeleton animation="fade" width="55%"></b-skeleton>
+        <b-skeleton animation="fade" width="70%"></b-skeleton>
+      </b-card>
+    </div>
   </div>
 </template>
 
@@ -95,9 +103,8 @@ export default {
   mixins: [Context, Util],
   components: {RosterPhoto},
   watch: {
-    search(value) {
-      const v = this.$_.trim(value && value.toLowerCase())
-      this.studentsFiltered = v ? this.$_.filter(this.roster.students, s => s.idx.includes(v)) : this.roster.students
+    search() {
+      this.updateStudentsFiltered()
     }
   },
   data: () => ({
@@ -112,17 +119,29 @@ export default {
     this.courseId = this.toInt(this.$_.get(this.$route, 'params.id'))
     getRoster(this.courseId).then(data => {
       this.roster = data
-      this.studentsFiltered = []
+      const students = []
       this.$_.each(this.roster.students, student => {
-        student.idx = `${student.first_name} ${student.last_name}`.replace(/[^\w\s]/gi, '').toLowerCase()
-        this.studentsFiltered.push(student)
+        student.idx = this.idx(`${student.first_name} ${student.last_name}`)
+        students.push(student)
       })
+      this.studentsFiltered = this.sort(students)
       this.$ready('Roster')
     })
   },
   methods: {
-    onSectionChange() {
-
+    idx(value) {
+      return value && this.$_.trim(value).replace(/[^\w\s]/gi, '').toLowerCase()
+    },
+    sort(students) {
+      return  this.$_.sortBy(students, s => s.last_name)
+    },
+    updateStudentsFiltered() {
+      const snippet = this.idx(this.search)
+      const students = this.$_.filter(this.roster.students, student => {
+        let idxMatch = !snippet || student.idx.includes(snippet)
+        return idxMatch && (!this.section || this.$_.includes(student.section_ccns, this.section.toString()))
+      })
+      this.studentsFiltered = this.sort(students)
     }
   }
 }
