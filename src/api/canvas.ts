@@ -17,5 +17,5 @@ export function getRoster(courseId: number) {
 }
 
 export function getRosterCsv(courseId: number) {
-  return utils.get(`/api/academics/rosters/canvas/csv/${courseId}`)
+  return utils.downloadViaGet(`/api/academics/rosters/canvas/csv/${courseId}`, `course_${courseId}_rosters.csv`)
 }

@@ -2,6 +2,7 @@
   <div>
     <img
       v-if="student.photo"
+      :id="`student-photo-${student.student_id}`"
       :alt="`Photo of ${student.first_name} ${student.last_name}`"
       :aria-label="`Photo of ${student.first_name} ${student.last_name}`"
       class="photo"
