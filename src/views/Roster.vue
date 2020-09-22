@@ -1,11 +1,11 @@
 <template>
-  <div v-if="roster">
+  <div v-if="roster" class="cc-page-roster">
     <b-container>
-      <b-row>
+      <b-row class="cc-page-roster cc-roster-search" no-gutters>
         <b-col sm="6">
           <div class="d-flex flex-wrap">
-            <div>
-              <b-input placeholder="Search People"></b-input>
+            <div class="pr-2">
+              <b-input v-model="search" placeholder="Search People"></b-input>
             </div>
             <div v-if="roster.sections">
               <b-form-select
@@ -36,11 +36,10 @@
           </div>
         </b-col>
       </b-row>
-      <b-row>
-        <b-col sm="12">
-          <ul class="d-flex align-content-start flex-wrap">
-            <li v-for="student in roster.students" :key="student.student_id">
-              {{ student.student_id }}
+      <b-row no-gutters>
+        <b-col class="pt-5" sm="12">
+          <ul v-if="studentsFiltered.length" class="d-flex align-content-start flex-wrap">
+            <li v-for="student in studentsFiltered" :key="student.student_id" class="pl-5 pr-5 text-center">
               <div v-if="student.profile_url">
                 <a :href="student.profile_url" target="_top">
                   <RosterPhoto :student="student" />
@@ -52,7 +51,7 @@
                 </a>
               </div>
               <div v-if="!student.email">
-                <div class="cc-page-roster-student-name" data-ng-bind="student.first_name"></div>
+                <div class="cc-page-roster-student-name">{{ student.first_name }}</div>
                 <div class="cc-page-roster-student-name font-weight-bolder">
                   {{ student.last_name }}
                 </div>
@@ -69,7 +68,7 @@
               </div>
               <div class="cc-print-hide">
                 <span class="sr-only">Student ID: </span>
-                <span data-ng-bind="student.student_id"></span>
+                {{ student.student_id }}
               </div>
               <div v-if="student.terms_in_attendance" class="cc-page-roster-student-terms cc-print-hide">
                 Terms: {{ student.terms_in_attendance }}
@@ -82,9 +81,6 @@
         </b-col>
       </b-row>
     </b-container>
-    <div>
-      {{ roster }}
-    </div>
   </div>
 </template>
 
@@ -98,16 +94,29 @@ export default {
   name: 'RosterPhotos',
   mixins: [Context, Util],
   components: {RosterPhoto},
+  watch: {
+    search(value) {
+      const v = this.$_.trim(value && value.toLowerCase())
+      this.studentsFiltered = v ? this.$_.filter(this.roster.students, s => s.idx.includes(v)) : this.roster.students
+    }
+  },
   data: () => ({
     context: 'canvas',
     courseId: undefined,
+    search: undefined,
     roster: undefined,
-    section: null
+    section: null,
+    studentsFiltered: undefined
   }),
   mounted() {
     this.courseId = this.toInt(this.$_.get(this.$route, 'params.id'))
     getRoster(this.courseId).then(data => {
       this.roster = data
+      this.studentsFiltered = []
+      this.$_.each(this.roster.students, student => {
+        student.idx = `${student.first_name} ${student.last_name}`.replace(/[^\w\s]/gi, '').toLowerCase()
+        this.studentsFiltered.push(student)
+      })
       this.$ready('Roster')
     })
   },
