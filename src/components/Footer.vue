@@ -1,5 +1,5 @@
 <template>
-  <b-row class="bg-white fixed pb-3 pl-3 pr-4 w-100 z-max" no-gutters>
+  <b-row class="bg-white cc-print-hide fixed pb-3 pl-3 pr-4 w-100 z-max" no-gutters>
     <b-row v-if="$currentUser.isDirectlyAuthenticated || !$currentUser.isLoggedIn" class="border-top pl-2 pt-3 text-secondary w-100" no-gutters>
       <b-col sm="6">
         <div>

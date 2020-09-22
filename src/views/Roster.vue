@@ -1,7 +1,7 @@
 <template>
   <div class="cc-page-roster">
     <b-container v-if="roster" fluid>
-      <b-row align-v="start" class="cc-page-roster cc-roster-search" no-gutters>
+      <b-row align-v="start" class="cc-page-roster cc-print-hide cc-roster-search" no-gutters>
         <b-col class="pb-2 pr-2" sm="3">
           <b-input
             id="roster-search"
@@ -47,6 +47,7 @@
                 id="print-roster"
                 class="cc-button-blue"
                 variant="outline-secondary"
+                @click="printRoster"
               >
                 <fa icon="print" size="1x" variant="primary" /> Print<span class="sr-only"> roster of students</span>
               </b-button>
@@ -54,7 +55,7 @@
           </div>
         </b-col>
       </b-row>
-      <b-row :class="{'sr-only': !$config.isVueAppDebugMode}" no-gutters>
+      <b-row class=" cc-print-hide" :class="{'sr-only': !$config.isVueAppDebugMode}" no-gutters>
         <b-col sm="12">
           <div class="float-right pb-2">
             <b-form-radio-group
@@ -140,6 +141,9 @@ export default {
     },
     idx(value) {
       return value && this.$_.trim(value).replace(/[^\w\s]/gi, '').toLowerCase()
+    },
+    printRoster() {
+      this.printPage(`${this.idx(this.roster.canvas_course.name).replace(/\s/g, '-')}_roster`)
     },
     sort(students) {
       return  this.$_.sortBy(students, s => s.last_name)
