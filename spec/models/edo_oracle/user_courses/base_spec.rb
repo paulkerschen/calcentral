@@ -18,7 +18,7 @@ describe EdoOracle::UserCourses::Base do
 
     let(:subject_areas) { ['MECENG', 'MUSIC'] }
     before do
-      allow(EdoOracle::Queries).to receive(:get_subject_areas).and_return subject_areas.map { |area| {'subjectarea' => area} }
+      allow(EdoOracle::Queries).to receive(:get_subject_areas).and_return subject_areas.map { |area| {'subjectArea' => area} }
     end
 
     describe 'enrolled sections merge' do
