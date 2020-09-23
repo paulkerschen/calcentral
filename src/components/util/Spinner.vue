@@ -9,15 +9,6 @@ import Context from '@/mixins/Context.vue'
 
 export default {
   mixins: [Context],
-  props: {
-    alertPrefix: {
-      type: String,
-      default: 'The page'
-    },
-    isPlural: {
-      type: Boolean
-    }
-  },
   watch: {
     loading(value) {
       this.alert(value, true)
@@ -28,10 +19,11 @@ export default {
   },
   methods: {
     alert(isLoading, voiceIfLoaded)  {
+      const prefix = this.alertPrefix || this.$_.get(this.$route, 'meta.title') || 'Page'
       if (isLoading) {
-        this.alertScreenReader(`${this.alertPrefix} ${this.isPlural ? 'are' : 'is'} loading...`)
+        this.alertScreenReader(`${prefix} is loading...`)
       } else if (voiceIfLoaded) {
-        this.alertScreenReader(`${this.alertPrefix} ${this.isPlural ? 'have' : 'has'} loaded.`)
+        this.alertScreenReader(`${prefix} has loaded.`)
       }
     }
   }

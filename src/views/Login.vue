@@ -10,8 +10,8 @@
       <div class="pt-5">
         <b-button
           id="sign-in-button"
-          class="text-nowrap"
-          size="md"
+          class="cc-button-blue text-nowrap"
+          size="lg"
           variant="primary"
           @click="toCasLogin"
         >
@@ -26,20 +26,29 @@
 </template>
 
 <script>
+import Context from '@/mixins/Context'
 import Footer from '@/components/Footer'
 
 export default {
   name: 'Login',
+  mixins: [Context],
   components: {Footer},
   methods: {
     toCasLogin() {
       window.location.href = `${this.$config.apiBaseUrl}/auth/cas`
     }
+  },
+  created() {
+    this.alertScreenReader('Welcome. Please log in.')
   }
 }
 </script>
 
 <style scoped>
+button {
+  height: 48px;
+  width: 200px;
+}
 h1 {
   color: #025a86;
   font-size: 23px;

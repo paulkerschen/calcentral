@@ -6,25 +6,30 @@
       </div>
     </b-col>
     <b-col cols="auto" sm="4">
-      <b-button
-        id="log-out"
-        class="float-right text-white"
-        variant="link"
-        @click="exit"
-      >
-        Log out
-      </b-button>
+      <div class="mt-1 pr-3">
+        <b-button
+          id="log-out"
+          class="float-right text-white"
+          variant="link"
+          @click="exit"
+        >
+          Log out
+        </b-button>
+      </div>
     </b-col>
   </b-row>
 </template>
 
 <script>
+import Context from '@/mixins/Context'
 import {logOut} from '@/api/auth'
 
 export default {
   name: 'ToolboxHeader',
+  mixins: [Context],
   methods: {
     exit() {
+      this.alertScreenReader('Logging out.')
       logOut().then(() => {
         window.location.href = '/'
       })
