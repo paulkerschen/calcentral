@@ -93,6 +93,9 @@ module Oec
         end
 
         log :info, "Merged all rows from department sheet '#{department_item.name}'"
+
+        # Without a delay, this loop will hit enough sheets in quick succession to trigger API throttling.
+        sleep Settings.oec.google.api_delay
       end
 
       if !valid?
