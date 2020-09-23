@@ -5,6 +5,7 @@
         <b-form-input
           id="basic-auth-uid"
           v-model="uid"
+          aria-invalid="!!error"
           placeholder="UID"
           size="sm"
           required
@@ -21,13 +22,20 @@
           size="sm"
           type="password"
         ></b-form-input>
-        <b-button
-          id="basic-auth-submit-button"
-          variant="primary"
-          @click="devAuth"
-        >
-          Login
-        </b-button>
+        <b-form-invalid-feedback :state="!this.error">
+          {{ error }}
+        </b-form-invalid-feedback>
+        <div class="pt-2">
+          <b-button
+            id="basic-auth-submit-button"
+            class="cc-button-blue"
+            size="sm"
+            variant="outline-secondary"
+            @click="devAuth"
+          >
+            Login
+          </b-button>
+        </div>
       </div>
     </b-form>
   </div>
@@ -59,10 +67,11 @@ export default {
             if (data.isLoggedIn) {
               myStatus().then(data => {
                 Vue.prototype.$currentUser = data
+                this.alertScreenReader('You are logged in.')
                 this.$router.push({ path: '/' })
               })
             } else {
-              const message = this.$_.get(data, 'response.data.message') || this.$_.get(data, 'message') || 'Authentication failed'
+              const message = this.$_.get(data, 'response.data.error') || this.$_.get(data, 'response.data.message') || this.$_.get(data, 'message') || 'Authentication failed'
               this.reportError(message)
             }
           },
@@ -72,14 +81,14 @@ export default {
         )
       } else if (uid) {
         this.reportError('Password required')
-        this.$putFocusNextTick('basic-auth-uid')
       } else {
-        this.reportError('Both UID and password are required')
-        this.$putFocusNextTick('basic-auth-password')
+        this.reportError('Both UID and password are required', 'basic-auth-password')
       }
     },
-    reportError(message) {
+    reportError(message, putFocus='basic-auth-uid') {
       this.error = message
+      this.alertScreenReader(message)
+      this.$putFocusNextTick(putFocus)
     }
   }
 }

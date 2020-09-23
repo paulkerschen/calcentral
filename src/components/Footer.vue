@@ -85,7 +85,7 @@
     <b-row v-if="$config.isVueAppDebugMode" class="pl-3 w-100">
       <b-col sm="12">
         <div class="text-secondary">
-          <span class="font-weight-bolder">Screen-reader alert:</span> {{ screenReaderAlert }}
+          <span class="font-weight-bolder">Screen-reader alert:</span> {{ screenReaderAlert || '&mdash;' }}
         </div>
       </b-col>
     </b-row>

@@ -8,7 +8,9 @@ export function devAuthLogIn(uid: string, password: string) {
     password,
     uid
   }).then(response => {
-    Vue.prototype.$currentUser = response.data
+    if (response.data.isLoggedIn) {
+      Vue.prototype.$currentUser = response.data
+    }
     return response.data
   })
 }
