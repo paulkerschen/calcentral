@@ -42,6 +42,10 @@ google_proxy:
 hub_term_proxy:
   fake: true
 
+oec:
+  google:
+    api_delay: 0
+
 postgres:
   database: <%= ENV['DB_ENV_POSTGRESQL_DB'] || 'calcentral_test' %>
   username: <%= ENV['DB_ENV_POSTGRESQL_USER'] || 'calcentral_test' %>
