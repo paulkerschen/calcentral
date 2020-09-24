@@ -49,6 +49,7 @@ cat ${TOMCAT_DEPLOY}/ROOT/WEB-INF/versions/git.txt | ${LOGIT}
 
 log_info "Copying assets into ${DOC_ROOT}"
 cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/public/assets ${DOC_ROOT} | ${LOGIT}
+cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist ${DOC_ROOT} | ${LOGIT}
 
 log_info "Deleting old assets from ${DOC_ROOT}/assets"
 find ${DOC_ROOT}/assets -type f -mtime +${MAX_ASSET_AGE_IN_DAYS} -delete | ${LOGIT}
