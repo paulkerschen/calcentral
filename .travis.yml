@@ -54,7 +54,6 @@ jobs:
       if: type = push OR env(DEPLOY_JUNCTION_WAR) = true
       script:
         - npm install --production
-        - npm install -g @vue/cli
         - npm run build-vue
         - pip install --user awscli
         - aws configure list
