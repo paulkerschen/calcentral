@@ -15,6 +15,8 @@ module Oec
         if (diff_report = diff_for_department dept_code)
           update_departmental_diff(diff_report, dept_code)
         end
+        # Without a delay, this loop will hit enough sheets in quick succession to trigger API throttling.
+        sleep Settings.oec.google.api_delay
       end
       log_validation_errors
     end
