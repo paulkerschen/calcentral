@@ -59,7 +59,7 @@ terms:
   fake_now:
   # If hub term API is disabled (see hub_term_api in features flags),
   # and this flag is false, query the EDO DB for terms data.
-  # If this flag is true, use /public/json/terms.json or the file specified below.
+  # If this flag is true, use /docs/json/terms.json or the file specified below.
   use_term_definitions_json_file: false
   term_definitions_json_file:
 

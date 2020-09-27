@@ -91,12 +91,12 @@ describe MailingLists::OutgoingMessage do
           data: {
             'attachment-1' => ActionDispatch::Http::UploadedFile.new(
               filename: 'sample_student_72x96.jpg',
-              tempfile: File.new(Rails.root.join 'public', 'dummy', 'images', 'sample_student_72x96.jpg'),
+              tempfile: File.new(Rails.root.join 'config', 'images', 'sample_student_72x96.jpg'),
               type: 'image/jpg'
             ),
             'attachment-2' => ActionDispatch::Http::UploadedFile.new(
               filename: 'academic_dates.json',
-              tempfile: File.new(Rails.root.join 'public', 'dummy', 'json', 'academic_dates.json'),
+              tempfile: File.new(Rails.root.join 'test', 'data', 'dummy', 'json', 'academic_dates.json'),
               type: 'application/json'
             )
           }
@@ -108,11 +108,11 @@ describe MailingLists::OutgoingMessage do
             expect(params['attachment'].count).to eq 2
             expect(params['attachment'][0].content_type).to eq 'image/jpg'
             expect(params['attachment'][0].io.size).to be > 0
-            expect(params['attachment'][0].local_path).to eq "#{Rails.root}/public/dummy/images/sample_student_72x96.jpg"
+            expect(params['attachment'][0].local_path).to eq "#{Rails.root}/config/images/sample_student_72x96.jpg"
             expect(params['attachment'][0].original_filename).to eq 'sample_student_72x96.jpg'
             expect(params['attachment'][1].content_type).to eq 'application/json'
             expect(params['attachment'][1].io.size).to be > 0
-            expect(params['attachment'][1].local_path).to eq "#{Rails.root}/public/dummy/json/academic_dates.json"
+            expect(params['attachment'][1].local_path).to eq "#{Rails.root}/test/data/dummy/json/academic_dates.json"
             expect(params['attachment'][1].original_filename).to eq 'academic_dates.json'
           end
         end
@@ -130,7 +130,7 @@ describe MailingLists::OutgoingMessage do
           data: {
             'attachment-1' => ActionDispatch::Http::UploadedFile.new(
               filename: 'sample_student_72x96.jpg',
-              tempfile: File.new(Rails.root.join 'public', 'dummy', 'images', 'sample_student_72x96.jpg'),
+              tempfile: File.new(Rails.root.join 'config', 'images', 'sample_student_72x96.jpg'),
               type: 'image/jpg'
             )
           }

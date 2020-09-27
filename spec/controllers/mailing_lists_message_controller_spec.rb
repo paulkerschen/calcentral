@@ -80,14 +80,14 @@ describe MailingListsMessageController do
       let(:attachment_1) do
         ActionDispatch::Http::UploadedFile.new(
           filename: 'sample_student_72x96.jpg',
-          tempfile: File.new(Rails.root.join 'public', 'dummy', 'images', 'sample_student_72x96.jpg'),
+          tempfile: File.new(Rails.root.join 'config', 'images', 'sample_student_72x96.jpg'),
           type: 'image/jpg'
         )
       end
       let(:attachment_2) do
         ActionDispatch::Http::UploadedFile.new(
           filename: 'academic_dates.json',
-          tempfile: File.new(Rails.root.join 'public', 'dummy', 'json', 'academic_dates.json'),
+          tempfile: File.new(Rails.root.join 'test', 'data', 'dummy', 'json', 'academic_dates.json'),
           type: 'application/json'
         )
       end
