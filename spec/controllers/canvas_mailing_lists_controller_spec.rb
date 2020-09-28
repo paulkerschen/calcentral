@@ -28,7 +28,7 @@ describe CanvasMailingListsController do
   end
 
   def fake_mailing_list(filename)
-    JSON.parse(File.read Rails.root.join('public', 'dummy', 'json', filename))
+    JSON.parse(File.read Rails.root.join('test', 'data', 'dummy', 'json', filename))
   end
 
   describe '#show' do

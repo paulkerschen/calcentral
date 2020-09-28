@@ -59,7 +59,7 @@ module Cal1card
       {
         status: 200,
         headers: {'Content-Type' => 'application/jpeg'},
-        body: File.open(Rails.root.join('public', 'dummy', 'images', 'sample_student_72x96.jpg'), 'rb').read
+        body: File.open(Rails.root.join('config', 'images', 'sample_student_72x96.jpg'), 'rb').read
       }
     end
   end
