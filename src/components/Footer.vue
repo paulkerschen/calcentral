@@ -64,9 +64,11 @@
     </b-row>
     <b-row v-if="$currentUser.isLoggedIn && !$currentUser.isDirectlyAuthenticated" class="border-top pl-3 pt-3 text-secondary w-100" no-gutters>
       <b-col class="pt-1" sm="8">
-        You are viewing as {{ $currentUser.fullName }} ({{ $currentUser.uid }}),
-        <span v-if="$currentUser.firstLoginAt">first logged in on {{ $currentUser.firstLoginAt | moment('M/D/YY') }}</span>
-        <span v-if="!$currentUser.firstLoginAt">who has never logged in to CalCentral</span>
+        <div aria-live="polite" role="alert">
+          You are viewing as {{ $currentUser.fullName }} ({{ $currentUser.uid }}),
+          <span v-if="$currentUser.firstLoginAt">first logged in on {{ $currentUser.firstLoginAt | moment('M/D/YY') }}</span>
+          <span v-if="!$currentUser.firstLoginAt">who has never logged in to CalCentral</span>
+        </div>
       </b-col>
       <b-col sm="4">
         <div class="float-right">

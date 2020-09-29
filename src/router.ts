@@ -7,6 +7,7 @@ import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
 import Roster from '@/views/Roster.vue'
 import Router from 'vue-router'
+import SiteCreation from '@/views/SiteCreation.vue'
 import SiteMailingList from '@/components/bcourses/SiteMailingList.vue'
 import SiteMailingLists from '@/components/bcourses/SiteMailingLists.vue'
 import StandaloneLti from '@/views/StandaloneLti.vue'
@@ -77,6 +78,13 @@ const router = new Router({
               path: '/canvas/rosters/:id',
               meta: {
                 title: 'bCourses Roster Photos'
+              }
+            },
+            {
+              component: SiteCreation,
+              path: '/canvas/site_creation',
+              meta: {
+                title: 'bCourses Site Creation'
               }
             },
             {
