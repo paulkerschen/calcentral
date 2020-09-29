@@ -8,5 +8,15 @@ module.exports = {
   	  	additionalData: `@import "~@/assets/styles/colors.scss"; @import "~@/assets/styles/_canvas_colors.scss"; @import "~@/assets/styles/_canvas_base.scss"; @import "~@/assets/styles/_bootstrap_variables.scss";`
   	  }
   	}
+  },
+  pages: {
+    index: {
+      entry: 'src/main.ts',
+      template: 'public/index.html'
+    },
+    lti: {
+      entry: 'src/main.ts',
+      template: 'public/lti.html'
+    }
   }
 }
