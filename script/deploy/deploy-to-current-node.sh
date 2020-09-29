@@ -36,10 +36,6 @@ function log_info {
 
 touch "${DOC_ROOT}/calcentral-in-maintenance"
 
-if [ ! -f "${DOC_ROOT}/index.html" ]; then
-  cp -p "${DOC_ROOT}/index_maintenance.html" "${DOC_ROOT}/index.html"
-fi
-
 ./script/deploy/_download-war-for-tomcat.sh || { log_error "download-war-for-tomcat failed"; exit 1; }
 
 if [[ "$(uname -n)" = *-01\.ist.berkeley.edu ]]; then
