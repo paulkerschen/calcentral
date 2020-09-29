@@ -13,13 +13,13 @@
     }
 
     // Load the JavaScript customizations
-    $.getScript(window.CALCENTRAL + '/canvas/canvas-customization.js');
+    $.getScript(window.CALCENTRAL + '/static/canvas/canvas-customization.js');
 
     // Load the CSS customizations
     var css = $('<link>', {
       'rel': 'stylesheet',
       'type': 'text/css',
-      'href': window.CALCENTRAL + '/canvas/canvas-customization.css'
+      'href': window.CALCENTRAL + '/static/canvas/canvas-customization.css'
     });
     $('head').append(css);
   };

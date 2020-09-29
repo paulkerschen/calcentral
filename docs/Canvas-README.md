@@ -69,7 +69,8 @@ Sets the app to show up as a Course site tool, visible to teachers and admins, a
 
 ### Dependencies
 
-Canvas is configured on the account level to include [Javascript](../public/canvas/canvas-customization.js) and [CSS](../public/canvas/canvas-skin.css) from the CalCentral server. Some modifications to the Canvas user interface are being made by the Javascript included within Canvas. Please note the following:
+Canvas is configured on the account level to include
+[Javascript](../public/canvas/canvas-customization.js) and [CSS](../public/canvas/canvas-skin.css) from the CalCentral server. Some modifications to the Canvas user interface are being made by the Javascript included within Canvas. Please note the following:
 
 * A modification is made to the '+ People' button displayed on the 'People' section within a Canvas course site. This button triggers the content of the popup window that is displayed to be replaced with bCourses specific instructions, including a  link to the 'Find a Person to Add' LTI application. This [modification](../public/canvas/canvas-customization.js#L9) relies on the public [CanvasController#external_tools](../app/controllers/canvas_controller.rb#L16) API end-point to obtain the LTI application ID for the 'Find a Person to Add' LTI application within the cloud hosted Canvas system.
 * A [modification](../public/canvas/canvas-customization.js#L69) is made to the Canvas Dashboard page, and Course index page, which inserts a 'Create a Course Site' button in the main content area, aligned to the right. This modification also relies on the Canvas external tools API end-point to generate the URL for the 'Create a Course Site' LTI application.
