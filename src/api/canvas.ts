@@ -29,5 +29,9 @@ export function populateSiteMailingList(canvasCourseId: string) {
 }
 
 export function registerSiteMailingList(canvasCourseId: string, list: any) {
-  return utils.post(`/api/academics/canvas/mailing_lists/${canvasCourseId}/create`, {listName: list.name})  	
+  return utils.post(`/api/academics/canvas/mailing_lists/${canvasCourseId}/create`, {listName: list.name})
+}
+
+export function getSiteCreationAuthorizations() {
+  return utils.get('/api/academics/canvas/site_creation/authorizations')
 }

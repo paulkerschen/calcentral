@@ -55,7 +55,7 @@
         <div class="small-12 medium-3 columns">
           <div class="bc-page-site-creation-feature-icon-container">
             <div class="bc-page-site-creation-feature-icon-box">
-              <i class="fa fa-cubes bc-page-site-creation-feature-icon"></i>
+              <fa icon="cubes" class="bc-page-site-creation-feature-icon"></fa>
             </div>
           </div>
         </div>
@@ -96,6 +96,7 @@
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import Context from '@/mixins/Context'
 import Util from '@/mixins/Utils'
+import {getSiteCreationAuthorizations} from '@/api/canvas'
 
 export default {
   name: 'SiteCreation',
@@ -110,6 +111,12 @@ export default {
     linkToCreateCourseSite: undefined,
     linkToCreateProjectSite: undefined
   }),
+  created() {
+    getSiteCreationAuthorizations().then(data => {
+      this.canCreateCourseSite = data.authorizations.canCreateCourseSite
+      this.canCreateProjectSite = data.authorizations.canCreateProjectSite
+    })
+  },
   methods: {
 
   }
