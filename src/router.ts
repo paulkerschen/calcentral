@@ -2,6 +2,7 @@ import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
 import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
+import EmbeddedLti from '@/views/EmbeddedLti.vue'
 import Error from '@/views/Error.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
@@ -51,7 +52,7 @@ const router = new Router({
     },
     {
       path: '/',
-      beforeEnter: auth.requiresAdmin,
+      beforeEnter: auth.requiresAuthenticated,
       component: BaseView,
       children: [
         {
@@ -107,6 +108,36 @@ const router = new Router({
               meta: {
                 title: 'bCourses User Provision'
               }
+            }
+          ]
+        },
+        {
+          component: EmbeddedLti,
+          path: '/canvas/embedded',
+          children: [
+            {
+              component: CourseGradeExport,
+              path: '/canvas/embedded/course_grade_export'
+            },
+            {
+              component: Roster,
+              path: '/canvas/embedded/rosters'
+            },
+            {
+              component: SiteCreation,
+              path: '/canvas/embedded/site_creation'
+            },
+            {
+              component: SiteMailingList,
+              path: '/canvas/embedded/site_mailing_list'
+            },
+            {
+              component: SiteMailingLists,
+              path: '/canvas/embedded/site_mailing_lists'
+            },
+            {
+              component: UserProvision,
+              path: '/canvas/embedded/user_provision'
             }
           ]
         }
