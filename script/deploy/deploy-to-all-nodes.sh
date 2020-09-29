@@ -31,7 +31,6 @@ function log_info {
 
 if [ "$(./script/deploy/_is_deploy_necessary.sh)" == "true" ]; then
 
-  cp -p "${DOC_ROOT}/index_maintenance.html" "${DOC_ROOT}/index.html"
   touch "${DOC_ROOT}/calcentral-in-maintenance"
 
   log_info "Delegating deploy to Capistrano..."
