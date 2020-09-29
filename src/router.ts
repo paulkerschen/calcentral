@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
+import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
 import Error from '@/views/Error.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/NotFound.vue'
@@ -64,6 +65,13 @@ const router = new Router({
           component: StandaloneLti,
           path: '/canvas',
           children: [
+            {
+              component: CourseGradeExport,
+              path: '/canvas/course_grade_export/:id',
+              meta: {
+                title: 'E-Grade Export'
+              }
+            },
             {
               component: Roster,
               path: '/canvas/rosters/:id',
