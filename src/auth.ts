@@ -11,7 +11,7 @@ const goToLogin = (to: any, next: any) => {
 }
 
 export default {
-  requiresAdmin: (to: any, from: any, next: any) => {
+  requiresAuthenticated: (to: any, from: any, next: any) => {
     const currentUser = Vue.prototype.$currentUser
     if (currentUser.isLoggedIn) {
       next()
