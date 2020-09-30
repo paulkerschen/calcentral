@@ -18,13 +18,16 @@ export default {
      * Canvas 5000px limit, in which case our own listener handles it.
      */
     iframeUpdateHeight() {
-      var frameHeight = this.$refs.main.scrollHeight
-      var messageSubject = frameHeight > 5000 ? 'changeParent' : 'lti.frameResize'
-      var message = {
-        subject: messageSubject,
-        height: frameHeight
+      const mainElement = this.$refs.main
+      if (mainElement) {
+        const frameHeight = mainElement.scrollHeight
+        const messageSubject = frameHeight > 5000 ? 'changeParent' : 'lti.frameResize'
+        const message = {
+          subject: messageSubject,
+          height: frameHeight
+        }
+        this.iframePostMessage(JSON.stringify(message))
       }
-      this.iframePostMessage(JSON.stringify(message))
     }
   },
   mounted() {

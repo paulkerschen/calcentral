@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import {getSiteMailingList, populateSiteMailingList, registerSiteMailingList} from '@/api/canvas'
+import {createSiteMailingListAdmin, getSiteMailingListAdmin, populateSiteMailingList} from '@/api/canvas'
 import Utils from '@/mixins/Utils'
 
 export default {
@@ -160,7 +160,7 @@ export default {
   methods: {
     findSiteMailingList() {
       this.isProcessing = true
-      getSiteMailingList(this.canvasSite.canvasCourseId).then(response => {
+      getSiteMailingListAdmin(this.canvasSite.canvasCourseId).then(response => {
         this.updateDisplay(response)
       })
     },
@@ -175,7 +175,7 @@ export default {
     },
     registerMailingList() {
       this.isProcessing = true
-      registerSiteMailingList(this.canvasSite.canvasCourseId, this.mailingList).then(response => {
+      createSiteMailingListAdmin(this.canvasSite.canvasCourseId, this.mailingList).then(response => {
         this.updateDisplay(response)
       })
     },

@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import {getSiteMailingList, registerSiteMailingList} from '@/api/canvas'
+import {createSiteMailingList, getSiteMailingList} from '@/api/canvas'
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Utils from '@/mixins/Utils'
 
@@ -74,7 +74,7 @@ export default {
   methods: {
     createMailingList() {
       this.isCreating = true
-      registerSiteMailingList(this.canvasCourseId, this.mailingList).then(response => {
+      createSiteMailingList(this.canvasCourseId, this.mailingList).then(response => {
         this.updateDisplay(response)
       })
     },

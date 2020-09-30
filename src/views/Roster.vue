@@ -74,10 +74,10 @@
       <b-row no-gutters>
         <b-col class="pt-5" sm="12">
           <div v-if="viewMode === 'list'">
-            <RosterList :course-id="courseId" :students="studentsFiltered" />
+            <RosterList :course-id="canvasCourseId" :students="studentsFiltered" />
           </div>
           <div v-if="viewMode === 'photos'">
-            <RosterPhotos :course-id="courseId" :students="studentsFiltered" />
+            <RosterPhotos :course-id="canvasCourseId" :students="studentsFiltered" />
           </div>
         </b-col>
       </b-row>
@@ -114,7 +114,7 @@ export default {
     }
   },
   data: () => ({
-    courseId: undefined,
+    canvasCourseId: undefined,
     search: undefined,
     roster: undefined,
     section: null,
@@ -125,7 +125,7 @@ export default {
     this.getCanvasCourseId()
   },
   mounted() {
-    getRoster(this.courseId).then(data => {
+    getRoster(this.canvasCourseId).then(data => {
       this.roster = data
       const students = []
       this.$_.each(this.roster.students, student => {
@@ -138,7 +138,7 @@ export default {
   },
   methods: {
     downloadCsv() {
-      getRosterCsv(this.courseId).then(() => {
+      getRosterCsv(this.canvasCourseId).then(() => {
         this.alertScreenReader(`${this.roster.canvas_course.name} CSV downloaded`)
       })
     },
