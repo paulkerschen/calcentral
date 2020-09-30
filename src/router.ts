@@ -3,6 +3,7 @@ import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
 import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
 import CreateCourseSite from '@/views/CreateCourseSite.vue'
+import CreateProjectSite from '@/views/CreateProjectSite.vue'
 import EmbeddedLti from '@/views/EmbeddedLti.vue'
 import Error from '@/views/Error.vue'
 import Login from '@/views/Login.vue'
@@ -94,6 +95,13 @@ const router = new Router({
               path: '/canvas/create_course_site',
               meta: {
                 title: 'Create a Course Site'
+              }
+            },
+            {
+              component: CreateProjectSite,
+              path: '/canvas/create_project_site',
+              meta: {
+                title: 'Create a Project Site'
               }
             },
             {

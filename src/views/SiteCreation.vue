@@ -2,7 +2,6 @@
   <div v-if="!loading" class="bc-page-site-creation">
     <div v-if="!displayError">
       <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
-
       <div class="row">
         <div class="small-12 medium-3 columns">
           <div class="bc-page-site-creation-feature-icon-container">
@@ -31,10 +30,12 @@
             </p>
             <div class="bc-page-site-creation-feature-button-wrapper">
               <a
+                id="create-course-site"
                 :disabled="!canCreateCourseSite"
                 :href="linkToCreateCourseSite"
                 class="bc-canvas-button bc-canvas-button-primary"
                 :tabindex="createCourseSiteButtonFocus"
+                @click="goCreateCourseSite"
               >
                 Create a Course Site
               </a>
@@ -74,10 +75,12 @@
             </p>
             <div class="bc-page-site-creation-feature-button-wrapper">
               <a
+                id="create-project-site"
                 :disabled="!canCreateProjectSite"
                 :tabindex="createProjectSiteButtonFocus"
                 :href="linkToCreateProjectSite"
                 class="bc-canvas-button bc-canvas-button-primary"
+                @click="goCreateProjectSite"
               >
                 Create a Project Site
               </a>
@@ -117,6 +120,14 @@ export default {
       this.canCreateProjectSite = data.authorizations.canCreateProjectSite
       this.$ready()
     })
+  },
+  methods: {
+    goCreateCourseSite() {
+      this.$router.push({ path: '/canvas/create_course_site' })
+    },
+    goCreateProjectSite() {
+      this.$router.push({ path: '/canvas/create_project_site' })
+    }
   }
 }
 </script>
