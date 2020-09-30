@@ -19,7 +19,6 @@ export default {
      */
     iframeUpdateHeight() {
       var frameHeight = this.$refs.main.scrollHeight
-      console.log(frameHeight)
       var messageSubject = frameHeight > 5000 ? 'changeParent' : 'lti.frameResize'
       var message = {
         subject: messageSubject,

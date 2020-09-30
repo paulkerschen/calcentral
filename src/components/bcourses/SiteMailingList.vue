@@ -54,11 +54,12 @@
 
 <script>
 import {getSiteMailingList, registerSiteMailingList} from '@/api/canvas'
+import CanvasUtils from '@/mixins/CanvasUtils'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingList',
-  mixins: [Utils],
+  mixins: [CanvasUtils, Utils],
   data: () => ({
     alerts: {
       error: [],
@@ -92,12 +93,7 @@ export default {
   },
   created() {
     this.isLoading = true
-    const idParam = this.$_.get(this.$route, 'params.id')
-    if (idParam) {
-      this.canvasCourseId = this.toInt(idParam)
-    } else {
-      this.canvasCourseId = 'embedded'
-    }
+    this.getCanvasCourseId()
     this.getMailingList()
   }
 }
