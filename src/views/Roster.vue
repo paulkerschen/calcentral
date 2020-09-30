@@ -94,15 +94,16 @@
 </template>
 
 <script>
+import CanvasUtils from '@/mixins/CanvasUtils'
 import Context from '@/mixins/Context'
 import RosterList from '@/components/bcourses/roster/RosterList'
 import RosterPhotos from '@/components/bcourses/roster/RosterPhotos'
-import Util from '@/mixins/Utils'
+import Utils from '@/mixins/Utils'
 import {getRoster, getRosterCsv} from '@/api/canvas'
 
 export default {
   name: 'Roster',
-  mixins: [Context, Util],
+  mixins: [CanvasUtils, Context, Utils],
   components: {RosterList, RosterPhotos},
   watch: {
     search() {
@@ -120,8 +121,10 @@ export default {
     studentsFiltered: undefined,
     viewMode: 'photos'
   }),
+  created() {
+    this.getCanvasCourseId()
+  },
   mounted() {
-    this.courseId = this.toInt(this.$_.get(this.$route, 'params.id'))
     getRoster(this.courseId).then(data => {
       this.roster = data
       const students = []
