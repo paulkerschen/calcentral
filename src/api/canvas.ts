@@ -46,6 +46,10 @@ export function getSiteCreationAuthorizations() {
   return utils.get('/api/academics/canvas/site_creation/authorizations')
 }
 
+export function getCourseSections(canvasCourseId) {
+  return utils.get(`/api/academics/canvas/course_provision/sections_feed/${canvasCourseId}`)
+}
+
 // User provision
 
 export function canUserCreateSite() {
