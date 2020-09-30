@@ -115,10 +115,8 @@ export default {
     getSiteCreationAuthorizations().then(data => {
       this.canCreateCourseSite = data.authorizations.canCreateCourseSite
       this.canCreateProjectSite = data.authorizations.canCreateProjectSite
+      this.$ready()
     })
-  },
-  methods: {
-
   }
 }
 </script>

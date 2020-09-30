@@ -107,6 +107,7 @@
       </b-row>
       <b-row no-gutters>
         <b-col md="12">
+          <!-- TODO: data-cc-focus-reset-directive -->
           <h1 class="bc-page-course-grade-export-header bc-accessibility-no-outline" data-cc-focus-reset-directive="focusOnSelectionHeader">Export E-Grades</h1>
         </b-col>
       </b-row>

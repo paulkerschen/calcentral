@@ -1,6 +1,6 @@
 <template>
   <div class="bc-template-progress-bar">
-    <div class="bc-template-progress-bar-container" c-if="percentCompleteRounded">
+    <div v-if="percentCompleteRounded" class="bc-template-progress-bar-container">
       <div
         class="bc-template-progress-bar-display"
         role="progressbar"
