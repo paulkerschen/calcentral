@@ -96,6 +96,11 @@ axios.get(`${apiBaseUrl}/api/my/status`).then(response => {
     Vue.prototype.$config.apiBaseUrl = apiBaseUrl
     Vue.prototype.$config.isVueAppDebugMode = _.trim(process.env.VUE_APP_DEBUG).toLowerCase() === 'true'
 
+    // Set Axios CSRF headers for non-GET requests
+    axios.defaults.headers.post['X-CSRF-Token'] = response.data.csrfToken
+    axios.defaults.headers.put['X-CSRF-Token'] = response.data.csrfToken
+    axios.defaults.headers.delete['X-CSRF-Token'] = response.data.csrfToken
+
     new Vue({
       router,
       store,
