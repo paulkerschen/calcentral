@@ -2,6 +2,16 @@
   <div class="bc-canvas-application bc-page-course-grade-export">
     <div v-if="appState === 'initializing'" class="cc-spinner"></div>
 
+    <div v-if="appState === 'error'">
+      <div v-if="errorStatus" role="alert">
+        <p>
+          <fa icon="exclamation-triangle" class="text-warning"></fa> {{ errorStatus }}
+        </p>
+        <p v-if="contactSupport">Please contact <a href="http://www.ets.berkeley.edu/discover-services/bcourses">bCourses support</a> for further assistance.</p>
+        <p v-if="unexpectedContactSupport">If this is not expected, please contact <a href="http://www.ets.berkeley.edu/discover-services/bcourses">bCourses support</a> for further assistance.</p>
+      </div>
+    </div>
+
     <b-container v-if="appState === 'preselection'">
       <b-row no-gutters>
         <b-col md="12">
@@ -116,9 +126,11 @@
       </b-row>
       <b-row v-if="officialSections.length > 1" no-gutters>
         <h2 class="bc-page-course-grade-export-download-header">Select section</h2>
+      </b-row>
+      <b-row v-if="officialSections.length > 1" no-gutters>
         <b-col md="5">
           <select id="course-sections" v-model="selectedSection" class="bc-form-input-select">
-            <option v-for="section in officialSections" :key="section" :value="section">
+            <option v-for="section in officialSections" :key="section.display_name" :value="section">
               {{ section.display_name }}
             </option>
           </select>
@@ -138,7 +150,7 @@
                 type="radio"
                 name="enablePnpCoversion"
                 value="true"
-                @change="selectedPnpCutoffGrade = null"
+                @change="selectedPnpCutoffGrade = ''"
               />
               Automatically convert letter grades in the E-Grades export to the student-selected grading option. Please select the lowest passing letter grade.
             </label>
@@ -173,7 +185,7 @@
                 type="radio"
                 name="enablePnpConversion"
                 value="false"
-                @change="selectedPnpCutoffGrade = null"
+                @change="selectedPnpCutoffGrade = ''"
               />
               Do not automatically convert any letter grades to P/NP. I have applied a P/NP grading scheme to all grades in this course, or will manually adjust the grades in the E-Grades Export CSV to reflect the student-selected grading option.
             </label>
@@ -234,7 +246,7 @@
         </b-col>
       </b-row>
       <b-row no-gutters>
-        <b-col v-if="canvasCourseId && parentHostUrl" md="12" class="bc-page-course-grade-export-grade-link">
+        <b-col v-if="canvasCourseId && canvasRootUrl" md="12" class="bc-page-course-grade-export-grade-link">
           <button type="button" class="bc-button-link" @click="goToGradebook">Back to Gradebook</button>
         </b-col>
       </b-row>
@@ -264,32 +276,160 @@
 </template>
 
 <script>
+import {downloadGradeCsv, getCourseUserRoles, getExportJobStatus, getExportOptions, prepareGradesCacheJob} from '@/api/canvas'
+import Accessibility from '@/mixins/Accessibility'
+import CanvasUtils from '@/mixins/CanvasUtils'
+import Iframe from '@/mixins/Iframe'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
 
 export default {
   name: 'CourseGradeExport',
   components: { ProgressBar },
+  mixins: [Accessibility, CanvasUtils, Iframe],
   data: () => ({
-    appState: 'selection',
+    appState: null,
+    backgroundJobId: null,
     canvasCourseId: null,
-    enablePnpConversion: true,
+    canvasRootUrl: null,
+    contactSupport: false,
+    courseUserRoles: [],
+    enablePnpConversion: null,
+    exportTimer: null,
+    focusOnSelectionHeader: false,
     jobStatus: null,
-    letterGrades: [],
-    noGradingStandardEnabled: true,
+    letterGrades: ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'],
+    noGradingStandardEnabled: false,
     officialSections: [],
-    percentCompleteRounded: 0,
-    selectedPnpCutoffGrade: ''
+    percentCompleteRounded: null,
+    selectedPnpCutoffGrade: '',
+    selectedSection: null,
+    selectedType: null,
+    unexpectedContactSupport: false
   }),
   methods: {
+    downloadGrades() {
+      const pnpCutoff = this.enablePnpConversion === 'false' ? 'ignore' : encodeURIComponent(this.selectedPnpCutoffGrade)
+      downloadGradeCsv(
+        this.canvasCourseId,
+        this.selectedSection.course_cntl_num,
+        this.selectedSection.term_cd,
+        this.selectedSection.term_yr,
+        this.selectedType,
+        pnpCutoff
+      )
+    },
     goToCourseSettings() {
-      // TODO implement
+      const courseDetailsUrl = `${this.canvasRootUrl}/courses/${this.canvasCourseId}/settings#tab-details`
+      if (this.isInIframe) {
+        this.iframeParentLocation(courseDetailsUrl)
+      } else {
+        window.location.href = courseDetailsUrl
+      }
     },
     goToGradebook() {
-      // TODO implement
+      const gradebookUrl = `${this.canvasRootUrl}/courses/${this.canvasCourseId}/grades`
+      if (this.isInIframe) {
+        this.iframeParentLocation(gradebookUrl)
+      } else {
+        window.location.href = gradebookUrl
+      }
+    },
+    initializePnpCutoffGrades() {
+      this.enablePnpConversion = 'true'
+      this.selectedPnpCutoffGrade = ''
+    },
+    loadExportOptions() {
+      getExportOptions(this.canvasCourseId).then(response => {
+        this.loadSectionTerms(this.$_.get(response, 'sectionTerms'))
+        if (this.appState !== 'error') {
+          this.loadOfficialSections(this.$_.get(response, 'officialSections'))
+        }
+        if (this.appState !== 'error') {
+          this.appState = 'preselection'
+          if (!response.gradingStandardEnabled) {
+            this.noGradingStandardEnabled = true
+          }
+          this.initializePnpCutoffGrades()
+        }
+      })
+    },
+    loadOfficialSections(officialSections) {
+      if (!officialSections || !officialSections.length) {
+        this.appState = 'error'
+        this.errorStatus = 'None of the sections within this course site are associated with UC Berkeley course catalog sections.'
+        this.contactSupport = true
+      } else {
+        this.officialSections = officialSections
+        this.selectedSection = officialSections[0]
+      }
+    },
+    loadSectionTerms(sectionTerms) {
+      if (!sectionTerms || !sectionTerms.length) {
+        this.appState = 'error'
+        this.errorStatus = 'No sections found in this course representing a currently maintained campus term.'
+        this.unexpectedContactSupport = true
+      } else if (sectionTerms.length > 1) {
+        this.appState = 'error'
+        this.errorStatus = 'This course site contains sections from multiple terms. Only sections from a single term should be present.'
+        this.contactSupport = true      
+      } else {
+        this.sectionTerms = sectionTerms
+      }
+    },
+    preloadGrades(type) {
+      this.selectedType = type
+      this.appState = 'loading'
+      this.appfocus = true
+      this.jobStatus = 'New'
+      this.iframeScrollToTop()
+      prepareGradesCacheJob(this.canvasCourseId).then(response => {
+        if (response.jobRequestStatus === 'Success') {
+          this.backgroundJobId = response.jobId
+          this.startExportJob()
+        } else {
+          this.appState = 'error'
+          this.contactSupport = true
+          this.errorStatus = 'Grade preloading request failed'
+        }
+      })
+    },
+    startExportJob() {
+      this.exportTimer = setInterval(() => {
+        getExportJobStatus(this.canvasCourseId, this.backgroundJobId).then(response => {
+          this.jobStatus = response.jobStatus
+          this.percentCompleteRounded = Math.round(response.percentComplete * 100)
+          if (this.jobStatus !== 'New' && this.jobStatus !== 'Processing') {
+            this.percentCompleteRounded = null
+            clearInterval(this.exportTimer)
+            this.accessibilityAnnounce('Downloading export. Export form options presented for an additional download.')
+            this.switchToSelection()
+            this.downloadGrades()
+          }
+        })
+      }, 2000)
     },
     switchToSelection() {
-      // TODO implement
+      this.iframeScrollToTop()
+      this.appState = 'selection'
+      this.focusOnSelectionHeader = true
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.exportTimer)
+  },
+  created() {
+    this.appState = 'initializing'
+    this.getCanvasCourseId()
+    getCourseUserRoles(this.canvasCourseId).then(response => {
+      this.canvasRootUrl = response.canvasRootUrl
+      this.canvasCourseId = response.courseId
+      if (this.$_.includes(response.roles, 'Teacher') || this.$_.includes(response.roles, 'globalAdmin') ) {
+        this.loadExportOptions()
+      } else {
+        this.appState = 'error'
+        this.errorStatus = 'You must be a teacher in this bCourses course to export to E-Grades CSV.'
+      }
+    })
   }
 }
 </script>

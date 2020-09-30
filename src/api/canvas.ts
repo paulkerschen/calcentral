@@ -1,5 +1,11 @@
 import utils from '@/api/api-utils'
 
+// Shared
+
+export function getCourseUserRoles(canvasCourseId: string) {
+  return utils.get(`/api/academics/canvas/course_user_roles/${canvasCourseId}`)
+}
+
 // External tools
 
 export function externalTools() {
@@ -14,6 +20,32 @@ export function createSiteMailingList(canvasCourseId: string) {
 
 export function getSiteMailingList(canvasCourseId: string) {
   return utils.get(`/api/academics/canvas/mailing_list/${canvasCourseId}`)
+}
+
+// Grade export
+
+export function downloadGradeCsv(courseId: string, ccn: string, termCode: string, termYear: string, type: string, pnpCutoff: string) {
+  const queryParams = [
+    `ccn=${ccn}`,
+    `term_cd=${termCode}`,
+    `term_yr=${termYear}`,
+    `type=${type}`,
+    `pnp_cutoff=${pnpCutoff}`
+  ].join('&')
+  const filename = `egrades-${type}-${ccn}-${utils.termCodeToName(termCode)}-${termYear}-${courseId}.csv`
+  return utils.downloadViaGet(`/api/academics/canvas/egrade_export/download/${courseId}.csv?${queryParams}`, filename)
+}
+
+export function getExportOptions(canvasCourseId: string) {
+  return utils.get(`/api/academics/canvas/egrade_export/options/${canvasCourseId}`)
+}
+
+export function getExportJobStatus(canvasCourseId: string, jobId: string) {
+  return utils.get(`/api/academics/canvas/egrade_export/status/${canvasCourseId}?jobId=${jobId}`)
+}
+
+export function prepareGradesCacheJob(canvasCourseId: string) {
+  return utils.post(`/api/academics/canvas/egrade_export/prepare/${canvasCourseId}`)
 }
 
 // Mailing lists: endpoints requiring admin permissions
