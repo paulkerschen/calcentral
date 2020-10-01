@@ -44,14 +44,15 @@ if [ ! -d "ROOT/WEB-INF/versions" ]; then
   echo "$(date): ERROR: Missing or malformed junction.war file!" | ${LOGIT}
   exit 1
 fi
+
 echo "Last commit in junction.war deployed:" | ${LOGIT}
 cat ${TOMCAT_DEPLOY}/ROOT/WEB-INF/versions/git.txt | ${LOGIT}
 
 log_info "Copying assets into ${DOC_ROOT}"
 cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist ${DOC_ROOT} | ${LOGIT}
 
-log_info "Deleting old assets from ${DOC_ROOT}/assets"
-find ${DOC_ROOT}/assets -type f -mtime +${MAX_ASSET_AGE_IN_DAYS} -delete | ${LOGIT}
+log_info "Move compiled 'index.html' into ${TOMCAT_DEPLOY}/ROOT"
+cp -vf "${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist/static/index.html" "${TOMCAT_DEPLOY}/ROOT/" | ${LOGIT}
 
 # Fix file permissions for Tomcat deploys
 cd ${DOC_ROOT}
