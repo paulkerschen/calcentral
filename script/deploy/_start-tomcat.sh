@@ -53,12 +53,6 @@ cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist ${DOC_ROOT} | ${LOGIT}
 log_info "Deleting old assets from ${DOC_ROOT}/assets"
 find ${DOC_ROOT}/assets -type f -mtime +${MAX_ASSET_AGE_IN_DAYS} -delete | ${LOGIT}
 
-log_info "Copying bCourses static files into ${DOC_ROOT}"
-cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/public/canvas ${DOC_ROOT} | ${LOGIT}
-
-log_info "Copying OAuth static files into ${DOC_ROOT}"
-cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/config/oauth ${DOC_ROOT} | ${LOGIT}
-
 # Fix file permissions for Tomcat deploys
 cd ${DOC_ROOT}
 
