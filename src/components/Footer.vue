@@ -1,7 +1,7 @@
 <template>
   <b-row class="cc-print-hide pb-5 w-100" no-gutters>
     <b-col>
-      <b-container class="fixed pb-3 w-100 z-max">
+      <b-container class="tangerine-border m-0 w-100" fluid>
         <b-row
           v-if="$currentUser.isDirectlyAuthenticated || !$currentUser.isLoggedIn"
           class="mt-3 text-secondary"
@@ -138,18 +138,7 @@ h4 {
   height: 25px;
   width: 110px;
 }
-.fixed {
+.tangerine-border {
   border-top: 2px solid $cc-color-dark-tangerine;
-  bottom: 0;
-  position: fixed;
-  @media print {
-    position: relative;
-    p {
-      border-top: 2px solid #000;
-    }
-  }
-}
-.z-max {
-  z-index: 9999;
 }
 </style>

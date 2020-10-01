@@ -597,7 +597,7 @@
       'href': 'http://www.berkeley.edu',
       'title': 'University of California, Berkeley',
       'css': {
-        'backgroundImage': 'url(' + window.CALCENTRAL + '/canvas/images/ucberkeley_footer.png)'
+        'backgroundImage': 'url(' + window.CALCENTRAL + '/static/canvas/images/ucberkeley_footer.png)'
       }
     });
     $('#footer a.footer-logo').replaceWith($berkeleyLogo);

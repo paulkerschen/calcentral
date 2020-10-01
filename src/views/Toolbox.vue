@@ -23,7 +23,7 @@
         </div>
       </b-col>
     </b-row>
-    <Footer :include-build-summary="true" />
+    <Footer class="pt-5" :include-build-summary="true" />
   </b-container>
 </template>
 
