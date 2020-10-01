@@ -5,7 +5,7 @@
       isInIframe: false,
     }),
     methods: {
-      iframeParentLocation: () => {
+      iframeParentLocation: location => {
         if (this.isInIframe) {
           const message = JSON.stringify(
             {

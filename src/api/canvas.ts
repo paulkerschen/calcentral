@@ -42,6 +42,10 @@ export function getRosterCsv(courseId: number) {
 
 // Site creation
 
+export function createProjectSite(name) {
+  return utils.post('/api/academics/canvas/project_provision/create',{name})
+}
+
 export function getSiteCreationAuthorizations() {
   return utils.get('/api/academics/canvas/site_creation/authorizations')
 }

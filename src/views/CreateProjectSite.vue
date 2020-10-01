@@ -1,16 +1,16 @@
 <template>
   <!-- TODO: data-cc-spinner-directive -->
   <div class="bc-canvas-application bc-page-create-project-site" data-cc-spinner-directive>
-    <div v-if="!displayError">
+    <div v-if="!error">
       <h1 class="bc-header bc-header2">Create a Project Site</h1>
       <div
-        v-if="creatingSite"
+        v-if="isCreating"
         id="cc-page-reader-alert"
         role="alert"
         aria-live="polite"
         class="cc-visuallyhidden"
       >
-        {{ actionStatus }}
+        Now redirecting to the new project site
       </div>
       <form class="bc-canvas-page-form bc-canvas-form">
         <div class="row bc-page-create-project-site-form-fields">
@@ -23,10 +23,9 @@
             <div class="bc-page-create-project-site-form-area-container">
               <b-form-input
                 id="bc-page-create-project-site-name"
-                v-model="projectSiteName"
+                v-model="name"
                 type="text"
-                name="projectSiteName"
-                :disabled="creatingSite"
+                :disabled="isCreating"
                 placeholder="Enter a name for your site"
                 class="bc-canvas-form-input-text"
               />
@@ -36,14 +35,14 @@
 
         <div class="bc-form-actions">
           <button
-            :disabled="disableSubmit"
+            :disabled="!name || isCreating"
             aria-controls="cc-page-reader-alert"
             class="bc-canvas-button bc-canvas-button-primary"
             type="submit"
             @click="createProjectSite"
           >
-            <span v-if="!creatingSite">Create a Project Site</span>
-            <span v-if="creatingSite"><fa icon="spinner" spin></fa> Creating ...</span>
+            <span v-if="!isCreating">Create a Project Site</span>
+            <span v-if="isCreating"><fa icon="spinner" spin></fa> Creating ...</span>
           </button>
           <a
             id="link-to-site-overview"
@@ -57,29 +56,41 @@
         </div>
       </form>
     </div>
-    <div v-if="displayError" class="bc-alert-container">
-      <CanvasErrors :display-error="displayError" />
+    <div v-if="error" class="bc-alert-container">
+      <CanvasErrors :display-error="error" />
     </div>
   </div>
 </template>
 
 <script>
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
+import Iframe from '@/mixins/Iframe'
+import {createProjectSite} from '@/api/canvas'
 
 export default {
   name: 'CreateProjectSite',
   components: {CanvasErrors},
+  mixins: [Iframe],
   data: () => ({
-    actionStatus: undefined,
-    creatingSite: undefined,
-    disableSubmit: true,
-    displayError: undefined,
+    isCreating: undefined,
+    error: undefined,
     linkToSiteOverview: undefined,
-    projectSiteName: undefined
+    name: undefined
   }),
   methods: {
     createProjectSite() {
-      // TODO
+      this.isCreating = true
+      createProjectSite(this.name).then(data => {
+        if (data.projectSiteUrl) {
+          if (this.isInIframe) {
+            this.iframeParentLocation(data.projectSiteUrl)
+          } else {
+            window.location.href = data.projectSiteUrl
+          }
+        } else {
+          this.error = 'Failed to create project site.'
+        }
+      })
     }
   }
 }
