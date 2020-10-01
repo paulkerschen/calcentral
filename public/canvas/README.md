@@ -28,7 +28,7 @@ Configure the following values:
 | Nav Badge             | #ffffff                        |
 | Nav Badge Text        | #003262                        |
 | Nav Logo Background   | #003262                        |
-| Nav Logo              | `images/bcourses_lefthand.png` |
+| Nav Logo              | [bcourses_lefthand.png](public/canvas/images/bcourses_lefthand.png) |
 
 ## Watermarks & Other Images
 
@@ -36,17 +36,17 @@ Configure the following values:
 |------------------------|--------------------------------------|
 | Watermark              | N/A                                  |
 | Watermark Opacity      | 100%                                 |
-| Favicon                | `images/favicon.ico`                 |
-| Mobile Homescreen Icon | `images/bcourses_ios_icon.png`       |
+| Favicon                | [favicon.ico](public/canvas/images/favicon.ico) |
+| Mobile Homescreen Icon | [bcourses_ios_icon.png](public/canvas/images/bcourses_ios_icon.png) |
 | Windows Tile Color     | #003262                              |
-| Windows Tile: Square   | `images/bcourses_windows_square.png` |
-| Windows Tile: Wide     | `images/bcourses_windows_wide.png`   |
-| Right Sidebar Logo     | `images/bcourses_righthand.png`      |
+| Windows Tile: Square   | [bcourses_windows_square.png](public/canvas/images/bcourses_windows_square.png) |
+| Windows Tile: Wide     | [bcourses_windows_wide.png](public/canvas/images/bcourses_windows_wide.png) |
+| Right Sidebar Logo     | [bcourses_righthand.png](public/canvas/images/bcourses_righthand.png) |
 
 ## Upload
 
 | Property               | Value                     |
 |----------------------- |---------------------------|
-| JavaScript file        | `canvas-customization.js` |
+| JavaScript file        | [canvas-customization.js](public/canvas/canvas-customization.js) |
 
 **NOTE:** The `canvas-customization.js` file will by default load resources from and make API requests to CalCentral production. In order to point to a different CalCentral server, the `window.CALCENTRAL` property in the `canvas-customization.js` file should be updated to point to that server.

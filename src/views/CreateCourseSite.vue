@@ -1,6 +1,6 @@
 <template>
   <div class="bc-canvas-application bc-page-create-course-site">
-    <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
+    <div v-if="!loading && !errorType" class="bc-accessibility-no-outline">
       <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
         <h1 class="cc-visuallyhidden">Administrator Options</h1>
         <button
@@ -412,8 +412,8 @@
         </div>
       </div>
     </div>
-    <div v-if="displayError" class="bc-alert-container">
-      <CanvasErrors :display-error="displayError" />
+    <div v-if="errorType" class="bc-alert-container">
+      <CanvasErrors :display-error="errorType" />
     </div>
   </div>
 </template>
@@ -442,13 +442,13 @@ export default {
     currentSemester: undefined,
     currentSemesterName: undefined,
     currentWorkflowStep: undefined,
-    displayError: undefined,
     errorConfig: {
       header: undefined,
       supportAction: undefined,
       supportInfo: undefined
     },
     errors: undefined,
+    errorType: undefined,
     isAdmin: undefined,
     isTeacher: undefined,
     isUidInputMode: true,
@@ -464,31 +464,35 @@ export default {
     }
   }),
   mounted() {
-    this.canvasCourseId = this.$route.query.canvasCourseId || 'embedded'
-    getCourseSections(this.canvasCourseId).then(data => {
-      this.percentCompleteRounded = undefined
-      // get users feed
-      if (data) {
-        if (data.canvas_course) {
-          this.canvasCourse = data.canvas_course
-          this.isTeacher = this.canvasCourse.canEdit
-          if (data.teachingSemesters) {
-            this.loadCourseLists(data.teachingSemesters)
+    this.canvasCourseId = this.isInIframe ? 'embedded' : this.$route.query.canvasCourseId
+    if (this.canvasCourseId) {
+      getCourseSections(this.canvasCourseId).then(data => {
+        this.percentCompleteRounded = undefined
+        // get users feed
+        if (data) {
+          if (data.canvas_course) {
+            this.canvasCourse = data.canvas_course
+            this.isTeacher = this.canvasCourse.canEdit
+            if (data.teachingSemesters) {
+              this.loadCourseLists(data.teachingSemesters)
+            }
+            this.isAdmin = data.is_admin
+            this.adminActingAs = data.admin_acting_as
+            this.adminSemesters = data.admin_semesters
+            this.isCourseCreator = this.usersClassCount > 0
+            this.feedFetched = true
+            this.currentWorkflowStep = 'preview'
+          } else {
+            this.errorType = 'failure'
           }
-          this.isAdmin = data.is_admin
-          this.adminActingAs = data.admin_acting_as
-          this.adminSemesters = data.admin_semesters
-          this.isCourseCreator = this.usersClassCount > 0
-          this.feedFetched = true
-          this.currentWorkflowStep = 'preview'
         } else {
-          this.displayError = 'failure'
+          this.errorType = 'failure'
         }
-      } else {
-        this.displayError = 'failure'
-      }
-      this.$ready()
-    })
+        this.$ready()
+      })
+    } else {
+      this.errorType = 'badRequest'
+    }
   },
   methods: {
     createCourseSiteJob() {

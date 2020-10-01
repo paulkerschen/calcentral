@@ -2,7 +2,7 @@
   <div class="bc-main">
     <ToolboxHeader />
     <b-row class="cc-off-canvas-container" no-gutters>
-      <b-col class="cc-offcanvas-right">
+      <b-col class="bg-white cc-offcanvas-right pb-5">
         <div id="cc-main-content" class="cc-container-main cc-container-standalone" role="main">
           <router-view />
         </div>
