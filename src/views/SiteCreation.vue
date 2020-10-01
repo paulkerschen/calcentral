@@ -71,7 +71,7 @@
             <p class="bc-page-site-creation-feature-description">
               Project sites do not have access to all bCourses tools, including assignments, and are not intended for
               lecture, lab, or discussion sections.
-              <a href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010457">Learn more about collaboration tools available at UC Berkeley.</a>
+              <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010457">Learn more about collaboration tools available at UC Berkeley.</OutboundLink>
             </p>
             <div class="bc-page-site-creation-feature-button-wrapper">
               <a
@@ -98,13 +98,14 @@
 <script>
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import Context from '@/mixins/Context'
+import OutboundLink from '@/components/util/OutboundLink'
 import Util from '@/mixins/Utils'
 import {getSiteCreationAuthorizations} from '@/api/canvas'
 
 export default {
   name: 'SiteCreation',
   mixins: [Context, Util],
-  components: {CanvasErrors},
+  components: {CanvasErrors, OutboundLink},
   data: () => ({
     canCreateCourseSite: undefined,
     canCreateProjectSite: undefined,

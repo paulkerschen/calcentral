@@ -55,15 +55,15 @@
           <b-col sm="6">
             <div class="d-flex flex-wrap float-right">
               <div>
-                <a href="https://bcourses.berkeley.edu" target="_blank">Return to bCourses<span class="sr-only"> (link opens new browser tab)</span></a>
+                <OutboundLink href="https://bcourses.berkeley.edu">Return to bCourses</OutboundLink>
               </div>
               <div class="pl-1 pr-1">|</div>
               <div>
-                <a href="https://security.berkeley.edu/policy" target="_blank">Usage Policy<span class="sr-only"> (link opens new browser tab)</span></a>
+                <OutboundLink href="https://security.berkeley.edu/policy">Usage Policy</OutboundLink>
               </div>
               <div class="pl-1 pr-1">|</div>
               <div>
-                <a href="https://www.ets.berkeley.edu/services-facilities/bcourses" target="_blank">About<span class="sr-only"> bCourses (link opens new browser tab)</span></a>
+                <OutboundLink href="https://www.ets.berkeley.edu/services-facilities/bcourses">About<span class="sr-only"> bCourses</span></OutboundLink>
               </div>
             </div>
           </b-col>
@@ -106,12 +106,13 @@
 import BuildSummary from '@/components/util/BuildSummary'
 import Context from '@/mixins/Context'
 import DevAuth from '@/components/util/DevAuth'
+import OutboundLink from '@/components/util/OutboundLink'
 import {stopActAs} from '@/api/act'
 
 export default {
   name: 'Footer',
   mixins: [Context],
-  components: {DevAuth, BuildSummary},
+  components: {BuildSummary, DevAuth, OutboundLink},
   props: {
     includeBuildSummary: {
       required: false,

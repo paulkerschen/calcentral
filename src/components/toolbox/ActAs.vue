@@ -27,7 +27,7 @@
             </b-button>
           </div>
           <div class="pt-1">
-            <a href="https://www.berkeley.edu/directory" target="_blank">Campus Directory<span class="sr-only"> will open in a new tab</span></a>
+            <OutboundLink href="https://www.berkeley.edu/directory">Campus Directory</OutboundLink>
           </div>
         </div>
       </b-form>
@@ -60,6 +60,7 @@
 <script>
 import ActAsSaved from '@/components/toolbox/ActAsSaved'
 import Context from '@/mixins/Context'
+import OutboundLink from '@/components/util/OutboundLink'
 import {
   actAs,
   getMyStoredUsers,
@@ -71,7 +72,7 @@ import {
 
 export default {
   name: 'ActAs',
-  components: {ActAsSaved},
+  components: {ActAsSaved, OutboundLink},
   mixins: [Context],
   data: () => ({
     recentUsers: undefined,

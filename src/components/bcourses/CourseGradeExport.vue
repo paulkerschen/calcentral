@@ -41,7 +41,7 @@
             and return once completed.
           </p>
           <p class="bc-page-course-grade-export-download-description">
-            For detailed instructions, see: "<a href="https://community.canvaslms.com/docs/DOC-26521-how-do-i-enable-a-grading-scheme-for-a-course">How do I enable a grading scheme for a course?</a>"
+            For detailed instructions, see: "<OutboundLink href="https://community.canvaslms.com/docs/DOC-26521-how-do-i-enable-a-grading-scheme-for-a-course">How do I enable a grading scheme for a course?</OutboundLink>"
           </p>
         </b-col>
       </b-row>
@@ -72,13 +72,13 @@
           </ul>
           <p class="bc-page-course-grade-export-download-description">
             For detailed instructions, see:
-            "<a href="https://community.canvaslms.com/docs/DOC-17330-41521116619">How do I post grades for an assignment?</a>"
+            "<OutboundLink href="https://community.canvaslms.com/docs/DOC-17330-41521116619">How do I post grades for an assignment?</OutboundLink>"
           </p>
           <p class="bc-page-course-grade-export-download-description">
             <strong>In order to avoid errors, we suggest cross-checking final grades in the bCourses gradebook with the output CSV to confirm grades were exported as expected.</strong>
           </p>
           <p class="bc-page-course-grade-export-download-description">
-            If you have used the <a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-override-a-student-s-final-grade-in-the-Gradebook/ta-p/946">Final Grade Override</a> feature to set student grades, the override grades will be included in the export.
+            If you have used the <OutboundLink href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-override-a-student-s-final-grade-in-the-Gradebook/ta-p/946">Final Grade Override</OutboundLink> feature to set student grades, the override grades will be included in the export.
           </p>
         </b-col>
       </b-row>
@@ -240,7 +240,7 @@
           <div class="bc-page-course-grade-export-more-info-container">
             <p class="bc-page-course-grade-export-more-info">
               For more information, see
-              <a href="https://berkeley.service-now.com/kb?id=kb_article_view&sysparm_article=KB0010659&sys_kb_id=8b7818e11b1837ccbc27feeccd4bcbbe">From bCourses to E-Grades</a>
+              <OutboundLink href="https://berkeley.service-now.com/kb?id=kb_article_view&sysparm_article=KB0010659&sys_kb_id=8b7818e11b1837ccbc27feeccd4bcbbe">From bCourses to E-Grades</OutboundLink>
             </p>
           </div>
         </b-col>
@@ -280,11 +280,12 @@ import {downloadGradeCsv, getCourseUserRoles, getExportJobStatus, getExportOptio
 import Accessibility from '@/mixins/Accessibility'
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Iframe from '@/mixins/Iframe'
+import OutboundLink from '@/components/util/OutboundLink'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
 
 export default {
   name: 'CourseGradeExport',
-  components: { ProgressBar },
+  components: { OutboundLink, ProgressBar },
   mixins: [Accessibility, CanvasUtils, Iframe],
   data: () => ({
     appState: null,

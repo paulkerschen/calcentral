@@ -19,15 +19,18 @@
       <i class="fa fa-warning bc-alert-error-icon"></i>
       <div class="bc-notice-text-container">
         <h1 class="bc-notice-text-header">Unexpected Error</h1>
-        <p>Please contact <a href="http://ets.berkeley.edu/discover-services/bcourses">bCourses support</a> for further assistance.</p>
+        <p>Please contact <OutboundLink href="http://ets.berkeley.edu/discover-services/bcourses">bCourses support</OutboundLink> for further assistance.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import OutboundLink from '@/components/util/OutboundLink'
+
 export default {
   name: 'CanvasErrors',
+  components: {OutboundLink},
   props: {
     displayError: {
       required: true,
