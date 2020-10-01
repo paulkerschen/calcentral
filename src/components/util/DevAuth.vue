@@ -1,6 +1,6 @@
 <template>
   <div class="d-inline-flex">
-    <b-form class="bg-white border-0" @submit="devAuth">
+    <b-form class="border-0" @submit="devAuth">
       <div class="p-1">
         <b-form-input
           id="basic-auth-uid"

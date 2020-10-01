@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="text-center d-flex flex-column-reverse p-3 w-50">
+  <b-container fluid>
+    <b-row class="d-flex flex-column-reverse p-3 text-center w-50">
       <div class="pb-5">
         <h1>ETS Support Utilities</h1>
       </div>
@@ -18,11 +18,9 @@
           Sign In
         </b-button>
       </div>
-    </div>
-    <div>
-      <Footer :include-build-summary="true" />
-    </div>
-  </div>
+    </b-row>
+    <Footer :include-build-summary="true" />
+  </b-container>
 </template>
 
 <script>
