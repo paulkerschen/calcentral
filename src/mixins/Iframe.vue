@@ -5,7 +5,7 @@
       isInIframe: false,
     }),
     methods: {
-      iframeParentLocation: location => {
+      iframeParentLocation(location) {
         if (this.isInIframe) {
           const message = JSON.stringify(
             {
@@ -16,12 +16,12 @@
           this.iframePostMessage(message)
         }
       },
-      iframePostMessage: (message) => {
+      iframePostMessage(message) {
         if (window.parent) {
           window.parent.postMessage(message, '*')
         }
       },
-      iframeScrollToTop: () => {
+      iframeScrollToTop() {
         if (this.isInIframe) {
           const message = JSON.stringify(
             {

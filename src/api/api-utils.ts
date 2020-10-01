@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import Vue from 'vue'
 import axios from 'axios'
 
@@ -12,6 +13,17 @@ export default {
         fileDownload(response.data, filename)
       },
       () => null
+    )
+  },
+  termCodeToName(termCode: string) {
+    return _.get(
+      {
+        'A': 'Winter',
+        'B': 'Spring',
+        'C': 'Summer',
+        'D': 'Fall'
+      },
+      termCode
     )
   }
 }
