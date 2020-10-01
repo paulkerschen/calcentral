@@ -23,7 +23,7 @@
           bCourses performs scheduled maintenance every day between 8-9AM, during which time bCourses user
           and enrollment information is synchronized with other campus systems.
           This process may cause delays of up to 10 minutes before your request is completed.
-          For more information, check the <a href="http://ets.berkeley.edu/discover-services/bcourses">bCourses service page</a>.
+          For more information, check the <OutboundLink href="http://ets.berkeley.edu/discover-services/bcourses">bCourses service page</OutboundLink>.
         </p>
       </div>
     </div>
@@ -31,8 +31,11 @@
 </template>
 
 <script>
+import OutboundLink from '@/components/util/OutboundLink'
+
 export default {
   name: 'MaintenanceNotice',
+  components: {OutboundLink},
   data: () => ({
     courseActionVerb: undefined,
     maintenanceCollapsed: true
