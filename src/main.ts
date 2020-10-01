@@ -78,7 +78,11 @@ axios.interceptors.response.use(
       // Refresh user in case his/her session expired.
       return axios.get(`${apiBaseUrl}/api/my/status`).then(response => {
         Vue.prototype.$currentUser = response.data
-        axiosErrorHandler(error)
+        const errorUrl = _.get(error, 'response.config.url')
+        // Auth errors from the academics API should be handled by individual LTI components.
+        if (!(errorUrl && errorUrl.includes('/api/academics'))) {
+          axiosErrorHandler(error)
+        }
         return Promise.reject(error)
       })
     } else {
