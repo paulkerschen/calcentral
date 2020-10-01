@@ -35,7 +35,7 @@ export default {
   name: 'MaintenanceNotice',
   data: () => ({
     courseActionVerb: undefined,
-    maintenanceCollapsed: false
+    maintenanceCollapsed: true
   })
 }
 </script>
