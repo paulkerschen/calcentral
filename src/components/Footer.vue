@@ -1,5 +1,5 @@
 <template>
-  <b-row class="cc-print-hide pb-5 w-100" no-gutters>
+  <b-row v-if="!loading" class="cc-print-hide pb-5 w-100" no-gutters>
     <b-col>
       <b-container class="tangerine-border m-0 w-100" fluid>
         <b-row
