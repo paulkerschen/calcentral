@@ -6,6 +6,20 @@ export function getCourseUserRoles(canvasCourseId: string) {
   return utils.get(`/api/academics/canvas/course_user_roles/${canvasCourseId}`)
 }
 
+// Add user
+
+export function addUser(canvasCourseId: string, ldapUserId: string, sectionId: string, role: string) {
+  return utils.post(`/api/academics/canvas/course_add_user/${canvasCourseId}/add_user`, {ldapUserId, sectionId, role})
+}
+
+export function getAddUserCourseSections(canvasCourseId: string) {
+  return utils.get(`/api/academics/canvas/course_add_user/${canvasCourseId}/course_sections`)
+}
+
+export function searchUsers(canvasCourseId: string, searchText: string, searchType: string) {
+  return utils.get(`/api/academics/canvas/course_add_user/${canvasCourseId}/search_users?searchText=${searchText}&searchType=${searchType}`)
+}
+
 // External tools
 
 export function externalTools() {
