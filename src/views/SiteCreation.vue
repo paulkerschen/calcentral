@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading" class="bc-page-site-creation">
-    <div v-if="!displayError">
+    <div>
       <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
       <div class="row">
         <div class="small-12 medium-3 columns">
@@ -89,14 +89,10 @@
         </div>
       </div>
     </div>
-    <div v-if="displayError" class="bc-alert-container">
-      <CanvasErrors :display-error="displayError" />
-    </div>
   </div>
 </template>
 
 <script>
-import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import Context from '@/mixins/Context'
 import OutboundLink from '@/components/util/OutboundLink'
 import Util from '@/mixins/Utils'
@@ -105,13 +101,12 @@ import {getSiteCreationAuthorizations} from '@/api/canvas'
 export default {
   name: 'SiteCreation',
   mixins: [Context, Util],
-  components: {CanvasErrors, OutboundLink},
+  components: {OutboundLink},
   data: () => ({
     canCreateCourseSite: undefined,
     canCreateProjectSite: undefined,
     createCourseSiteButtonFocus: undefined,
     createProjectSiteButtonFocus: undefined,
-    displayError: undefined,
     linkToCreateCourseSite: undefined,
     linkToCreateProjectSite: undefined
   }),

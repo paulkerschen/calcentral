@@ -82,8 +82,30 @@ export function getSiteCreationAuthorizations() {
   return utils.get('/api/academics/canvas/site_creation/authorizations')
 }
 
+export function getCourseProvisioningMetadata() {
+  return utils.get('/api/academics/canvas/course_provision')
+}
+
 export function getCourseSections(canvasCourseId) {
   return utils.get(`/api/academics/canvas/course_provision/sections_feed/${canvasCourseId}`)
+}
+
+export function getSections(
+  adminActingAs: string,
+  adminByCcns: string[],
+  adminMode: string,
+  currentAdminSemester: string,
+  isAdmin: boolean
+) {
+  let feedUrl = '/api/academics/canvas/course_provision'
+  if (isAdmin) {
+    if ((adminMode === 'act_as') && adminActingAs) {
+      feedUrl = '/api/academics/canvas/course_provision_as/' + adminActingAs
+    } else if ((adminMode !== 'act_as') && adminByCcns) {
+      feedUrl = `/api/academics/canvas/course_provision?admin_by_ccns[]=${adminByCcns}&admin_term_slug=${currentAdminSemester}`
+    }
+  }
+  return utils.get(feedUrl)
 }
 
 // User provision
