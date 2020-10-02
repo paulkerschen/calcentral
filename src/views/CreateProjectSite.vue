@@ -57,7 +57,7 @@
       </form>
     </div>
     <div v-if="error" class="bc-alert-container">
-      <CanvasErrors :display-error="error" />
+      <CanvasErrors :message="error" />
     </div>
   </div>
 </template>

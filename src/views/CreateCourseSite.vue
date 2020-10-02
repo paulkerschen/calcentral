@@ -1,17 +1,17 @@
 <template>
-  <div class="bc-canvas-application bc-page-create-course-site">
-    <div v-if="!loading && !errorType" class="bc-accessibility-no-outline">
+  <div class="bc-canvas-application bc-page-create-course-site p-5">
+    <div v-if="!loading && !error" class="bc-accessibility-no-outline">
       <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
         <h1 class="cc-visuallyhidden">Administrator Options</h1>
         <button
           aria-controls="bc-page-create-course-site-admin-section-loader-form"
-          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch"
-          @click="isUidInputMode = !isUidInputMode"
+          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch p-2"
+          @click="adminMode = adminMode === 'act_as' ? 'by_ccn' : 'act_as'"
         >
-          Switch to {{ isUidInputMode ? 'acting as instructor' : 'CCN input' }}
+          Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
         </button>
         <div id="bc-page-create-course-site-admin-section-loader-form">
-          <div v-if="isUidInputMode">
+          <div v-if="adminMode === 'act_as'" class="pt-3">
             <h2 class="cc-visuallyhidden">Load Sections By Instructor UID</h2>
             <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form" @submit="fetchFeed">
               <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
@@ -23,17 +23,20 @@
                 type="text"
                 role="search"
               ></b-form-input>
-              <button
-                class="bc-canvas-button bc-canvas-button-primary"
-                type="submit"
-                aria-label="Load official sections for instructor"
-                aria-controls="bc-page-create-course-site-steps-container"
-              >
-                As instructor
-              </button>
+              <div class="pt-3">
+                <button
+                  class="bc-canvas-button bc-canvas-button-primary"
+                  type="submit"
+                  aria-label="Load official sections for instructor"
+                  aria-controls="bc-page-create-course-site-steps-container"
+                  @click="fetchFeed"
+                >
+                  As instructor
+                </button>
+              </div>
             </form>
           </div>
-          <div v-if="!isUidInputMode">
+          <div v-if="adminMode === 'by_ccn'">
             <h2 class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h2>
             <form class="bc-canvas-page-form" @submit="fetchFeed">
               <div v-if="$_.size(adminSemesters)">
@@ -412,8 +415,8 @@
         </div>
       </div>
     </div>
-    <div v-if="errorType" class="bc-alert-container">
-      <CanvasErrors :display-error="errorType" />
+    <div v-if="error" class="bc-alert-container pt-5">
+      <CanvasErrors :message="error" />
     </div>
   </div>
 </template>
@@ -425,7 +428,7 @@ import Context from '@/mixins/Context'
 import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
 import Utils from '@/mixins/Utils'
-import {getCourseSections} from '@/api/canvas'
+import {getCourseProvisioningMetadata, getSections} from '@/api/canvas'
 
 export default {
   name: 'CreateCourseSite',
@@ -434,6 +437,7 @@ export default {
   data: () => ({
     adminActingAs: undefined,
     adminByCcns: undefined,
+    adminMode: 'act_as',
     adminSemesters: undefined,
     canvasCourseId: undefined,
     course: undefined,
@@ -447,8 +451,8 @@ export default {
       supportAction: undefined,
       supportInfo: undefined
     },
+    error: undefined,
     errors: undefined,
-    errorType: undefined,
     isAdmin: undefined,
     isTeacher: undefined,
     isUidInputMode: true,
@@ -464,73 +468,112 @@ export default {
     }
   }),
   mounted() {
-    this.canvasCourseId = this.isInIframe ? 'embedded' : this.$route.query.canvasCourseId
-    if (this.canvasCourseId) {
-      getCourseSections(this.canvasCourseId).then(data => {
-        this.percentCompleteRounded = undefined
-        // get users feed
-        if (data) {
-          if (data.canvas_course) {
-            this.canvasCourse = data.canvas_course
-            this.isTeacher = this.canvasCourse.canEdit
-            if (data.teachingSemesters) {
-              this.loadCourseLists(data.teachingSemesters)
-            }
-            this.isAdmin = data.is_admin
-            this.adminActingAs = data.admin_acting_as
-            this.adminSemesters = data.admin_semesters
-            this.isCourseCreator = this.usersClassCount > 0
-            this.feedFetched = true
-            this.currentWorkflowStep = 'preview'
-          } else {
-            this.errorType = 'failure'
-          }
-        } else {
-          this.errorType = 'failure'
-        }
-        this.$ready()
-      })
-    } else {
-      this.errorType = 'badRequest'
-    }
+    getCourseProvisioningMetadata().then(data => {
+      this.adminActingAs = data.admin_acting_as
+      this.adminSemesters = data.admin_semesters
+      this.isAdmin = data.is_admin
+      this.teachingSemesters = data.teachingSemesters
+      this.$ready()
+    })
   },
   methods: {
+    classCount(semesters) {
+      let count = 0
+      if (this.$_.size(semesters) > 0) {
+        this.$_.each(semesters, semester => {
+          count += semester.classes.length
+        })
+      }
+      return count
+    },
+    clearCourseSiteJob() {
+      this.jobId = undefined
+      this.jobStatus = undefined
+      this.completedSteps = undefined
+      this.percentComplete = undefined
+      this.showMaintenanceNotice = true
+    },
     createCourseSiteJob() {
       this.showMaintenanceNotice = false
       // TODO
     },
     fetchFeed() {
-      // TODO
-      return []
+      this.clearCourseSiteJob()
+      this.$loading()
+      this.feedFetched = false
+      this.currentWorkflowStep = 'selecting'
+      this.selectedSectionsList = []
+      this.accessibilityAnnounce('Loading courses and sections')
+      getSections(
+        this.adminActingAs,
+        this.adminByCcns,
+        this.adminMode,
+        this.currentAdminSemester,
+        this.isAdmin
+      ).then(data => {
+        data.usersClassCount = this.classCount(data.teachingSemesters)
+        const canvasCourseId = data.canvas_course ? data.canvas_course.canvasCourseId : ''
+        this.fillCourseSites(data.teachingSemesters, canvasCourseId)
+        this.feedFetched = true
+        this.selectFocus = true
+        // TODO: Error handling?
+        // if (this.sectionsFeed.status !== 200) {
+        //   $scope.accessibilityAnnounce('Course section loading failed');
+        //   $scope.isLoading = false;
+        //   $scope.displayError = 'failure';
+        // } else {
+        this.accessibilityAnnounce('Course section loaded successfully')
+        if (this.$_.size(this.teachingSemesters) > 0) {
+          this.switchSemester(this.teachingSemesters[0])
+        }
+        if (!this.currentAdminSemester && this.$_.size(this.adminSemesters) > 0) {
+          this.switchAdminSemester(this.adminSemesters[0])
+        }
+        if (this.adminMode === 'by_ccn' && this.adminByCcns) {
+          this.selectAllSections()
+        }
+        if (!this.isAdmin && !this.usersClassCount) {
+          this.displayError = 'Sorry, you are not an admin user and you have no classes.'
+        }
+      })
     },
-    selectedSections(coursesList) {
-      // TODO
-      console.log(coursesList)
-      return []
+    fillCourseSites(semestersFeed, canvasCourseId) {
+      this.$_.each(semestersFeed, semester => {
+        this.$_.each(semester.classes, course => {
+          course.collapsed = !course.containsCourseSections
+          course.allSelected = false
+          course.selectToggleText = 'All'
+          let hasSites = false
+          let ccnToSites = {}
+          this.$_.each(course.class_sites, site => {
+            if (site.emitter === 'bCourses') {
+              if (site.id !== canvasCourseId) {
+                this.$_.each(site.sections, siteSection => {
+                  hasSites = true
+                  if (!ccnToSites[siteSection.ccn]) {
+                    ccnToSites[siteSection.ccn] = []
+                  }
+                  ccnToSites[siteSection.ccn].push(site)
+                })
+              }
+            }
+          })
+          if (hasSites) {
+            course.hasSites = hasSites
+            this.$_.each(course.sections, section => {
+              let ccn = section.ccn
+              if (ccnToSites[ccn]) {
+                section.sites = ccnToSites[ccn]
+              }
+            })
+          }
+        })
+      })
     },
-    showConfirmation() {
-      // TODO
-      return []
-    },
-    showSelecting() {
-      // TODO
-      return false
-    },
-    switchAdminSemester(semester) {
-      // TODO
-      console.log(semester)
-    },
-    switchSemester(semester) {
-      // TODO
-      console.log(semester)
-    },
-    toggleCourseSectionsWithUpdate() {
-      // TODO
-    },
-    loadCourseLists(teachingSemesters) {
+    loadCourseLists() {
       this.courseSemester = false
       // identify semester matching current course site
-      this.$_.each(teachingSemesters, semester => {
+      this.$_.each(this.teachingSemesters, semester => {
         if ((semester.termYear === this.canvasCourse.term.term_yr) && (semester.termCode === this.canvasCourse.term.term_cd)) {
           this.courseSemester = semester
         }
@@ -563,6 +606,58 @@ export default {
       } else {
         this.usersClassCount = 0
       }
+    },
+    selectedSections(coursesList) {
+      const selectedSections = []
+      this.$_.each(coursesList, course => {
+        this.$_.each(course.sections, section => {
+          if (section.selected) {
+            section.courseTitle = course.title
+            section.courseCatalog = course.course_catalog
+            selectedSections.push(section)
+          }
+        })
+      })
+      return selectedSections
+    },
+    selectAllSections() {
+      const newSelectedCourses = []
+      this.$_.each(this.coursesList, course => {
+        this.$_.each(course.sections, section => {
+          section.selected = true
+        })
+        newSelectedCourses.push(course)
+      })
+      this.coursesList = newSelectedCourses
+      this.updateSelected()
+    },
+    showConfirmation() {
+      // TODO
+      return []
+    },
+    showSelecting() {
+      // TODO
+      return false
+    },
+    switchAdminSemester(semester) {
+      this.currentAdminSemester = semester.slug
+      this.selectedSectionsList = []
+      this.updateSelected()
+
+    },
+    switchSemester(semester) {
+      this.currentSemester = semester.slug
+      this.coursesList = semester.classes
+      this.selectedSectionsList = []
+      this.currentSemesterName = semester.name
+      this.accessibilityAnnounce(`'Course sections for ${semester.name} loaded'`)
+      this.updateSelected()
+    },
+    toggleCourseSectionsWithUpdate() {
+      // TODO
+    },
+    updateSelected() {
+      this.selectedSectionsList = this.selectedSections(this.coursesList)
     }
   }
 }
