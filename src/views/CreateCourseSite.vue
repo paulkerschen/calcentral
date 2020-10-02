@@ -203,8 +203,7 @@
                         ({{ pluralize('section', course.sections.length, {0: 'No', 1: 'One'}) }})
                       </div>
                     </div>
-                    <b-collapse :id="course.course_id" v-model="course.visible" visible>
-                      {{ course.sections.length }}
+                    <b-collapse :id="course.course_id" visible>
                       <div v-if="course.sections.length > 1" class="bc-page-create-course-site-form-select-all-option">
                         Select:
                         <button
@@ -218,13 +217,8 @@
                       </div>
                       <CourseSectionsTable
                         mode="createCourseForm"
-                        :no-current-sections="noCurrentSections"
                         :sections="course.sections"
-                        :stage-add-action="$_.noop"
-                        :stage-delete-action="$_.noop"
-                        :stage-update-action="$_.noop"
-                        :unstage-action="$_.noop"
-                        update-selected="updateSelected"
+                        :update-selected="updateSelected"
                       />
                     </b-collapse>
                   </li>
@@ -355,8 +349,7 @@
           <!-- TODO: data-cc-focus-reset-directive -->
           <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="confirmFocus">Course Site Creation</h2>
           <div aria-live="polite">
-            <!-- TODO: data-ng-hide -->
-            <div data-ng-hide="jobStatus" class="bc-page-create-course-site-pending-request">
+            <div v-show="!jobStatus" class="bc-page-create-course-site-pending-request">
               <fa icon="spinner" spin></fa>
               Sending request...
             </div>
@@ -462,7 +455,8 @@ export default {
       displayHelp: false
     }
   }),
-  mounted() {
+  created() {
+    this.$loading()
     getCourseProvisioningMetadata().then(data => {
       this.adminActingAs = data.admin_acting_as
       this.adminSemesters = data.admin_semesters

@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" id="spinner-when-loading" class="spinner">
-    <fa icon="sync" size="5x" spin />
+    <b-spinner label="Spinner"></b-spinner>
   </div>
 </template>
 
@@ -30,8 +30,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .spinner {
+  color: $cc-blue;
   position: fixed;
   top: 0;
   right: 0;
