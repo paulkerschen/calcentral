@@ -36,8 +36,13 @@ import OutboundLink from '@/components/util/OutboundLink'
 export default {
   name: 'MaintenanceNotice',
   components: {OutboundLink},
+  props: {
+    courseActionVerb: {
+      type: String,
+      default: ''
+    }
+  },
   data: () => ({
-    courseActionVerb: undefined,
     maintenanceCollapsed: true
   })
 }

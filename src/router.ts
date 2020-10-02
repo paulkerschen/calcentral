@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
+import CourseAddUser from '@/components/bcourses/CourseAddUser.vue'
 import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
 import CreateCourseSite from '@/views/CreateCourseSite.vue'
 import CreateProjectSite from '@/views/CreateProjectSite.vue'
@@ -70,6 +71,13 @@ const router = new Router({
           path: '/canvas',
           children: [
             {
+              component: CourseAddUser,
+              path: '/canvas/course_add_user/:id',
+              meta: {
+                title: 'Find a User to Add'
+              }
+            },
+            {
               component: CourseGradeExport,
               path: '/canvas/course_grade_export/:id',
               meta: {
@@ -131,6 +139,10 @@ const router = new Router({
           component: EmbeddedLti,
           path: '/canvas/embedded',
           children: [
+            {
+              component: CourseAddUser,
+              path: '/canvas/embedded/course_add_user'
+            },
             {
               component: CourseGradeExport,
               path: '/canvas/embedded/course_grade_export'
