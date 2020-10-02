@@ -12,5 +12,4 @@ export default {
 
 <style lang="scss">
 @import './assets/styles/junction-global.scss';
-@import './assets/styles/lib/foundation.css';
 </style>
