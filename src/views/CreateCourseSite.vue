@@ -13,26 +13,24 @@
         <div id="bc-page-create-course-site-admin-section-loader-form">
           <div v-if="adminMode === 'act_as'" class="pt-3">
             <h2 class="cc-visuallyhidden">Load Sections By Instructor UID</h2>
-            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form" @submit="fetchFeed">
+            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit="fetchFeed">
               <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
               <b-form-input
                 id="instructor-uid"
                 v-model="adminActingAs"
-                class="cc-left"
                 placeholder="Instructor UID"
-                type="text"
                 role="search"
               ></b-form-input>
-              <div class="pt-3">
-                <button
+              <div>
+                <b-button
+                  id="sections-by-uid-button"
                   class="bc-canvas-button bc-canvas-button-primary"
-                  type="submit"
                   aria-label="Load official sections for instructor"
                   aria-controls="bc-page-create-course-site-steps-container"
                   @click="fetchFeed"
                 >
                   As instructor
-                </button>
+                </b-button>
               </div>
             </form>
           </div>
@@ -78,13 +76,14 @@
                   placeholder="Paste your list of CCNs here, separated by commas or spaces"
                 >
                 </textarea>
-                <button
+                <b-button
+                  id="sections-by-ids-button"
                   class="bc-canvas-button bc-canvas-button-primary"
                   type="submit"
                   aria-controls="bc-page-create-course-site-steps-container"
                 >
                   Review matching CCNs
-                </button>
+                </b-button>
               </div>
             </form>
           </div>
@@ -106,158 +105,151 @@
             <p>You are currently not listed as the instructor of record for any courses, so you cannot create a course site in bCourses.</p>
           </div>
           <div v-if="$_.size(teachingSemesters)">
-            <div class="row collapse">
-              <div class="medium-5 columns">
-                <div class="bc-buttonset">
-                  <!-- TODO: data-cc-focus-reset-directive -->
-                  <h2
-                    class="bc-page-create-course-site-header bc-page-create-course-site-header2 bc-accessibility-no-outline"
-                    data-cc-focus-reset-directive="selectFocus"
+            <div class="medium-5 columns">
+              <div class="bc-buttonset">
+                <!-- TODO: data-cc-focus-reset-directive -->
+                <h2
+                  class="bc-page-create-course-site-header bc-page-create-course-site-header2 bc-accessibility-no-outline"
+                  data-cc-focus-reset-directive="selectFocus"
+                >
+                  Term
+                </h2>
+                <span v-for="(semester, index) in teachingSemesters" :key="index">
+                  <input
+                    :id="`semester${index}`"
+                    type="radio"
+                    name="semester"
+                    class="cc-visuallyhidden"
+                    :aria-selected="currentSemester === semester.slug"
+                    role="tab"
+                    @click="switchSemester(semester)"
+                  />
+                  <label
+                    :for="`semester${index}`"
+                    class="bc-buttonset-button"
+                    aria-disabled="false"
+                    :class="{
+                      'bc-buttonset-button-active': currentSemester === semester.slug,
+                      'bc-buttonset-corner-left': !index,
+                      'bc-buttonset-corner-right': (index === $_.size(teachingSemesters) - 1)
+                    }"
                   >
-                    Term
-                  </h2>
-                  <span v-for="(semester, index) in teachingSemesters" :key="index">
-                    <input
-                      :id="`semester${index}`"
-                      type="radio"
-                      name="semester"
-                      class="cc-visuallyhidden"
-                      :aria-selected="currentSemester === semester.slug"
-                      role="tab"
-                      @click="switchSemester(semester)"
-                    />
-                    <label
-                      :for="`semester${index}`"
-                      class="bc-buttonset-button"
-                      aria-disabled="false"
-                      :class="{
-                        'bc-buttonset-button-active': currentSemester === semester.slug,
-                        'bc-buttonset-corner-left': !index,
-                        'bc-buttonset-corner-right': (index === $_.size(teachingSemesters) - 1)
-                      }"
-                    >
-                      {{ semester.name }}
-                    </label>
-                  </span>
-                </div>
+                    {{ semester.name }}
+                  </label>
+                </span>
               </div>
             </div>
-            <div class="row collapse">
-              <div class="medium-12 columns">
-                <h2 class="bc-page-create-course-site-header bc-page-create-course-site-header2">Official Sections</h2>
-                <p>All official sections you select below will be put in ONE, single course site.</p>
-                <div class="bc-page-help-notice bc-page-create-course-site-help-notice">
-                  <fa icon="question-circle" class="cc-left bc-page-help-notice-icon"></fa>
-                  <div class="bc-page-help-notice-left-margin">
-                    <button
-                      class="bc-button-link"
-                      aria-haspopup="true"
-                      aria-controls="section-selection-help"
-                      :aria-expanded="toggle.displayHelp"
-                      @click="toggle.displayHelp = !toggle.displayHelp"
+            <div class="medium-12 columns">
+              <h2 class="bc-page-create-course-site-header bc-page-create-course-site-header2">Official Sections</h2>
+              <p>All official sections you select below will be put in ONE, single course site.</p>
+              <div class="bc-page-help-notice bc-page-create-course-site-help-notice">
+                <fa icon="question-circle" class="cc-left bc-page-help-notice-icon"></fa>
+                <div class="bc-page-help-notice-left-margin pl-1">
+                  <button
+                    class="bc-button-link"
+                    aria-haspopup="true"
+                    aria-controls="section-selection-help"
+                    :aria-expanded="toggle.displayHelp"
+                    @click="toggle.displayHelp = !toggle.displayHelp"
+                  >
+                    Need help deciding which official sections to select?
+                  </button>
+                  <div aria-live="polite">
+                    <div
+                      v-if="toggle.displayHelp"
+                      id="section-selection-help"
+                      class="bc-page-help-notice-content"
                     >
-                      Need help deciding which official sections to select?
-                    </button>
-                    <div aria-live="polite">
-                      <div
-                        v-if="toggle.displayHelp"
-                        id="section-selection-help"
-                        class="bc-page-help-notice-content"
-                      >
-                        <p>If you have a course with multiple sections, you will need to decide whether you want to:</p>
-                        <ol class="bc-page-create-course-site-help-notice-ordered-list">
-                          <li>
-                            Create one, single course site which includes official sections for both your primary and secondary sections, or
-                          </li>
-                          <li>
-                            Create multiple course sites, perhaps with one for each section, or
-                          </li>
-                          <li>
-                            Create separate course sites based on instruction mode.
-                            <a target="_blank" href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010732#instructionmode">
-                              Learn more about instruction modes in bCourses.
-                            </a>
-                          </li>
-                        </ol>
-                      </div>
+                      <p>If you have a course with multiple sections, you will need to decide whether you want to:</p>
+                      <ol class="bc-page-create-course-site-help-notice-ordered-list">
+                        <li>
+                          Create one, single course site which includes official sections for both your primary and secondary sections, or
+                        </li>
+                        <li>
+                          Create multiple course sites, perhaps with one for each section, or
+                        </li>
+                        <li>
+                          Create separate course sites based on instruction mode.
+                          <a target="_blank" href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010732#instructionmode">
+                            Learn more about instruction modes in bCourses.
+                          </a>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="row collapse">
-              <div class="medium-12 columns">
-                <form class="bc-canvas-page-form" @submit="showConfirmation">
-                  <ul class="bc-page-create-course-site-section-margin">
-                    <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
-                      <button
-                        type="button"
-                        class="bc-button-link bc-page-create-course-site-form-course-button"
-                        :aria-controls="course.course_id"
-                        :aria-label="`Toggle course sections list for ${course.course_code} ${course.title}`"
-                        :aria-expanded="!course.collapsed"
-                        @click="course.collapsed = !course.collapsed"
-                      >
-                        <fa :icon="course.collapsed ? 'caret-right' : 'caret-down'" class="cc-left bc-sections-triangle-icon"></fa>
-                        <h3 class="bc-sections-course-title">
-                          {{ course.course_code }}
-                          <span v-if="course.title"> : {{ course.title }}</span>
-                        </h3>
-                        <span v-if="$_.size(course.sections)">
-                          ({{ pluralize('section', course.sections.length, {'one': '1', 'other': 'No'}) }})
-                        </span>
-                      </button>
-                      <div
-                        v-if="!course.collapsed"
-                        :id="course.course_id"
-                        class="bc-page-create-course-site-form-collapsible-container"
-                        :aria-expanded="!course.collapsed"
-                        role="region"
-                      >
-                        <div v-if="course.sections.length > 1" class="bc-page-create-course-site-form-select-all-option">
-                          Select:
-                          <button
-                            :aria-label="`Select ${course.selectToggleText} of the course sections`"
-                            class="bc-button-link bc-page-create-course-site-form-select-all-option-button"
-                            type="button"
-                            @click="toggleCourseSectionsWithUpdate(course)"
-                          >
-                            {{ course.selectToggleText }}
-                          </button>
-                        </div>
-                        <!-- TODO: data-bc-sections-table -->
-                        <div
-                          data-bc-sections-table
-                          data-list-mode="'createCourseForm'"
-                          data-sections-list="course.sections"
-                          data-row-display-logic="rowDisplayLogic()"
-                          data-update-selected="updateSelected()"
-                        ></div>
+            <div class="medium-12 columns">
+              <form class="bc-canvas-page-form" @submit="showConfirmation">
+                <ul class="bc-page-create-course-site-section-margin">
+                  <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
+                    <div class="d-flex">
+                      <div>
+                        <b-button
+                          :aria-expanded="course.visible"
+                          class="pb-0 pt-0"
+                          variant="link"
+                          @click="course.visible = !course.visible"
+                        >
+                          <fa :icon="course.visible ? 'caret-down' : 'caret-right'" />
+                          <span class="sr-only">Toggle course sections list for {{ course.course_code }} {{ course.title }}</span>
+                        </b-button>
                       </div>
-                    </li>
-                  </ul>
-                  <div class="bc-form-actions">
-                    <button
-                      class="bc-canvas-button bc-canvas-button-primary"
-                      type="submit"
-                      :disabled="!selectedSectionsList.length"
-                      aria-controls="bc-page-create-course-site-steps-container"
-                      aria-label="Continue to next step"
-                      role="button"
-                    >
-                      Next
-                    </button>
-                    <a
-                      :href="linkToSiteOverview"
-                      class="bc-canvas-button"
-                      type="reset"
-                      aria-label="Cancel and return to Site Creation Overview"
-                    >
-                      Cancel
-                    </a>
-                  </div>
-                </form>
-              </div>
+                      <div>
+                        <h3 class="bc-sections-course-title">{{ course.course_code }}<span v-if="course.title">: {{ course.title }}</span></h3>
+                      </div>
+                      <div v-if="$_.size(course.sections)" class="ml-1">
+                        ({{ pluralize('section', course.sections.length, {0: 'No', 1: 'One'}) }})
+                      </div>
+                    </div>
+                    <b-collapse :id="course.course_id" v-model="course.visible" visible>
+                      {{ course.sections.length }}
+                      <div v-if="course.sections.length > 1" class="bc-page-create-course-site-form-select-all-option">
+                        Select:
+                        <button
+                          :aria-label="`Select ${course.selectToggleText} of the course sections`"
+                          class="bc-button-link bc-page-create-course-site-form-select-all-option-button"
+                          type="button"
+                          @click="toggleCourseSectionsWithUpdate(course)"
+                        >
+                          {{ course.selectToggleText }}
+                        </button>
+                      </div>
+                      <CourseSectionsTable
+                        mode="createCourseForm"
+                        :no-current-sections="noCurrentSections"
+                        :sections="course.sections"
+                        :stage-add-action="$_.noop"
+                        :stage-delete-action="$_.noop"
+                        :stage-update-action="$_.noop"
+                        :unstage-action="$_.noop"
+                        update-selected="updateSelected"
+                      />
+                    </b-collapse>
+                  </li>
+                </ul>
+                <div class="bc-form-actions">
+                  <button
+                    class="bc-canvas-button bc-canvas-button-primary"
+                    type="submit"
+                    :disabled="!selectedSectionsList.length"
+                    aria-controls="bc-page-create-course-site-steps-container"
+                    aria-label="Continue to next step"
+                    role="button"
+                  >
+                    Next
+                  </button>
+                  <a
+                    :href="linkToSiteOverview"
+                    class="bc-canvas-button"
+                    type="reset"
+                    aria-label="Cancel and return to Site Creation Overview"
+                  >
+                    Cancel
+                  </a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -266,7 +258,7 @@
           id="bc-page-create-course-site-confirmation-step"
           :aria-expanded="currentWorkflowStep === 'confirmation'"
         >
-          <div class="row collapse">
+          <div>
             <div class="medium-12 columns">
               <div class="bc-alert bc-alert-info" role="alert">
                 <!-- TODO: data-cc-focus-reset-directive -->
@@ -285,17 +277,17 @@
               </div>
             </div>
           </div>
-          <div class="row collapse">
+          <div>
             <div class="medium-12 columns">
               <form
                 name="createCourseSiteForm"
                 class="bc-canvas-page-form"
                 @submit="createCourseSiteJob"
               >
-                <div class="row">
+                <div>
                   <div class="small-12 medium-6 end">
                     <div class="bc-page-create-course-site-form-fields-container">
-                      <div class="row">
+                      <div>
                         <div class="medium-offset-1 medium-4 columns">
                           <label for="siteName" class="right">Site Name:</label>
                         </div>
@@ -313,7 +305,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="row">
+                      <div>
                         <div class="medium-offset-1 medium-4 columns">
                           <label for="siteAbbreviation" class="right">Site Abbreviation:</label>
                         </div>
@@ -334,7 +326,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
+                <div>
                   <div class="medium-12 columns">
                     <div class="bc-form-actions">
                       <button
@@ -378,7 +370,7 @@
               </div>
               <div v-if="jobStatus === 'Error'">
                 <BackgroundJobError :error-config="errorConfig" :errors="errors" />
-                <div class="row bc-page-create-course-site-step-options">
+                <div class="bc-page-create-course-site-step-options">
                   <div class="medium-12 columns">
                     <div class="bc-form-actions">
                       <button
@@ -422,9 +414,11 @@
 </template>
 
 <script>
+import Accessibility from '@/mixins/Accessibility'
 import BackgroundJobError from '@/components/bcourses/shared/BackgroundJobError'
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import Context from '@/mixins/Context'
+import CourseSectionsTable from '@/components/bcourses/CourseSectionsTable'
 import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
 import Utils from '@/mixins/Utils'
@@ -432,13 +426,14 @@ import {getCourseProvisioningMetadata, getSections} from '@/api/canvas'
 
 export default {
   name: 'CreateCourseSite',
-  mixins: [Context, Utils],
-  components: {BackgroundJobError, CanvasErrors, MaintenanceNotice, ProgressBar},
+  mixins: [Accessibility, Context, Utils],
+  components: {BackgroundJobError, CanvasErrors, CourseSectionsTable, MaintenanceNotice, ProgressBar},
   data: () => ({
     adminActingAs: undefined,
     adminByCcns: undefined,
     adminMode: 'act_as',
     adminSemesters: undefined,
+    canvasCourse: undefined,
     canvasCourseId: undefined,
     course: undefined,
     coursesList: undefined,
@@ -512,7 +507,9 @@ export default {
         this.isAdmin
       ).then(data => {
         data.usersClassCount = this.classCount(data.teachingSemesters)
-        const canvasCourseId = data.canvas_course ? data.canvas_course.canvasCourseId : ''
+        this.teachingSemesters = data.teachingSemesters
+        this.canvasCourse = data.canvas_course
+        const canvasCourseId = this.canvasCourse ? this.canvasCourse.canvasCourseId : ''
         this.fillCourseSites(data.teachingSemesters, canvasCourseId)
         this.feedFetched = true
         this.selectFocus = true
@@ -535,12 +532,13 @@ export default {
         if (!this.isAdmin && !this.usersClassCount) {
           this.displayError = 'Sorry, you are not an admin user and you have no classes.'
         }
+        this.$ready()
       })
     },
     fillCourseSites(semestersFeed, canvasCourseId) {
       this.$_.each(semestersFeed, semester => {
         this.$_.each(semester.classes, course => {
-          course.collapsed = !course.containsCourseSections
+          course.visible = false
           course.allSelected = false
           course.selectToggleText = 'All'
           let hasSites = false
@@ -576,6 +574,7 @@ export default {
       this.$_.each(this.teachingSemesters, semester => {
         if ((semester.termYear === this.canvasCourse.term.term_yr) && (semester.termCode === this.canvasCourse.term.term_cd)) {
           this.courseSemester = semester
+          return false
         }
       })
       if (this.courseSemester) {
@@ -662,3 +661,132 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.bc-page-create-course-site {
+  padding: 25px;
+
+  .cc-button {
+    padding: 10px;
+  }
+
+  .bc-page-create-course-site-header {
+    color: $bc-color-headers;
+    font-family: $bc-base-font-family;
+    font-weight: normal;
+    line-height: 40px;
+    margin: 5px 0;
+  }
+
+  .bc-page-create-course-site-header1 {
+    font-size: 23px;
+  }
+
+  .bc-page-create-course-site-header2 {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+
+  .bc-page-create-course-site-admin-options {
+    margin-bottom: 15px;
+  }
+
+  .cc-page-button-grey {
+    background: linear-gradient($bc-color-button-grey-gradient-1, $bc-color-button-grey-gradient-2);
+    border: 1px solid $bc-color-button-grey-border;
+    color: $bc-color-button-grey-text;
+  }
+
+  .bc-page-create-course-site-act-as-form {
+    margin: 5px 0;
+    input[type="text"] {
+      font-family: $bc-base-font-family;
+      font-size: 14px;
+      margin: 2px 10px 0 0;
+      padding: 8px 12px;
+      width: 140px;
+    }
+  }
+
+  .bc-page-create-course-site-admin-mode-switch {
+    margin-bottom: 5px;
+    outline: none;
+  }
+
+  .bc-page-create-course-site-choices {
+    overflow: hidden;
+    li {
+      border-left: 1px solid $cc-color-very-light-grey;
+      float: left;
+      max-width: 250px;
+      padding: 15px;
+      width: 50%;
+      &:first-child {
+        border: 0;
+      }
+    }
+  }
+
+  .bc-page-create-course-site-section-list {
+    list-style-type: disc;
+    margin: 10px 0 0 39px;
+  }
+
+  .bc-page-create-course-site-help-notice {
+    margin-bottom: 20px;
+    .bc-page-create-course-site-help-notice-ordered-list {
+      margin-bottom: 10px;
+      margin-left: 20px;
+    }
+
+    .bc-page-create-course-site-help-notice-paragraph {
+      margin-bottom: 7px;
+    }
+  }
+
+  .bc-page-create-course-site-form-fields-container {
+    margin: 10px 0;
+  }
+
+  .bc-page-create-course-site-pending-request {
+    margin: 15px auto;
+  }
+
+  .bc-page-create-course-site-steps-container {
+    padding: 0;
+  }
+
+  .bc-page-create-course-site-step-options {
+    padding: 20px 0;
+  }
+
+  .bc-page-create-course-site-success-intro {
+    margin: 15px 0 0;
+  }
+
+  // Form with Expandable Courses & Sections
+
+  .bc-page-create-course-site-section-margin {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .bc-page-create-course-site-form-course-button {
+    color: $bc-color-body-black;
+
+    &:focus, &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .bc-page-create-course-site-form-select-all-option {
+    font-size: 12px;
+    font-weight: normal;
+    margin: 6px 0 4px 2px;
+  }
+
+  .bc-page-create-course-site-form-select-all-option-button {
+    outline: none;
+  }
+}
+</style>
