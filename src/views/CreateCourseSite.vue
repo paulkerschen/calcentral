@@ -179,7 +179,6 @@ export default {
     fillCourseSites(semestersFeed, canvasCourseId) {
       this.$_.each(semestersFeed, semester => {
         this.$_.each(semester.classes, course => {
-          course.visible = false
           course.allSelected = false
           course.selectToggleText = 'All'
           let hasSites = false

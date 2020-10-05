@@ -1,10 +1,10 @@
 <template>
   <div v-if="!loading" class="bc-page-site-creation">
-    <div>
-      <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
-      <div class="row">
-        <div class="small-12 medium-3 columns">
-          <div class="bc-page-site-creation-feature-icon-container">
+    <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
+    <b-container>
+      <b-row no-gutters>
+        <b-col sm="3">
+          <div class="pl-4">
             <div class="bc-page-site-creation-feature-icon-box">
               <fa
                 icon="graduation-cap"
@@ -14,20 +14,19 @@
               </fa>
             </div>
           </div>
-        </div>
-
-        <div class="small-12 medium-5 columns end">
-          <div class="bc-page-site-creation-feature-details">
+        </b-col>
+        <b-col sm="9">
+          <div class="bc-page-site-creation-feature-details mr-5 pr-5">
             <h3 class="bc-header bc-header3">Course Sites</h3>
-            <p v-if="canCreateCourseSite" class="bc-page-site-creation-feature-description">
+            <div v-if="canCreateCourseSite" class="bc-page-site-creation-feature-description">
               Set up course sites to communicate with and manage the work of students enrolled in your classes.
-            </p>
-            <p v-if="!canCreateCourseSite" class="bc-page-site-creation-feature-description">
+            </div>
+            <div v-if="!canCreateCourseSite" class="bc-page-site-creation-feature-description">
               To create a course site, you will need to be the official instructor of record for a course.
               If you have not been assigned as the official instructor of record for the course,
               please contact your department scheduler.
               You will be able to create a course site the day after you have been officially assigned to teach the course.
-            </p>
+            </div>
             <div class="bc-page-site-creation-feature-button-wrapper">
               <a
                 id="create-course-site"
@@ -41,38 +40,35 @@
               </a>
             </div>
           </div>
-        </div>
-      </div>
+        </b-col>
+      </b-row>
 
-      <div class="row">
-        <div class="small-12 medium-8 columns">
-          <div class="bc-page-site-creation-features-divider-wrapper">
-            <div class="bc-page-site-creation-features-divider"></div>
-          </div>
-        </div>
-      </div>
+      <b-row>
+        <b-col>
+          <div class="bc-page-site-creation-features-divider"></div>
+        </b-col>
+      </b-row>
 
-      <div class="row">
-        <div class="small-12 medium-3 columns">
-          <div class="bc-page-site-creation-feature-icon-container">
+      <b-row no-gutters>
+        <b-col sm="3">
+          <div class="pl-4">
             <div class="bc-page-site-creation-feature-icon-box">
               <fa icon="cubes" class="bc-page-site-creation-feature-icon"></fa>
             </div>
           </div>
-        </div>
-
-        <div class="small-12 medium-5 columns end">
-          <div class="bc-page-site-creation-feature-details">
+        </b-col>
+        <b-col sm="9">
+          <div class="bc-page-site-creation-feature-details mr-5 pr-5">
             <h3 class="bc-header bc-header3">Project Sites</h3>
-            <p class="bc-page-site-creation-feature-description">
+            <div class="bc-page-site-creation-feature-description">
               Share files and collaborate with your team. Projects are best suited for instructors and GSIs who already
               use bCourses.
-            </p>
-            <p class="bc-page-site-creation-feature-description">
+            </div>
+            <div class="bc-page-site-creation-feature-description pt-3">
               Project sites do not have access to all bCourses tools, including assignments, and are not intended for
               lecture, lab, or discussion sections.
               <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010457">Learn more about collaboration tools available at UC Berkeley.</OutboundLink>
-            </p>
+            </div>
             <div class="bc-page-site-creation-feature-button-wrapper">
               <a
                 id="create-project-site"
@@ -86,9 +82,9 @@
               </a>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 

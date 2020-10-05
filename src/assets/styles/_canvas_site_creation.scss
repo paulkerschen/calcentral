@@ -11,13 +11,6 @@
     margin-left: 10px;
   }
 
-  .bc-page-site-creation-feature-icon-container {
-    display: table;
-    margin: 0 auto;
-    text-align: center;
-    vertical-align: middle;
-  }
-
   .bc-page-site-creation-feature-icon-box {
     background-color: $bc-color-feature-icon-box-background;
     border: $bc-color-feature-icon-box-border solid 1px;
@@ -52,10 +45,6 @@
   .bc-page-site-creation-features-divider {
     border-top: $bc-color-button-grey-border solid 1px;
     margin: 30px 0;
-  }
-
-  .bc-page-site-creation-features-divider-wrapper {
-    margin: 30px;
   }
 
   @media #{$small-only} {
