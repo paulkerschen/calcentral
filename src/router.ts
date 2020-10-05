@@ -2,6 +2,7 @@ import _ from 'lodash'
 import auth from './auth'
 import BaseView from '@/views/BaseView.vue'
 import CourseAddUser from '@/components/bcourses/CourseAddUser.vue'
+import CourseCaptures from '@/components/bcourses/CourseCaptures.vue'
 import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
 import CreateCourseSite from '@/views/CreateCourseSite.vue'
 import CreateProjectSite from '@/views/CreateProjectSite.vue'
@@ -78,6 +79,13 @@ const router = new Router({
               }
             },
             {
+              component: CourseCaptures,
+              path: '/canvas/course_mediacasts/:id',
+              meta: {
+                title: 'Course Captures'
+              }
+            },
+            {
               component: CourseGradeExport,
               path: '/canvas/course_grade_export/:id',
               meta: {
@@ -142,6 +150,10 @@ const router = new Router({
             {
               component: CourseAddUser,
               path: '/canvas/embedded/course_add_user'
+            },
+            {
+              component: CourseCaptures,
+              path: 'canvas/embedded/course_mediacasts'
             },
             {
               component: CourseGradeExport,

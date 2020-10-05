@@ -131,3 +131,9 @@ export function canUserCreateSite() {
 export function importUsers(userIds: string[]) {
   return utils.post('/api/academics/canvas/user_provision/user_import', {userIds})
 }
+
+// Webcasts
+
+export function getWebcasts(canvasCourseId: string) {
+  return utils.get(`/api/canvas/media/${canvasCourseId}`)
+}
