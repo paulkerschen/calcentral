@@ -11,12 +11,13 @@
 
     <div v-if="!showError">
       <b-row v-if="showAlerts" role="alert">
-        <div v-if="isLoading" class="cc-spinner"></div>
-        <div v-if="!isLoading">
+        <b-col v-if="isLoading" md="12" class="cc-spinner"></b-col>
+        <b-col v-if="!isLoading" md="12">
           <div v-if="noUserSelectedAlert" class="bc-alert bc-alert-error bc-page-course-add-user-alert">
             Please select a user.
             <div class="bc-alert-close-button-container">
-              <button class="fa fa-times-circle bc-close-button" @click="noUserSelectedAlert = ''">
+              <button class="bc-close-button" @click="noUserSelectedAlert = ''">
+                <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
             </div>
@@ -27,7 +28,8 @@
             {{ searchTypeNotice }}
             Please try again.
             <div class="bc-alert-close-button-container">
-              <button class="fa fa-times-circle bc-close-button" @click="noSearchResultsNotice = ''">
+              <button class="bc-close-button" @click="noSearchResultsNotice = ''">
+                <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
             </div>
@@ -47,7 +49,8 @@
             {{ userAdded.fullName }} was added to the
             &ldquo;{{ userAdded.sectionName }}&rdquo; section of this course as a {{ userAdded.role }}.
             <div class="bc-alert-close-button-container">
-              <button class="fa fa-times-circle bc-close-button" @click="additionSuccessMessage = ''">
+              <button class="bc-close-button" @click="additionSuccessMessage = ''">
+                <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
             </div>
@@ -57,12 +60,13 @@
             <fa icon="exclamation-triangle" class="cc-icon-red bc-canvas-notice-icon"></fa>
             {{ errorStatus }}
             <div class="bc-alert-close-button-container">
-              <button class="fa fa-times-circle bc-close-button" @click="additionFailureMessage = ''">
+              <button class="bc-close-button" @click="additionFailureMessage = ''">
+                <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
             </div>
           </div>
-        </div>
+        </b-col>
       </b-row>
 
       <b-row v-if="showSearchForm" no-gutters>
@@ -157,7 +161,7 @@
       </b-row>
 
       <b-row v-if="showUsersArea" no-gutters>
-        <div v-if="isLoading" class="cc-spinner"></div>
+        <b-col v-if="isLoading" md="12" class="cc-spinner"></b-col>
         <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="searchResultsFocus">User Search Results</h2>
         <b-col v-if="userSearchResults.length > 0" md="12">
           <form class="bc-canvas-page-form">
@@ -270,7 +274,6 @@ export default {
     additionSuccessMessage: null,
     canvasCourseId: null,
     courseSections: [],
-    error: null,
     errorStatus: null,
     grantingRoles: [],
     isLoading: null,
@@ -278,13 +281,14 @@ export default {
     noUserSelectedAlert: null,
     searchText: null,
     searchTextType: 'text',
-    searchType: null,
+    searchType: 'name',
+    searchTypeNotice: null,
     selectedRole: null,
     selectedSection: null,
     selectedUser: null,
     showAlerts: null,
     showError: null,
-    showSearchForm: true,
+    showSearchForm: null,
     showUsersArea: null,
     toggle: {
       displayHelp: false
@@ -304,6 +308,7 @@ export default {
     resetForm() {
       this.searchTextType = 'text'
       this.searchText = ''
+      this.searchType = 'name'
       this.searchTypeNotice = ''
       this.showAlerts = false
       this.resetSearchState()
@@ -331,7 +336,7 @@ export default {
       this.isLoading = true
       searchUsers(this.canvasCourseId, this.searchText, this.searchType).then(response => {
         this.userSearchResults = response.users
-        if (response.users.length) {
+        if (response.users && response.users.length) {
           this.userSearchResultsCount = response.users[0].resultCount
           this.selectedUser = response.users[0]
         } else {
@@ -342,8 +347,7 @@ export default {
         this.isLoading = false
         this.showAlerts = true
         this.searchResultsFocus = true
-      }, error => {
-        this.error = error
+      }, () => {
         this.showError = true
         this.errorStatus = 'User search failed.'
         this.isLoading = false
@@ -353,9 +357,9 @@ export default {
     setSearchTypeNotice() {
       this.searchTypeNotice = (this.searchType === 'ldap_user_id') ? 'CalNet UIDs must be an exact match.' : ''
     },
-    showUnauthorized(error) {
+    showUnauthorized() {
+      this.isLoading = false
       this.showError = true
-      this.error = error
       this.errorStatus = 'Authorization check failed.'
     },
     submitUser() {
@@ -376,8 +380,7 @@ export default {
         this.showSearchForm = true
         this.isLoading = false
         this.resetSearchState()
-      }, error => {
-        this.error = error
+      }, () => {
         this.errorStatus = 'Request to add user failed'
         this.showSearchForm = true
         this.additionFailureMessage = true
@@ -397,6 +400,7 @@ export default {
         this.grantingRoles = response.grantingRoles
         this.selectedRole = response.grantingRoles[0]        
         getAddUserCourseSections(this.canvasCourseId).then(response => {
+          this.isLoading = false
           this.courseSections = response.courseSections
           this.selectedSection = response.courseSections[0]
           this.showSearchForm = true
