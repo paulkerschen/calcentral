@@ -153,7 +153,7 @@ const router = new Router({
             },
             {
               component: CourseCaptures,
-              path: 'canvas/embedded/course_mediacasts'
+              path: '/canvas/embedded/course_mediacasts'
             },
             {
               component: CourseGradeExport,
