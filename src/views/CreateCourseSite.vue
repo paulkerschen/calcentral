@@ -34,7 +34,12 @@
           id="bc-page-create-course-site-confirmation-step"
           :aria-expanded="currentWorkflowStep === 'confirmation'"
         >
-          <ConfirmationStep :selected-sections="selectedSections" />
+          <ConfirmationStep
+            :create-course-site-job="createCourseSiteJob"
+            :current-semester-name="currentSemesterName"
+            :go-back="showSelecting"
+            :selected-sections-list="selectedSectionsList"
+          />
         </div>
         <div
           v-if="currentWorkflowStep === 'monitoring_job'"
@@ -57,14 +62,15 @@ import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import ConfirmationStep from '@/components/bcourses/create/ConfirmationStep'
 import Context from '@/mixins/Context'
 import CreateCourseSiteHeader from '@/components/bcourses/create/CreateCourseSiteHeader'
+import Iframe from '@/mixins/Iframe'
 import MonitoringJob from '@/components/bcourses/create/MonitoringJob'
 import SelectSectionsStep from '@/components/bcourses/create/SelectSectionsStep'
 import Utils from '@/mixins/Utils'
-import {getCourseProvisioningMetadata, getSections} from '@/api/canvas'
+import {courseCreate, courseProvisionJobStatus, getCourseProvisioningMetadata, getSections} from '@/api/canvas'
 
 export default {
   name: 'CreateCourseSite',
-  mixins: [Accessibility, Context, Utils],
+  mixins: [Accessibility, Context, Iframe, Utils],
   components: {
     CanvasErrors,
     ConfirmationStep,
@@ -81,6 +87,7 @@ export default {
     canvasCourseId: undefined,
     course: undefined,
     coursesList: undefined,
+    courseSite: undefined,
     currentAdminSemester: undefined,
     currentSemester: undefined,
     currentSemesterName: undefined,
@@ -96,11 +103,13 @@ export default {
     isTeacher: undefined,
     isUidInputMode: true,
     jobStatus: undefined,
+    percentComplete: undefined,
+    percentCompleteRounded: undefined,
     selectedSectionsList: undefined,
     semester: undefined,
     showMaintenanceNotice: true,
-    siteName: undefined,
-    teachingSemesters: undefined
+    teachingSemesters: undefined,
+    timeoutPromise: undefined
   }),
   created() {
     this.$loading()
@@ -129,9 +138,45 @@ export default {
       this.percentComplete = undefined
       this.showMaintenanceNotice = true
     },
-    createCourseSiteJob() {
+    createCourseSiteJob(siteName, siteAbbreviation) {
+      this.currentWorkflowStep = 'monitoring_job'
+      this.accessibilityAnnounce('Creating course site. Please wait.')
+      this.monitorFocus = true
       this.showMaintenanceNotice = false
-      // TODO
+      this.updateSelected()
+      const ccns = this.$_.map(this.selectedSectionsList, 'ccn')
+      if (ccns.length > 0) {
+        const course = {
+          siteName,
+          siteAbbreviation,
+          'termSlug': this.currentSemester,
+          'ccns': ccns
+        }
+        if (this.isAdmin) {
+          if (this.adminMode !== 'by_ccn' && this.admin_acting_as) {
+            course.admin_acting_as = this.admin_acting_as
+          } else if (this.adminMode === 'by_ccn' && this.adminByCcns) {
+            course.admin_by_ccns = this.admin_by_ccns.match(/\w+/g)
+            course.admin_term_slug = this.currentAdminSemester
+          }
+        }
+        courseCreate(course).then(data => {
+          this.$_.assignIn(this, data)
+          this.currentWorkflowStep = 'monitoring_job'
+          this.accessibilityAnnounce('Course site created successfully')
+          this.completedFocus = true
+          this.jobStatusLoader()
+        })
+        // TODO: error handling
+        //   function errorCallback() {
+        //     this.$_.assignIn(this, {
+        //       percentCompleteRounded: 0,
+        //       currentWorkflowStep: 'monitoring_job',
+        //       jobStatus: 'Error',
+        //       error: 'Failed to create course provisioning job.'
+        //     });
+        //   }
+      }
     },
     fetchFeed() {
       this.clearCourseSiteJob()
@@ -208,6 +253,36 @@ export default {
         })
       })
     },
+    jobStatusLoader() {
+      this.timeoutPromise = setTimeout(
+        () => {
+          return courseProvisionJobStatus(this.jobId).then(data => {
+            this.$_.assignIn(this, data)
+            this.percentCompleteRounded = Math.round(this.percentComplete * 100)
+            if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
+              this.jobStatusLoader()
+            } else {
+              this.$loading()
+              this.percentCompleteRounded = undefined
+              clearTimeout(this.timeoutPromise)
+              if (this.jobStatus === 'Completed') {
+                if (this.courseSite && this.courseSite.url) {
+                  if (this.isInIframe) {
+                    this.iframeParentLocation(this.courseSite.url)
+                  } else {
+                    window.location.href = this.courseSite.url
+                  }
+                } else {
+                  this.displayError = 'failure'
+                }
+              }
+            }
+            // TODO: error handling
+            //   this.displayError = 'failure'
+            //
+          })
+        }, 2000)
+    },
     loadCourseLists() {
       this.courseSemester = false
       // identify semester matching current course site
@@ -247,17 +322,17 @@ export default {
       }
     },
     selectedSections(coursesList) {
-      const selectedSections = []
+      const selectedSectionsList = []
       this.$_.each(coursesList, course => {
         this.$_.each(course.sections, section => {
           if (section.selected) {
             section.courseTitle = course.title
             section.courseCatalog = course.course_catalog
-            selectedSections.push(section)
+            selectedSectionsList.push(section)
           }
         })
       })
-      return selectedSections
+      return selectedSectionsList
     },
     selectAllSections() {
       const newSelectedCourses = []
@@ -274,12 +349,12 @@ export default {
       this.adminActingAs = uid
     },
     showConfirmation() {
-      // TODO
-      return []
+      this.updateSelected()
+      this.accessibilityAnnounce('Course site details form loaded.')
+      this.currentWorkflowStep = 'confirmation'
     },
     showSelecting() {
-      // TODO
-      return false
+      this.currentWorkflowStep = 'selecting'
     },
     switchAdminSemester(semester) {
       this.currentAdminSemester = semester.slug

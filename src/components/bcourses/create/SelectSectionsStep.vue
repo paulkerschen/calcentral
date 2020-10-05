@@ -125,16 +125,16 @@
             </li>
           </ul>
           <div class="bc-form-actions">
-            <button
+            <b-button
               class="bc-canvas-button bc-canvas-button-primary"
               type="submit"
               :disabled="!selectedSectionsList.length"
               aria-controls="bc-page-create-course-site-steps-container"
               aria-label="Continue to next step"
-              role="button"
+              @click="showConfirmation"
             >
               Next
-            </button>
+            </b-button>
             <b-button
               aria-label="Cancel and return to Site Creation Overview"
               class="bc-canvas-button"
