@@ -23,6 +23,7 @@
               v-model="section.selected"
               :aria-label="`Checkbox for ${section.courseCode} ${section.section_label}`"
               :aria-checked="section.selected"
+              class="ml-2"
               size="sm"
               @change="updateSelected"
             />
@@ -122,8 +123,9 @@
         >
           <td colspan="7" class="bc-template-sections-table-sites-cell">
             <div class="bc-template-sections-table-sites-container">
-              <i class="fa fa-info-circle bc-template-sections-table-sited-icon"></i>
-              The section name in bCourses no longer matches the Student Information System. Use the "Update" button to rename your bCourses section name to match SIS.
+              <fa icon="info-circle" class="bc-template-sections-table-sited-icon mr-1"></fa>
+              The section name in bCourses no longer matches the Student Information System.
+              Use the "Update" button to rename your bCourses section name to match SIS.
             </div>
           </td>
         </tr>
@@ -132,8 +134,8 @@
           :class="rowClassLogic({mode: mode, section: section})"
         >
           <td colspan="7" class="bc-template-sections-table-sites-cell">
-            <div v-for="site in section.sites" :key="site.name" class="bc-template-sections-table-sites-container">
-              <i class="fa fa-info-circle bc-template-sections-table-sited-icon"></i>
+            <div v-for="site in section.sites" :key="site.name" class="bc-template-sections-table-sites-container ml-4 pl-3">
+              <fa icon="info-circle" class="bc-template-sections-table-sited-icon mr-1" size="sm"></fa>
               This section is already in use by <a :href="site.site_url">{{ site.name }}</a>
             </div>
           </td>
@@ -213,6 +215,96 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+td {
+  padding-top: 5px;
+}
 
+.bc-template-sections-table-cell-checkbox {
+  width: 30px;
+}
+
+.bc-template-sections-table-row-disabled td {
+  color: $bc-color-grey-disabled;
+}
+
+.bc-template-sections-table-row-added td {
+  background-color: $bc-color-yellow-row-highlighted;
+}
+
+.bc-template-sections-table-row-deleted td {
+  background-color: $bc-color-red-row-highlighted;
+}
+
+.bc-template-sections-table-cell-section-action-option {
+  height: 45px;
+  text-align: right;
+}
+
+.bc-template-sections-table-button {
+  font-size: 12px;
+  margin: 0;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.bc-template-sections-table-button-undo-add {
+  background-color: $bc-color-orange-button-bg;
+  border: $bc-color-orange-button-border solid 1px;
+  color: $bc-color-white;
+  &:hover, &:active, &:focus, &:link {
+    background: $bc-color-orange-button-bg-selected;
+    border-color: $bc-color-orange-button-border-selected;
+  }
+}
+
+.bc-template-sections-table-button-undo-delete {
+  background-color: $bc-color-red-button-bg;
+  border: $bc-color-red-button-border solid 1px;
+  color: $bc-color-white;
+  &:hover, &:active, &:focus, &:link {
+    background: $bc-color-red-button-bg-selected;
+    border-color: $bc-color-red-button-border-selected;
+  }
+}
+
+.bc-template-sections-table-cell-course-code {
+  font-size: 13px;
+  width: 115px;
+}
+
+.bc-template-sections-table-cell-section-ccn {
+  width: 70px;
+}
+
+.bc-template-sections-table-cell-section-timestamps {
+  width: 155px;
+}
+
+.bc-template-sections-table-cell-section-locations {
+  width: 150px;
+}
+
+.bc-template-sections-table-cell-section-instructors {
+  width: 183px;
+}
+
+.bc-template-sections-table-cell-section-label-label {
+  cursor: pointer;
+  font-size: 13px;
+  margin: 0;
+  text-align: left;
+}
+
+.bc-template-sections-table-sited-icon {
+  color: $bc-color-help-link-blue;
+}
+
+.bc-template-sections-table-sites-cell {
+  padding: 0 14px;
+}
+
+.bc-template-sections-table-sites-container {
+  margin-bottom: 5px;
+}
 </style>

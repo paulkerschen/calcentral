@@ -86,25 +86,25 @@
           <ul class="bc-page-create-course-site-section-margin">
             <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
               <div class="d-flex">
-                <div>
+                <div class="toggle-show-hide">
                   <b-button
                     :aria-expanded="course.visible"
                     class="pb-0 pt-0"
                     variant="link"
-                    @click="course.visible = !course.visible"
+                    @click="toggleShowHide(course)"
                   >
                     <fa :icon="course.visible ? 'caret-down' : 'caret-right'" />
                     <span class="sr-only">Toggle course sections list for {{ course.course_code }} {{ course.title }}</span>
                   </b-button>
                 </div>
-                <div>
+                <div class="pr-2 pt-1">
                   <h3 class="bc-sections-course-title">{{ course.course_code }}<span v-if="course.title">: {{ course.title }}</span></h3>
                 </div>
-                <div v-if="$_.size(course.sections)" class="ml-1">
+                <div v-if="$_.size(course.sections)" class="pt-1">
                   ({{ pluralize('section', course.sections.length, {0: 'No', 1: 'One'}) }})
                 </div>
               </div>
-              <b-collapse :id="course.course_id" visible>
+              <b-collapse :id="course.course_id" v-model="course.visible">
                 <div v-if="course.sections.length > 1" class="bc-page-create-course-site-form-select-all-option">
                   Select:
                   <button
@@ -135,14 +135,14 @@
             >
               Next
             </button>
-            <a
-              :href="linkToSiteOverview"
-              class="bc-canvas-button"
-              type="reset"
+            <b-button
               aria-label="Cancel and return to Site Creation Overview"
+              class="bc-canvas-button"
+              variant="link"
+              @click="cancel"
             >
               Cancel
-            </a>
+            </b-button>
           </div>
         </form>
       </div>
@@ -152,11 +152,12 @@
 
 <script>
 import CourseSectionsTable from '@/components/bcourses/CourseSectionsTable'
+import Iframe from '@/mixins/Iframe'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SelectSectionsStep',
-  mixins: [Utils],
+  mixins: [Iframe, Utils],
   components: {CourseSectionsTable},
   props: {
     coursesList: {
@@ -197,7 +198,13 @@ export default {
     toggle: {
       displayHelp: false
     }
-  })
+  }),
+  methods: {
+    cancel() {
+      this.$router.push({ path: this.isInIframe ? '/canvas/embedded/site_creation' : '/canvas/site_creation'})
+    },
+    toggleShowHide: course => course.visible = !course.visible
+  }
 }
 </script>
 
@@ -227,5 +234,9 @@ export default {
 .bc-page-create-course-site-section-margin {
   margin: 0;
   overflow: hidden;
+}
+
+.toggle-show-hide {
+  width: 30px
 }
 </style>
