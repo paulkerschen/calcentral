@@ -107,6 +107,7 @@ export default {
     linkToCreateProjectSite: undefined
   }),
   created() {
+    this.$loading()
     getSiteCreationAuthorizations().then(data => {
       this.canCreateCourseSite = data.authorizations.canCreateCourseSite
       this.canCreateProjectSite = data.authorizations.canCreateProjectSite
@@ -124,6 +125,60 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.bc-page-site-creation {
+  background: $cc-color-white;
+  padding: 10px 0;
 
+  .bc-page-site-creation-feature-button-wrapper {
+    margin-top: 25px;
+  }
+
+  .bc-page-site-creation-primary-header {
+    margin-bottom: 25px;
+    margin-left: 10px;
+  }
+
+  .bc-page-site-creation-feature-icon-box {
+    background-color: $bc-color-feature-icon-box-background;
+    border: $bc-color-feature-icon-box-border solid 1px;
+    border-radius: 4px;
+    display: table-cell;
+    height: 150px;
+    text-align: center;
+    vertical-align: middle;
+    width: 190px;
+  }
+
+  .bc-page-site-creation-feature-icon {
+    color: $bc-color-headers;
+    font-size: 95px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .bc-page-site-creation-feature-icon-disabled {
+    color: $bc-color-feature-icon-color;
+  }
+
+  .bc-page-site-creation-feature-description {
+    font-weight: 300;
+    line-height: 18px;
+  }
+
+  .bc-page-site-creation-features-container {
+    margin: 0 20px;
+  }
+
+  .bc-page-site-creation-features-divider {
+    border-top: $bc-color-button-grey-border solid 1px;
+    margin: 30px 0;
+  }
+
+  @media #{$small-only} {
+    .bc-page-site-creation-feature-details {
+      text-align: center;
+    }
+  }
+}
 </style>
