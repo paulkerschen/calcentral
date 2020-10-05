@@ -106,7 +106,7 @@ export function getCourseSections(canvasCourseId) {
 
 export function getSections(
   adminActingAs: string,
-  adminByCcns: string[],
+  adminByCcns: string,
   adminMode: string,
   currentAdminSemester: string,
   isAdmin: boolean
