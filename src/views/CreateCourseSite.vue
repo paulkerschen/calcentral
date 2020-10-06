@@ -123,7 +123,7 @@ export default {
       this.adminSemesters = data.admin_semesters
       this.isAdmin = data.is_admin
       this.teachingSemesters = data.teachingSemesters
-      this.$ready()
+      this.$ready('Create a Course Site')
     })
   },
   methods: {

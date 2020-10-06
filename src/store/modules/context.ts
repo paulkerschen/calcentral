@@ -11,22 +11,38 @@ const getters = {
 }
 
 const mutations = {
-  loadingComplete: (state: any, pageTitle: string) => {
-    document.title = `${pageTitle || 'UC Berkeley'} | bCourses Support`
+  loadingComplete: (state: any, {label, focusTarget}) => {
+    document.title = `${label || 'UC Berkeley'} | bCourses Support`
     state.loading = false
-    if (pageTitle) {
-      state.screenReaderAlert = `${pageTitle} page is ready`
+    if (label) {
+      state.screenReaderAlert = `${label} page is ready`
     }
-    Vue.prototype.$putFocusNextTick('page-title')
+    if (focusTarget) {
+      Vue.prototype.$putFocusNextTick(focusTarget)
+    } else {
+      const callable = () => {
+        const elements = document.getElementsByTagName('h1')
+        if (elements.length > 0) {
+          elements[0].setAttribute('tabindex', '-1')
+          elements[0].focus()
+        }
+        return elements.length > 0
+      }
+      Vue.prototype.$nextTick(() => {
+        let counter = 0
+        const job = setInterval(() => (callable() || ++counter > 3) && clearInterval(job), 500)
+      })
+    }
   },
-  loadingStart: (state: any) => (state.loading = true),
+  loadingStart: (state: any, label: string) => {
+    state.loading = true
+    state.screenReaderAlert = `${label || 'Page'} is loading...`
+  },
   setScreenReaderAlert: (state: any, alert: string) => (state.screenReaderAlert = alert)
 }
 
 const actions = {
-  alertScreenReader: ({ commit }, alert) => commit('setScreenReaderAlert', alert),
-  loadingComplete: ({ commit }, pageTitle) => commit('loadingComplete', pageTitle),
-  loadingStart: ({ commit }) => commit('loadingStart')
+  alertScreenReader: ({ commit }, alert) => commit('setScreenReaderAlert', alert)
 }
 
 export default {

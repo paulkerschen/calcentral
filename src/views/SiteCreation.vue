@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading" class="bc-page-site-creation">
-    <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
+    <h1 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h1>
     <b-container>
       <b-row>
         <b-col sm="3">
@@ -35,6 +35,7 @@
                 class="bc-canvas-button bc-canvas-button-primary"
                 :tabindex="canCreateCourseSite ? 0 : -1"
                 @click="goCreateCourseSite"
+                @keypress="goCreateCourseSite"
               >
                 Create a Course Site
               </a>
@@ -77,6 +78,7 @@
                 :href="linkToCreateProjectSite"
                 class="bc-canvas-button bc-canvas-button-primary"
                 @click="goCreateProjectSite"
+                @keypress="goCreateProjectSite"
               >
                 Create a Project Site
               </a>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="cc-masthead">
     <Spinner />
     <SrAlert />
     <router-view />
