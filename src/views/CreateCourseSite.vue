@@ -47,7 +47,11 @@
           id="bc-page-create-course-site-monitor-step"
           :aria-expanded="currentWorkflowStep === 'monitoring_job'"
         >
-          <MonitoringJob fetch-feed="fetchFeed" job-status="jobStatus" show-confirmation="showConfirmation" />
+          <MonitoringJob
+            fetch-feed="fetchFeed"
+            job-status="jobStatus"
+            show-confirmation="showConfirmation"
+          />
         </div>
       </div>
     </div>

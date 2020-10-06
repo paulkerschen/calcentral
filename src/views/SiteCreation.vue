@@ -2,7 +2,7 @@
   <div v-if="!loading" class="bc-page-site-creation">
     <h2 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h2>
     <b-container>
-      <b-row no-gutters>
+      <b-row>
         <b-col sm="3">
           <div class="pl-4">
             <div class="bc-page-site-creation-feature-icon-box">
@@ -33,7 +33,7 @@
                 :disabled="!canCreateCourseSite"
                 :href="linkToCreateCourseSite"
                 class="bc-canvas-button bc-canvas-button-primary"
-                :tabindex="createCourseSiteButtonFocus"
+                :tabindex="canCreateCourseSite ? 0 : -1"
                 @click="goCreateCourseSite"
               >
                 Create a Course Site
@@ -49,7 +49,7 @@
         </b-col>
       </b-row>
 
-      <b-row no-gutters>
+      <b-row>
         <b-col sm="3">
           <div class="pl-4">
             <div class="bc-page-site-creation-feature-icon-box">
@@ -73,7 +73,7 @@
               <a
                 id="create-project-site"
                 :disabled="!canCreateProjectSite"
-                :tabindex="createProjectSiteButtonFocus"
+                :tabindex="canCreateProjectSite ? 0 : -1"
                 :href="linkToCreateProjectSite"
                 class="bc-canvas-button bc-canvas-button-primary"
                 @click="goCreateProjectSite"
@@ -101,7 +101,6 @@ export default {
   data: () => ({
     canCreateCourseSite: undefined,
     canCreateProjectSite: undefined,
-    createCourseSiteButtonFocus: undefined,
     createProjectSiteButtonFocus: undefined,
     linkToCreateCourseSite: undefined,
     linkToCreateProjectSite: undefined

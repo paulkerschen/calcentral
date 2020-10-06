@@ -1,40 +1,29 @@
 <template>
   <!-- TODO: data-cc-spinner-directive -->
   <div class="bc-canvas-application bc-page-create-project-site" data-cc-spinner-directive>
-    <div v-if="!error">
+    <div v-if="!loading && !error">
       <h1 class="bc-header bc-header2">Create a Project Site</h1>
-      <div
-        v-if="isCreating"
-        id="cc-page-reader-alert"
-        role="alert"
-        aria-live="polite"
-        class="cc-visuallyhidden"
-      >
-        Now redirecting to the new project site
-      </div>
-      <form class="bc-canvas-page-form bc-canvas-form">
-        <div class="row bc-page-create-project-site-form-fields">
-          <div class="small-12 medium-3 columns">
-            <div class="bc-page-create-project-site-form-area-container">
+      <form class="bg-transparent border-0 bc-canvas-form">
+        <b-container>
+          <b-row>
+            <b-col class="float-right" sm="3">
               <label for="bc-page-create-project-site-name" class="bc-page-create-project-site-form-label">Project Site Name</label>
-            </div>
-          </div>
-          <div class="small-12 medium-4 columns end">
-            <div class="bc-page-create-project-site-form-area-container">
+            </b-col>
+            <b-col class="pl-0 pt-2" sm="9">
               <b-form-input
                 id="bc-page-create-project-site-name"
                 v-model="name"
-                type="text"
+                class="bc-canvas-form-input-text w-50"
                 :disabled="isCreating"
                 placeholder="Enter a name for your site"
-                class="bc-canvas-form-input-text"
               />
-            </div>
-          </div>
-        </div>
+            </b-col>
+          </b-row>
+        </b-container>
 
         <div class="bc-form-actions">
           <button
+            id="create-project-site-button"
             :disabled="!name || isCreating"
             aria-controls="cc-page-reader-alert"
             class="bc-canvas-button bc-canvas-button-primary"
@@ -44,15 +33,15 @@
             <span v-if="!isCreating">Create a Project Site</span>
             <span v-if="isCreating"><fa icon="spinner" spin></fa> Creating ...</span>
           </button>
-          <a
-            id="link-to-site-overview"
-            :href="linkToSiteOverview"
-            class="bc-canvas-button"
-            type="reset"
+          <b-button
+            id="cancel-and-return-to-site-creation"
             aria-label="Cancel and return to Site Creation Overview"
+            class="bc-canvas-button"
+            variant="link"
+            @click="cancel"
           >
             Cancel
-          </a>
+          </b-button>
         </div>
       </form>
     </div>
@@ -63,23 +52,28 @@
 </template>
 
 <script>
+import Accessibility from '@/mixins/Accessibility'
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
+import Context from '@/mixins/Context'
 import Iframe from '@/mixins/Iframe'
 import {createProjectSite} from '@/api/canvas'
 
 export default {
   name: 'CreateProjectSite',
+  mixins: [Accessibility, Context, Iframe],
   components: {CanvasErrors},
-  mixins: [Iframe],
   data: () => ({
     isCreating: undefined,
     error: undefined,
-    linkToSiteOverview: undefined,
     name: undefined
   }),
   methods: {
+    cancel() {
+      this.$router.push({ path: this.isInIframe ? '/canvas/embedded/site_creation' : '/canvas/site_creation'})
+    },
     createProjectSite() {
       this.isCreating = true
+      this.accessibilityAnnounce('Creating new project site...')
       createProjectSite(this.name).then(data => {
         if (data.projectSiteUrl) {
           if (this.isInIframe) {
@@ -89,9 +83,29 @@ export default {
           }
         } else {
           this.error = 'Failed to create project site.'
+          this.isCreating = false
         }
       })
     }
   }
 }
 </script>
+
+<style scoped lang="scss">
+.bc-page-create-project-site {
+  background: $cc-color-white;
+  padding: 20px;
+
+  .bc-page-create-project-site-form-label {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  @media #{$small-only} {
+    .bc-page-create-project-site-form-label {
+      text-align: left;
+    }
+  }
+}
+</style>
