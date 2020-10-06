@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import Accessibility from '@/mixins/Accessibility'
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import Context from '@/mixins/Context'
 import Iframe from '@/mixins/Iframe'
@@ -60,7 +59,7 @@ import {createProjectSite} from '@/api/canvas'
 
 export default {
   name: 'CreateProjectSite',
-  mixins: [Accessibility, Context, Iframe],
+  mixins: [Context, Iframe],
   components: {CanvasErrors},
   data: () => ({
     isCreating: undefined,
@@ -76,7 +75,7 @@ export default {
     },
     createProjectSite() {
       this.isCreating = true
-      this.accessibilityAnnounce('Creating new project site...')
+      this.alertScreenReader('Creating new project site...')
       createProjectSite(this.name).then(data => {
         if (data.projectSiteUrl) {
           if (this.isInIframe) {

@@ -258,17 +258,16 @@
 </template>
 
 <script>
-import {addUser, getAddUserCourseSections, getCourseUserRoles, searchUsers} from '@/api/canvas'
-import Accessibility from '@/mixins/Accessibility'
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Iframe from '@/mixins/Iframe'
 import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import OutboundLink from '@/components/util/OutboundLink'
+import {addUser, getAddUserCourseSections, getCourseUserRoles, searchUsers} from '@/api/canvas'
 
 export default {
   name: 'CourseAddUser',
   components: {MaintenanceNotice, OutboundLink},
-  mixins: [Accessibility, CanvasUtils, Iframe],
+  mixins: [CanvasUtils, Iframe],
   data: () => ({
     additionFailureMessage: null,
     additionSuccessMessage: null,
@@ -301,7 +300,7 @@ export default {
     isAuthorized(response) {
       return (
         this.$_.includes(response.roleTypes, 'TeacherEnrollment') ||
-        this.$_.includes(response.roleTypes, 'TaEnrollment') ||        
+        this.$_.includes(response.roleTypes, 'TaEnrollment') ||
         this.$_.includes(response.roles, 'globalAdmin')
       )
     },
@@ -331,7 +330,7 @@ export default {
     searchUsers() {
       this.resetSearchState()
       this.resetImportState()
-      this.accessibilityAnnounce('Loading user search results')
+      this.alertScreenReader('Loading user search results')
       this.showUsersArea = true
       this.isLoading = true
       searchUsers(this.canvasCourseId, this.searchText, this.searchType).then(response => {
@@ -366,7 +365,7 @@ export default {
       this.iframeScrollToTop()
       this.showUsersArea = false
       this.showSearchForm = false
-      this.accessibilityAnnounce('Adding user')
+      this.alertScreenReader('Adding user')
       this.isLoading = true
       this.showAlerts = true
       addUser(this.canvasCourseId, this.selectedUser.ldapUid, this.selectedSection.id, this.selectedRole).then(response => {
@@ -398,7 +397,7 @@ export default {
     getCourseUserRoles(this.canvasCourseId).then(response => {
       if (this.isAuthorized(response)) {
         this.grantingRoles = response.grantingRoles
-        this.selectedRole = response.grantingRoles[0]        
+        this.selectedRole = response.grantingRoles[0]
         getAddUserCourseSections(this.canvasCourseId).then(response => {
           this.isLoading = false
           this.courseSections = response.courseSections

@@ -11,13 +11,13 @@
     <div class="order-1">
       <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
         <h2 class="cc-visuallyhidden">Administrator Options</h2>
-        <button
+        <b-button
           aria-controls="bc-page-create-course-site-admin-section-loader-form"
-          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch p-2"
-          @click="setAdminMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
+          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch pb-2 ptl-3 pr-2 pt-2"
+          @click="setMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
         >
           Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
-        </button>
+        </b-button>
         <div id="bc-page-create-course-site-admin-section-loader-form">
           <div v-if="adminMode === 'act_as'" class="pt-3">
             <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
@@ -44,7 +44,7 @@
             </form>
           </div>
           <div v-if="adminMode === 'by_ccn'">
-            <h3 class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h3>
+            <h3 id="load-sections-by-ccn" class="cc-visuallyhidden" tabindex="0">Load Sections By Course Control Numbers (CCN)</h3>
             <form class="bc-canvas-page-form" @submit="fetchFeed">
               <div v-if="$_.size(adminSemesters)">
                 <div class="bc-buttonset">
@@ -104,12 +104,13 @@
 </template>
 
 <script>
+import Context from '@/mixins/Context'
 import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'CreateCourseSiteHeader',
-  mixins: [Utils],
+  mixins: [Context, Utils],
   components: {MaintenanceNotice},
   watch: {
     ccns(value) {
@@ -165,7 +166,14 @@ export default {
   data: () => ({
     ccns: [],
     uid: undefined
-  })
+  }),
+  methods: {
+    setMode(mode) {
+      this.setAdminMode(mode)
+      this.alertScreenReader(`Input mode switched to ${mode === 'by_ccn' ? 'section ID' : 'UID'}`)
+      this.$putFocusNextTick(mode === 'by_ccn' ? 'load-sections-by-ccn' : 'instructor-uid')
+    }
+  }
 }
 </script>
 

@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import Accessibility from '@/mixins/Accessibility'
 import CanvasErrors from '@/components/bcourses/CanvasErrors'
 import ConfirmationStep from '@/components/bcourses/create/ConfirmationStep'
 import Context from '@/mixins/Context'
@@ -75,7 +74,7 @@ import {courseCreate, courseProvisionJobStatus, getCourseProvisioningMetadata, g
 
 export default {
   name: 'CreateCourseSite',
-  mixins: [Accessibility, Context, Iframe, Utils],
+  mixins: [Context, Iframe, Utils],
   components: {
     CanvasErrors,
     ConfirmationStep,
@@ -145,7 +144,7 @@ export default {
     },
     createCourseSiteJob(siteName, siteAbbreviation) {
       this.currentWorkflowStep = 'monitoring_job'
-      this.accessibilityAnnounce('Creating course site. Please wait.')
+      this.alertScreenReader('Creating course site. Please wait.')
       this.monitorFocus = true
       this.showMaintenanceNotice = false
       this.updateSelected()
@@ -168,7 +167,7 @@ export default {
         courseCreate(course).then(data => {
           this.$_.assignIn(this, data)
           this.currentWorkflowStep = 'monitoring_job'
-          this.accessibilityAnnounce('Course site created successfully')
+          this.alertScreenReader('Course site created successfully')
           this.completedFocus = true
           this.jobStatusLoader()
         })
@@ -189,7 +188,7 @@ export default {
       this.feedFetched = false
       this.currentWorkflowStep = 'selecting'
       this.selectedSectionsList = []
-      this.accessibilityAnnounce('Loading courses and sections')
+      this.alertScreenReader('Loading courses and sections')
       getSections(
         this.adminActingAs,
         this.adminByCcns,
@@ -206,11 +205,11 @@ export default {
         this.selectFocus = true
         // TODO: Error handling?
         // if (this.sectionsFeed.status !== 200) {
-        //   $scope.accessibilityAnnounce('Course section loading failed');
+        //   this.alertScreenReader('Course section loading failed');
         //   $scope.isLoading = false;
         //   $scope.displayError = 'failure';
         // } else {
-        this.accessibilityAnnounce('Course section loaded successfully')
+        this.alertScreenReader('Course section loaded successfully')
         if (this.$_.size(this.teachingSemesters) > 0) {
           this.switchSemester(this.teachingSemesters[0])
         }
@@ -361,7 +360,7 @@ export default {
     },
     showConfirmation() {
       this.updateSelected()
-      this.accessibilityAnnounce('Course site details form loaded.')
+      this.alertScreenReader('Course site details form loaded.')
       this.currentWorkflowStep = 'confirmation'
     },
     showSelecting() {
@@ -371,13 +370,14 @@ export default {
       this.currentAdminSemester = semester.slug
       this.selectedSectionsList = []
       this.updateSelected()
+      this.alertScreenReader(`Switched to ${semester.name} for CCN input`)
     },
     switchSemester(semester) {
       this.currentSemester = semester.slug
       this.coursesList = semester.classes
       this.selectedSectionsList = []
       this.currentSemesterName = semester.name
-      this.accessibilityAnnounce(`'Course sections for ${semester.name} loaded'`)
+      this.alertScreenReader(`'Course sections for ${semester.name} loaded'`)
       this.updateSelected()
     },
     toggleCourseSectionsWithUpdate() {

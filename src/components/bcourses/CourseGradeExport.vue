@@ -276,17 +276,16 @@
 </template>
 
 <script>
-import {downloadGradeCsv, getCourseUserRoles, getExportJobStatus, getExportOptions, prepareGradesCacheJob} from '@/api/canvas'
-import Accessibility from '@/mixins/Accessibility'
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Iframe from '@/mixins/Iframe'
 import OutboundLink from '@/components/util/OutboundLink'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
+import {downloadGradeCsv, getCourseUserRoles, getExportJobStatus, getExportOptions, prepareGradesCacheJob} from '@/api/canvas'
 
 export default {
   name: 'CourseGradeExport',
   components: { OutboundLink, ProgressBar },
-  mixins: [Accessibility, CanvasUtils, Iframe],
+  mixins: [CanvasUtils, Iframe],
   data: () => ({
     appState: null,
     backgroundJobId: null,
@@ -402,7 +401,7 @@ export default {
           if (this.jobStatus !== 'New' && this.jobStatus !== 'Processing') {
             this.percentCompleteRounded = null
             clearInterval(this.exportTimer)
-            this.accessibilityAnnounce('Downloading export. Export form options presented for an additional download.')
+            this.alertScreenReader('Downloading export. Export form options presented for an additional download.')
             this.switchToSelection()
             this.downloadGrades()
           }
