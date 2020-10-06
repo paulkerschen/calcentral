@@ -22,7 +22,7 @@
               value-field="ccn"
               @change="updateStudentsFiltered"
             >
-              <template v-slot:first>
+              <template #first>
                 <b-form-select-option :value="null">All sections</b-form-select-option>
               </template>
             </b-form-select>

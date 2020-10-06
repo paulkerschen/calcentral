@@ -21,7 +21,7 @@
           value-field="name"
           @change="departmentCode = null"
         >
-          <template v-slot:first>
+          <template #first>
             <b-form-select-option :value="null">Select task...</b-form-select-option>
           </template>
         </b-form-select>
@@ -44,7 +44,7 @@
             text-field="name"
             value-field="code"
           >
-            <template v-slot:first>
+            <template #first>
               <b-form-select-option :value="null">All participating departments</b-form-select-option>
             </template>
           </b-form-select>
