@@ -51,6 +51,9 @@ cat ${TOMCAT_DEPLOY}/ROOT/WEB-INF/versions/git.txt | ${LOGIT}
 log_info "Copying assets into ${DOC_ROOT}"
 cp -Rvf ${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist ${DOC_ROOT} | ${LOGIT}
 
+log_info "Copying oauth to ${DOC_ROOT}"
+cp -Rvf ${TOMCAT_DEPLOY}/ROOT/oauth ${DOC_ROOT} | ${LOGIT}
+
 log_info "Move compiled 'index.html' into ${TOMCAT_DEPLOY}/ROOT"
 cp -vf "${TOMCAT_DEPLOY}/ROOT/WEB-INF/dist/static/index.html" "${TOMCAT_DEPLOY}/ROOT/" | ${LOGIT}
 

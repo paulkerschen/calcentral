@@ -118,7 +118,7 @@ module Berkeley
       cs_terms = []
       filename = Settings.terms.term_definitions_json_file
       begin
-        filename = Settings.terms.term_definitions_json_file || "#{Rails.root}/docs/json/terms.json"
+        filename = Settings.terms.term_definitions_json_file || "#{Rails.root}/public/json/terms.json"
         contents = File.read(filename)
         json_terms = JSON.parse(contents)
       end
