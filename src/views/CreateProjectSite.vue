@@ -21,17 +21,17 @@
           </b-row>
         </b-container>
 
-        <div class="bc-form-actions">
+        <div class="bc-form-actions mt-4">
           <button
             id="create-project-site-button"
-            :disabled="!name || isCreating"
+            :disabled="isCreating || !$_.trim(name)"
             aria-controls="cc-page-reader-alert"
             class="bc-canvas-button bc-canvas-button-primary"
             type="submit"
             @click="createProjectSite"
           >
             <span v-if="!isCreating">Create a Project Site</span>
-            <span v-if="isCreating"><fa icon="spinner" spin></fa> Creating ...</span>
+            <span v-if="isCreating"><fa class="mr-1" icon="spinner" spin></fa> Creating...</span>
           </button>
           <b-button
             id="cancel-and-return-to-site-creation"
@@ -67,6 +67,9 @@ export default {
     error: undefined,
     name: undefined
   }),
+  created() {
+    this.$ready('Create bCourses Project Site', 'bc-page-create-project-site-name')
+  },
   methods: {
     cancel() {
       this.$router.push({ path: this.isInIframe ? '/canvas/embedded/site_creation' : '/canvas/site_creation'})

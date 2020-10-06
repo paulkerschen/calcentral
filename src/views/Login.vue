@@ -37,7 +37,7 @@ export default {
     }
   },
   created() {
-    this.alertScreenReader('Welcome. Please log in.')
+    this.$ready('Welcome. Please log in.')
   }
 }
 </script>

@@ -8,25 +8,8 @@
 import Context from '@/mixins/Context.vue'
 
 export default {
-  mixins: [Context],
-  watch: {
-    loading(value) {
-      this.alert(value, true)
-    }
-  },
-  created() {
-    this.alert(this.loading, false)
-  },
-  methods: {
-    alert(isLoading, voiceIfLoaded)  {
-      const prefix = this.alertPrefix || this.$_.get(this.$route, 'meta.title') || 'Page'
-      if (isLoading) {
-        this.alertScreenReader(`${prefix} is loading...`)
-      } else if (voiceIfLoaded) {
-        this.alertScreenReader(`${prefix} has loaded.`)
-      }
-    }
-  }
+  name: 'Spinner',
+  mixins: [Context]
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <b-row class="bg-header cc-masthead" no-gutters>
+  <b-row class="bg-header" no-gutters>
     <b-col sm="8">
       <div class="header-text mt-1 pl-3 pt-2">
         ETS bCourses Utilities

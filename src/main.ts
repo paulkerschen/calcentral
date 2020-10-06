@@ -38,8 +38,8 @@ const putFocusNextTick = (id, cssSelector) => {
 
 // Mount packages
 Vue.prototype.$_ = _
-Vue.prototype.$loading = () => store.dispatch('context/loadingStart')
-Vue.prototype.$ready = label => store.dispatch('context/loadingComplete', label)
+Vue.prototype.$loading = label => store.commit('context/loadingStart', label)
+Vue.prototype.$ready = (label, focusTarget) => store.commit('context/loadingComplete', {label, focusTarget})
 Vue.prototype.$putFocusNextTick = putFocusNextTick
 
 // Axios

@@ -1,12 +1,12 @@
 <template>
-  <b-container fluid>
+  <b-container class="pl-0 pr-0" fluid>
     <ToolboxHeader />
-    <b-row class="p-3">
+    <b-row class="mb-2 mt-4" no-gutters>
       <b-col>
-        <h1 id="cc-main-content" class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
+        <h1 class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
       </b-col>
     </b-row>
-    <b-row class="pl-3 pr-3">
+    <b-row>
       <b-col v-if="canActAs || canOec" sm="6">
         <ActAs />
       </b-col>
@@ -16,7 +16,7 @@
         </div>
       </b-col>
     </b-row>
-    <b-row v-if="!canActAs && !canOec" class="pl-3 pr-3">
+    <b-row v-if="!canActAs && !canOec">
       <b-col sm="12">
         <div class="text-center">
           <img class="w-50" src="@/assets/images/conjunction-junction.jpg" alt="Image of train junction" />

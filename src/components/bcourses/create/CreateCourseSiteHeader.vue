@@ -9,95 +9,93 @@
       </div>
     </div>
     <div class="order-1">
-      <div>
-        <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
-          <h1 class="cc-visuallyhidden">Administrator Options</h1>
-          <button
-            aria-controls="bc-page-create-course-site-admin-section-loader-form"
-            class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch p-2"
-            @click="setAdminMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
-          >
-            Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
-          </button>
-          <div id="bc-page-create-course-site-admin-section-loader-form">
-            <div v-if="adminMode === 'act_as'" class="pt-3">
-              <h2 class="cc-visuallyhidden">Load Sections By Instructor UID</h2>
-              <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit="fetchFeed">
-                <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
-                <b-form-input
-                  id="instructor-uid"
-                  v-model="uid"
-                  placeholder="Instructor UID"
-                  role="search"
-                ></b-form-input>
-                <div>
-                  <b-button
-                    id="sections-by-uid-button"
-                    class="bc-canvas-button bc-canvas-button-primary"
-                    :disabled="!toInt(uid)"
-                    aria-label="Load official sections for instructor"
-                    aria-controls="bc-page-create-course-site-steps-container"
-                    @click="fetchFeed"
-                  >
-                    As instructor
-                  </b-button>
+      <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
+        <h2 class="cc-visuallyhidden">Administrator Options</h2>
+        <button
+          aria-controls="bc-page-create-course-site-admin-section-loader-form"
+          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch p-2"
+          @click="setAdminMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
+        >
+          Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
+        </button>
+        <div id="bc-page-create-course-site-admin-section-loader-form">
+          <div v-if="adminMode === 'act_as'" class="pt-3">
+            <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
+            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit="fetchFeed">
+              <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
+              <b-form-input
+                id="instructor-uid"
+                v-model="uid"
+                placeholder="Instructor UID"
+                role="search"
+              ></b-form-input>
+              <div>
+                <b-button
+                  id="sections-by-uid-button"
+                  class="bc-canvas-button bc-canvas-button-primary"
+                  :disabled="!toInt(uid)"
+                  aria-label="Load official sections for instructor"
+                  aria-controls="bc-page-create-course-site-steps-container"
+                  @click="fetchFeed"
+                >
+                  As instructor
+                </b-button>
+              </div>
+            </form>
+          </div>
+          <div v-if="adminMode === 'by_ccn'">
+            <h3 class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h3>
+            <form class="bc-canvas-page-form" @submit="fetchFeed">
+              <div v-if="$_.size(adminSemesters)">
+                <div class="bc-buttonset">
+                  <span v-for="(semester, index) in adminSemesters" :key="index">
+                    <input
+                      :id="`semester${index}`"
+                      type="radio"
+                      name="adminSemester"
+                      class="cc-visuallyhidden"
+                      :aria-selected="currentAdminSemester === semester.slug"
+                      role="tab"
+                      @click="switchAdminSemester(semester)"
+                    />
+                    <label
+                      :for="`semester${index}`"
+                      class="bc-buttonset-button"
+                      role="button"
+                      aria-disabled="false"
+                      :class="{
+                        'bc-buttonset-button-active': currentAdminSemester === semester.slug,
+                        'bc-buttonset-corner-left': index === 0,
+                        'bc-buttonset-corner-right': index === ($_.size(adminSemesters) - 1)
+                      }"
+                    >
+                      {{ semester.name }}
+                    </label>
+                  </span>
                 </div>
-              </form>
-            </div>
-            <div v-if="adminMode === 'by_ccn'">
-              <h2 class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h2>
-              <form class="bc-canvas-page-form" @submit="fetchFeed">
-                <div v-if="$_.size(adminSemesters)">
-                  <div class="bc-buttonset">
-                    <span v-for="(semester, index) in adminSemesters" :key="index">
-                      <input
-                        :id="`semester${index}`"
-                        type="radio"
-                        name="adminSemester"
-                        class="cc-visuallyhidden"
-                        :aria-selected="currentAdminSemester === semester.slug"
-                        role="tab"
-                        @click="switchAdminSemester(semester)"
-                      />
-                      <label
-                        :for="`semester${index}`"
-                        class="bc-buttonset-button"
-                        role="button"
-                        aria-disabled="false"
-                        :class="{
-                          'bc-buttonset-button-active': currentAdminSemester === semester.slug,
-                          'bc-buttonset-corner-left': index === 0,
-                          'bc-buttonset-corner-right': index === ($_.size(adminSemesters) - 1)
-                        }"
-                      >
-                        {{ semester.name }}
-                      </label>
-                    </span>
-                  </div>
-                  <label
-                    for="bc-page-create-course-site-ccn-list"
-                    class="cc-visuallyhidden"
-                  >
-                    Provide CCN List Separated by Commas or Spaces
-                  </label>
-                  <textarea
-                    id="bc-page-create-course-site-ccn-list"
-                    v-model="ccns"
-                    placeholder="Paste your list of CCNs here, separated by commas or spaces"
-                  >
-                </textarea>
-                  <b-button
-                    id="sections-by-ids-button"
-                    class="bc-canvas-button bc-canvas-button-primary"
-                    :disabled="!$_.trim(ccns)"
-                    type="submit"
-                    aria-controls="bc-page-create-course-site-steps-container"
-                  >
-                    Review matching CCNs
-                  </b-button>
-                </div>
-              </form>
-            </div>
+                <label
+                  for="bc-page-create-course-site-ccn-list"
+                  class="cc-visuallyhidden"
+                >
+                  Provide CCN List Separated by Commas or Spaces
+                </label>
+                <textarea
+                  id="bc-page-create-course-site-ccn-list"
+                  v-model="ccns"
+                  placeholder="Paste your list of CCNs here, separated by commas or spaces"
+                >
+              </textarea>
+                <b-button
+                  id="sections-by-ids-button"
+                  class="bc-canvas-button bc-canvas-button-primary"
+                  :disabled="!$_.trim(ccns)"
+                  type="submit"
+                  aria-controls="bc-page-create-course-site-steps-container"
+                >
+                  Review matching CCNs
+                </b-button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
