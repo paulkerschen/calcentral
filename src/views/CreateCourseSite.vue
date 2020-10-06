@@ -3,12 +3,13 @@
     <div v-if="!loading && !error" class="bc-accessibility-no-outline">
       <CreateCourseSiteHeader
         :set-admin-acting-as="setAdminActingAs"
-        :admin-by-ccns="adminByCcns"
         :admin-mode="adminMode"
         :admin-semesters="adminSemesters"
         :current-admin-semester="currentAdminSemester"
         :is-admin="isAdmin"
         :fetch-feed="fetchFeed"
+        :set-admin-by-ccns="setAdminByCcns"
+        :set-admin-mode="setAdminMode"
         :show-maintenance-notice="showMaintenanceNotice"
         :switch-admin-semester="switchAdminSemester"
       />
@@ -347,6 +348,12 @@ export default {
     },
     setAdminActingAs(uid) {
       this.adminActingAs = uid
+    },
+    setAdminByCcns(ccns) {
+      this.adminByCcns = ccns
+    },
+    setAdminMode(adminMode) {
+      this.adminMode = adminMode
     },
     showConfirmation() {
       this.updateSelected()

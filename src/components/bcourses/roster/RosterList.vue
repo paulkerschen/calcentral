@@ -26,10 +26,10 @@
       :sort-by.sync="sortBy"
       striped
     >
-      <template v-slot:cell(last_name)="data">
+      <template #cell(last_name)="data">
         {{ data.item.last_name }}, {{ data.item.first_name }}
       </template>
-      <template v-slot:cell(sections)="data">
+      <template #cell(sections)="data">
         <div v-for="section in data.item.sections" :key="section.ccn">
           {{ section.name }} ({{ section.ccn }})
         </div>

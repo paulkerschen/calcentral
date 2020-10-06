@@ -15,7 +15,7 @@
           <button
             aria-controls="bc-page-create-course-site-admin-section-loader-form"
             class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch p-2"
-            @click="adminMode = adminMode === 'act_as' ? 'by_ccn' : 'act_as'"
+            @click="setAdminMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
           >
             Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
           </button>
@@ -82,14 +82,14 @@
                   </label>
                   <textarea
                     id="bc-page-create-course-site-ccn-list"
-                    v-model="adminByCcns"
+                    v-model="ccns"
                     placeholder="Paste your list of CCNs here, separated by commas or spaces"
                   >
                 </textarea>
                   <b-button
                     id="sections-by-ids-button"
                     class="bc-canvas-button bc-canvas-button-primary"
-                    :disabled="!$_.trim(adminByCcns)"
+                    :disabled="!$_.trim(ccns)"
                     type="submit"
                     aria-controls="bc-page-create-course-site-steps-container"
                   >
@@ -114,6 +114,9 @@ export default {
   mixins: [Utils],
   components: {MaintenanceNotice},
   watch: {
+    ccns(value) {
+      this.setAdminByCcns(value)
+    },
     uid() {
       this.setAdminActingAs(this.uid)
     }
@@ -122,11 +125,6 @@ export default {
     setAdminActingAs: {
       required: true,
       type: Function
-    },
-    adminByCcns: {
-      default: undefined,
-      required: false,
-      type: String
     },
     adminMode: {
       required: true,
@@ -149,6 +147,14 @@ export default {
       required: true,
       type: Function
     },
+    setAdminByCcns: {
+      required: true,
+      type: Function
+    },
+    setAdminMode: {
+      required: true,
+      type: Function
+    },
     showMaintenanceNotice: {
       required: true,
       type: Boolean
@@ -159,6 +165,7 @@ export default {
     }
   },
   data: () => ({
+    ccns: [],
     uid: undefined
   })
 }

@@ -4,6 +4,9 @@
     <div class="bc-notice-text-container">
       <h1 class="bc-notice-text-header">{{ decamelize(errorType) }}</h1>
       <p v-if="message" class="pt-2">{{ message }}</p>
+      <p v-if="!message && errorType === 'unauthorized'" class="pt-2">
+        You are unauthorized to use this feature. Please contact bCourses support for further assistance.
+      </p>
       <p>Please contact <OutboundLink href="http://ets.berkeley.edu/discover-services/bcourses">bCourses support</OutboundLink> for further assistance.</p>
     </div>
   </div>
@@ -27,13 +30,6 @@ export default {
       default: undefined,
       required: false,
       type: String
-    }
-  },
-  created() {
-    if (!this.message) {
-      if (this.errorType === 'unauthorized') {
-        this.message = 'You are unauthorized to use this feature. Please contact bCourses support for further assistance.'
-      }
     }
   }
 }

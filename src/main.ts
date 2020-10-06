@@ -21,7 +21,7 @@ library.add(far, fas, faSpinner, faUserSecret)
 Vue.config.productionTip = process.env.VUE_APP_DEBUG.toLowerCase() === 'true'
 Vue.use(BootstrapVue)
 Vue.use(VueMoment, { moment })
-Vue.component('fa', FontAwesomeIcon)
+Vue.component('fa', FontAwesomeIcon) // eslint-disable-line vue/component-definition-name-casing
 
 const putFocusNextTick = (id, cssSelector) => {
   const callable = () => {

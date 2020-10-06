@@ -22,7 +22,7 @@
         small
         sort-icon-left
       >
-        <template v-slot:cell(ldapUid)="data">
+        <template #cell(ldapUid)="data">
           <b-button
             id="act-as-by-uid"
             class="p-0"
@@ -32,13 +32,13 @@
             {{ data.item.ldapUid }}
           </b-button>
         </template>
-        <template v-slot:cell(studentId)="data">
+        <template #cell(studentId)="data">
           {{ data.item.studentId || '&mdash;' }}
         </template>
-        <template v-slot:cell(firstName)="data">
+        <template #cell(firstName)="data">
           {{ data.item.firstName }} {{ data.item.lastName }}
         </template>
-        <template v-slot:cell(action)="data">
+        <template #cell(action)="data">
           <b-button
             :id="`${actionVerb}-user-${data.item.ldapUid}`"
             :aria-label="`${actionVerb} user ${data.item.ldapUid}`"
