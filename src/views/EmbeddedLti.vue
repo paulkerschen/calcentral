@@ -1,5 +1,10 @@
 <template>
-  <div ref="main" class="cc-container-main" role="main">
+  <div
+    id="cc-main-content"
+    ref="main"
+    class="cc-container-main"
+    role="main"
+  >
     <router-view />
   </div>
 </template>

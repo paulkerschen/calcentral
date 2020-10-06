@@ -3,7 +3,7 @@
     <ToolboxHeader />
     <b-row class="p-3">
       <b-col>
-        <h1 class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
+        <h1 id="cc-main-content" class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
       </b-col>
     </b-row>
     <b-row class="pl-3 pr-3">
