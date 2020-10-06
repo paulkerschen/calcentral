@@ -45,7 +45,7 @@ module Berkeley
 
     def self.get_sections_from_legacy_ccns(term_yr, term_cd, legacy_ccns)
       results = []
-      sections = CSV.read('docs/csv/legacy_ccn_mappings.csv', headers: true)
+      sections = CSV.read('public/csv/legacy_ccn_mappings.csv', headers: true)
       legacy_ccns.each do |ccn|
         key = "#{term_yr}-#{term_cd}-#{ccn}"
         if (section_def = sections.find {|s| s['term_ccn'] == key})
