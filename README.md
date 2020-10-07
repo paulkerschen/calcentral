@@ -354,7 +354,7 @@ Fixture files can represent time information by tokens that are substituted with
 
 ## Rake tasks:
 
-To view other rake task for the project: `rake -T`
+To view other rake tasks for the project: `rake -T`
 
 ## Installing Memcached:
 
