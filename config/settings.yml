@@ -53,6 +53,7 @@ terms:
   oldest: spring-2010
   # This term and earlier have slightly different CCN logic, currently relevant only to Webcasts.
   legacy_cutoff: summer-2016
+  legacy_ccn_mappings_file: "public/csv/legacy_ccn_mappings.csv"
   # Timestamp in UTC, needed when testing against test Campus data.
   # Can also be used to force selection of a "current term" different
   # from the default.
