@@ -74,11 +74,14 @@ export default {
   created() {
     this.isLoading = true
     this.getCanvasCourseId()
-    getWebcasts(this.canvasCourseId).then(response => {
-      this.media = response.media
-      this.videos = response.videos
-      this.isLoading = false
-    })
+    getWebcasts(this.canvasCourseId).then(
+      response => {
+        this.media = response.media
+        this.videos = response.videos
+        this.isLoading = false
+      },
+      this.$errorHandler
+    )
   }
 }
 </script>

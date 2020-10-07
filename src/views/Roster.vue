@@ -151,9 +151,12 @@ export default {
   },
   methods: {
     downloadCsv() {
-      getRosterCsv(this.canvasCourseId).then(() => {
-        this.alertScreenReader(`${this.roster.canvas_course.name} CSV downloaded`)
-      })
+      getRosterCsv(this.canvasCourseId).then(
+        () => {
+          this.alertScreenReader(`${this.roster.canvas_course.name} CSV downloaded`)
+        },
+        this.$errorHandler
+      )
     },
     idx(value) {
       return value && this.$_.trim(value).replace(/[^\w\s]/gi, '').toLowerCase()
@@ -162,7 +165,7 @@ export default {
       this.printPage(`${this.idx(this.roster.canvas_course.name).replace(/\s/g, '-')}_roster`)
     },
     sort(students) {
-      return  this.$_.sortBy(students, s => s.last_name)
+      return this.$_.sortBy(students, s => s.last_name)
     },
     updateStudentsFiltered() {
       const snippet = this.idx(this.search)

@@ -162,24 +162,33 @@ export default {
   methods: {
     findSiteMailingList() {
       this.isProcessing = true
-      getSiteMailingListAdmin(this.canvasSite.canvasCourseId).then(response => {
-        this.updateDisplay(response)
-      })
+      getSiteMailingListAdmin(this.canvasSite.canvasCourseId).then(
+        response => {
+          this.updateDisplay(response)
+        },
+        this.$errorHandler
+      )
     },
     populateMailingList() {
       this.isProcessing = true
-      populateSiteMailingList(this.canvasSite.canvasCourseId).then(response => {
-        this.updateDisplay(response)
-        if (!response || !response.populationResults) {
-          this.alerts.error.push('The mailing list could not be populated.')
-        }
-      })
+      populateSiteMailingList(this.canvasSite.canvasCourseId).then(
+        response => {
+          this.updateDisplay(response)
+          if (!response || !response.populationResults) {
+            this.alerts.error.push('The mailing list could not be populated.')
+          }
+        },
+        this.$errorHandler
+      )
     },
     registerMailingList() {
       this.isProcessing = true
-      createSiteMailingListAdmin(this.canvasSite.canvasCourseId, this.mailingList).then(response => {
-        this.updateDisplay(response)
-      })
+      createSiteMailingListAdmin(this.canvasSite.canvasCourseId, this.mailingList).then(
+        response => {
+          this.updateDisplay(response)
+        },
+        this.$errorHandler
+      )
     },
     resetForm() {
       this.canvasSite = {}

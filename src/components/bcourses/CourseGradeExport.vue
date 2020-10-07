@@ -340,19 +340,22 @@ export default {
       this.selectedPnpCutoffGrade = ''
     },
     loadExportOptions() {
-      getExportOptions(this.canvasCourseId).then(response => {
-        this.loadSectionTerms(this.$_.get(response, 'sectionTerms'))
-        if (this.appState !== 'error') {
-          this.loadOfficialSections(this.$_.get(response, 'officialSections'))
-        }
-        if (this.appState !== 'error') {
-          this.appState = 'preselection'
-          if (!response.gradingStandardEnabled) {
-            this.noGradingStandardEnabled = true
+      getExportOptions(this.canvasCourseId).then(
+        response => {
+          this.loadSectionTerms(this.$_.get(response, 'sectionTerms'))
+          if (this.appState !== 'error') {
+            this.loadOfficialSections(this.$_.get(response, 'officialSections'))
           }
-          this.initializePnpCutoffGrades()
-        }
-      })
+          if (this.appState !== 'error') {
+            this.appState = 'preselection'
+            if (!response.gradingStandardEnabled) {
+              this.noGradingStandardEnabled = true
+            }
+            this.initializePnpCutoffGrades()
+          }
+        },
+        this.$errorHandler
+      )
     },
     loadOfficialSections(officialSections) {
       if (!officialSections || !officialSections.length) {
@@ -383,30 +386,36 @@ export default {
       this.appfocus = true
       this.jobStatus = 'New'
       this.iframeScrollToTop()
-      prepareGradesCacheJob(this.canvasCourseId).then(response => {
-        if (response.jobRequestStatus === 'Success') {
-          this.backgroundJobId = response.jobId
-          this.startExportJob()
-        } else {
-          this.appState = 'error'
-          this.contactSupport = true
-          this.errorStatus = 'Grade preloading request failed'
-        }
-      })
+      prepareGradesCacheJob(this.canvasCourseId).then(
+        response => {
+          if (response.jobRequestStatus === 'Success') {
+            this.backgroundJobId = response.jobId
+            this.startExportJob()
+          } else {
+            this.appState = 'error'
+            this.contactSupport = true
+            this.errorStatus = 'Grade preloading request failed'
+          }
+        },
+        this.$errorHandler
+      )
     },
     startExportJob() {
       this.exportTimer = setInterval(() => {
-        getExportJobStatus(this.canvasCourseId, this.backgroundJobId).then(response => {
-          this.jobStatus = response.jobStatus
-          this.percentCompleteRounded = Math.round(response.percentComplete * 100)
-          if (this.jobStatus !== 'New' && this.jobStatus !== 'Processing') {
-            this.percentCompleteRounded = null
-            clearInterval(this.exportTimer)
-            this.alertScreenReader('Downloading export. Export form options presented for an additional download.')
-            this.switchToSelection()
-            this.downloadGrades()
-          }
-        })
+        getExportJobStatus(this.canvasCourseId, this.backgroundJobId).then(
+          response => {
+            this.jobStatus = response.jobStatus
+            this.percentCompleteRounded = Math.round(response.percentComplete * 100)
+            if (this.jobStatus !== 'New' && this.jobStatus !== 'Processing') {
+              this.percentCompleteRounded = null
+              clearInterval(this.exportTimer)
+              this.alertScreenReader('Downloading export. Export form options presented for an additional download.')
+              this.switchToSelection()
+              this.downloadGrades()
+            }
+          },
+          this.$errorHandler
+        )
       }, 2000)
     },
     switchToSelection() {
@@ -421,16 +430,19 @@ export default {
   created() {
     this.appState = 'initializing'
     this.getCanvasCourseId()
-    getCourseUserRoles(this.canvasCourseId).then(response => {
-      this.canvasRootUrl = response.canvasRootUrl
-      this.canvasCourseId = response.courseId
-      if (this.$_.includes(response.roles, 'Teacher') || this.$_.includes(response.roles, 'globalAdmin') ) {
-        this.loadExportOptions()
-      } else {
-        this.appState = 'error'
-        this.errorStatus = 'You must be a teacher in this bCourses course to export to E-Grades CSV.'
-      }
-    })
+    getCourseUserRoles(this.canvasCourseId).then(
+      response => {
+        this.canvasRootUrl = response.canvasRootUrl
+        this.canvasCourseId = response.courseId
+        if (this.$_.includes(response.roles, 'Teacher') || this.$_.includes(response.roles, 'globalAdmin') ) {
+          this.loadExportOptions()
+        } else {
+          this.appState = 'error'
+          this.errorStatus = 'You must be a teacher in this bCourses course to export to E-Grades CSV.'
+        }
+      },
+      this.$errorHandler
+    )
   }
 }
 </script>
