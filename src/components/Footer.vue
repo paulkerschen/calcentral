@@ -11,7 +11,7 @@
             <div>
               Berkeley &copy; {{ new Date().getFullYear() }} UC Regents
             </div>
-            <div v-if="includeBuildSummary" class="pt-3">
+            <div v-if="!isInIframe && includeBuildSummary" class="pt-3">
               <div class="d-flex">
                 <div>
                   <h4>Build Summary</h4>
@@ -68,7 +68,7 @@
             </div>
           </b-col>
         </b-row>
-        <b-row v-if="$currentUser.isLoggedIn && !$currentUser.isDirectlyAuthenticated" class="border-top pl-3 pt-3 text-secondary w-100" no-gutters>
+        <b-row v-if="!isInIframe && $currentUser.isLoggedIn && !$currentUser.isDirectlyAuthenticated" class="border-top pl-3 pt-3 text-secondary w-100" no-gutters>
           <b-col class="pt-1" sm="8">
             <div aria-live="polite" role="alert">
               You are viewing as {{ $currentUser.fullName }} ({{ $currentUser.uid }}),
@@ -106,12 +106,13 @@
 import BuildSummary from '@/components/util/BuildSummary'
 import Context from '@/mixins/Context'
 import DevAuth from '@/components/util/DevAuth'
+import Iframe from '@/mixins/Iframe'
 import OutboundLink from '@/components/util/OutboundLink'
 import {stopActAs} from '@/api/act'
 
 export default {
   name: 'Footer',
-  mixins: [Context],
+  mixins: [Context, Iframe],
   components: {BuildSummary, DevAuth, OutboundLink},
   props: {
     includeBuildSummary: {
