@@ -61,13 +61,13 @@
           <div>Membership last updated: <strong id="mailing-list-membership-last-updated">{{ listLastPopulated }}</strong></div>
           <div>
             Course site:
-            <a 
+            <OutboundLink
               id="mailing-list-court-site-name"
               :href="canvasSite.url"
               @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)"
             >
               {{ canvasSite.name }}  
-            </a>
+            </OutboundLink>
           </div>
         </div>
         <b-row no-gutters>
@@ -140,10 +140,12 @@
 
 <script>
 import {createSiteMailingListAdmin, getSiteMailingListAdmin, populateSiteMailingList} from '@/api/canvas'
+import OutboundLink from '@/components/util/OutboundLink'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingLists',
+  components: {OutboundLink},
   mixins: [Utils],
   data: () => ({
     alerts: {
