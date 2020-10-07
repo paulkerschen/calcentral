@@ -67,6 +67,7 @@ export default {
   components: {OutboundLink},
   mixins: [CanvasUtils],
   data: () => ({
+    isLoading: null,
     media: [],
     videos: []
   }),
