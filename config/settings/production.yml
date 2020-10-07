@@ -33,4 +33,5 @@ background_threads:
   max_queue: 0  # unbounded work queue
 
 terms:
-  legacy_ccn_mappings_file: "csv/legacy_ccn_mappings.csv"
+  legacy_ccn_mappings_file: "dist/static/csv/legacy_ccn_mappings.csv"
+  term_definitions_json_file: "dist/static/json/terms.json"
