@@ -259,6 +259,7 @@
 
 <script>
 import CanvasUtils from '@/mixins/CanvasUtils'
+import Context from '@/mixins/Context'
 import Iframe from '@/mixins/Iframe'
 import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import OutboundLink from '@/components/util/OutboundLink'
@@ -267,7 +268,7 @@ import {addUser, getAddUserCourseSections, getCourseUserRoles, searchUsers} from
 export default {
   name: 'CourseAddUser',
   components: {MaintenanceNotice, OutboundLink},
-  mixins: [CanvasUtils, Iframe],
+  mixins: [CanvasUtils, Context, Iframe],
   data: () => ({
     additionFailureMessage: null,
     additionSuccessMessage: null,

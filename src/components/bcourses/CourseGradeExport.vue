@@ -277,6 +277,7 @@
 
 <script>
 import CanvasUtils from '@/mixins/CanvasUtils'
+import Context from '@/mixins/Context'
 import Iframe from '@/mixins/Iframe'
 import OutboundLink from '@/components/util/OutboundLink'
 import ProgressBar from '@/components/bcourses/shared/ProgressBar'
@@ -285,7 +286,7 @@ import {downloadGradeCsv, getCourseUserRoles, getExportJobStatus, getExportOptio
 export default {
   name: 'CourseGradeExport',
   components: { OutboundLink, ProgressBar },
-  mixins: [CanvasUtils, Iframe],
+  mixins: [CanvasUtils, Context, Iframe],
   data: () => ({
     appState: null,
     backgroundJobId: null,
