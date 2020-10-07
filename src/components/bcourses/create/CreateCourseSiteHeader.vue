@@ -21,7 +21,7 @@
         <div id="bc-page-create-course-site-admin-section-loader-form">
           <div v-if="adminMode === 'act_as'" class="pt-3">
             <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
-            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit="fetchFeed">
+            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit.prevent="submit">
               <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
               <b-form-input
                 id="instructor-uid"
@@ -33,10 +33,10 @@
                 <b-button
                   id="sections-by-uid-button"
                   class="bc-canvas-button bc-canvas-button-primary"
-                  :disabled="!toInt(uid)"
+                  :disabled="!uid"
                   aria-label="Load official sections for instructor"
                   aria-controls="bc-page-create-course-site-steps-container"
-                  @click="fetchFeed"
+                  @click="submit"
                 >
                   As instructor
                 </b-button>
@@ -45,7 +45,7 @@
           </div>
           <div v-if="adminMode === 'by_ccn'">
             <h3 id="load-sections-by-ccn" class="cc-visuallyhidden" tabindex="0">Load Sections By Course Control Numbers (CCN)</h3>
-            <form class="bc-canvas-page-form" @submit="fetchFeed">
+            <form class="bc-canvas-page-form" @submit.prevent="submit">
               <div v-if="$_.size(adminSemesters)">
                 <div class="bc-buttonset">
                   <span v-for="(semester, index) in adminSemesters" :key="index">
@@ -83,19 +83,27 @@
                   id="bc-page-create-course-site-ccn-list"
                   v-model="ccns"
                   placeholder="Paste your list of CCNs here, separated by commas or spaces"
-                >
-              </textarea>
+                ></textarea>
                 <b-button
                   id="sections-by-ids-button"
                   class="bc-canvas-button bc-canvas-button-primary"
+                  aria-controls="bc-page-create-course-site-steps-container"
                   :disabled="!$_.trim(ccns)"
                   type="submit"
-                  aria-controls="bc-page-create-course-site-steps-container"
+                  @click="submit"
                 >
                   Review matching CCNs
                 </b-button>
               </div>
             </form>
+          </div>
+          <div
+            v-if="error"
+            aria-live="polite"
+            class="has-error pl-2 pt-2"
+            role="alert"
+          >
+            {{ error }}
           </div>
         </div>
       </div>
@@ -113,18 +121,14 @@ export default {
   mixins: [Context, Utils],
   components: {MaintenanceNotice},
   watch: {
-    ccns(value) {
-      this.setAdminByCcns(value)
+    ccns() {
+      this.error = null
     },
     uid() {
-      this.setAdminActingAs(this.uid)
+      this.error = null
     }
   },
   props: {
-    setAdminActingAs: {
-      required: true,
-      type: Function
-    },
     adminMode: {
       required: true,
       type: String
@@ -134,8 +138,7 @@ export default {
       type: Array
     },
     currentAdminSemester: {
-      default: undefined,
-      required: false,
+      required: true,
       type: String
     },
     isAdmin: {
@@ -143,6 +146,10 @@ export default {
       type: Boolean
     },
     fetchFeed: {
+      required: true,
+      type: Function
+    },
+    setAdminActingAs: {
       required: true,
       type: Function
     },
@@ -164,14 +171,43 @@ export default {
     }
   },
   data: () => ({
-    ccns: [],
+    ccns: '',
+    error: undefined,
     uid: undefined
   }),
   methods: {
     setMode(mode) {
       this.setAdminMode(mode)
-      this.alertScreenReader(`Input mode switched to ${mode === 'by_ccn' ? 'section ID' : 'UID'}`)
-      this.$putFocusNextTick(mode === 'by_ccn' ? 'load-sections-by-ccn' : 'instructor-uid')
+      if (mode === 'by_ccn') {
+        this.alertScreenReader('Input mode switched to section ID')
+        this.$putFocusNextTick('load-sections-by-ccn')
+      } else {
+        this.alertScreenReader(`Input mode switched to ${mode === 'by_ccn' ? 'section ID' : 'UID'}`)
+        this.$putFocusNextTick(mode === 'by_ccn' ? 'load-sections-by-ccn' : 'instructor-uid')
+      }
+    },
+    submit() {
+      if (this.adminMode === 'by_ccn') {
+        const trimmed = this.$_.trim(this.ccns)
+        const split = this.$_.split(trimmed, /[,\r\n\t ]+/)
+        const notNumeric = this.$_.partition(split, ccn => /^\d+$/.test(this.$_.trim(ccn)))[1]
+        if (notNumeric.length) {
+          this.error = 'CCNs must be numeric.'
+          this.$putFocusNextTick('bc-page-create-course-site-ccn-list')
+        } else {
+          this.setAdminByCcns(split)
+          this.fetchFeed()
+        }
+      } else {
+        const trimmed = this.$_.trim(this.uid)
+        if (/^\d+$/.test(trimmed)) {
+          this.setAdminActingAs(trimmed)
+          this.fetchFeed()
+        } else {
+          this.error = 'UID must be numeric.'
+          this.$putFocusNextTick('instructor-uid')
+        }
+      }
     }
   }
 }
@@ -188,11 +224,9 @@ export default {
     width: 140px;
   }
 }
-
 .bc-page-create-course-site-admin-options {
   margin-bottom: 15px;
 }
-
 .bc-page-create-course-site-header {
   color: $bc-color-headers;
   font-family: $bc-base-font-family;
@@ -200,18 +234,20 @@ export default {
   line-height: 40px;
   margin: 5px 0;
 }
-
 .bc-page-create-course-site-header1 {
   font-size: 23px;
 }
-
 .bc-page-create-course-site-header2 {
   font-size: 18px;
   margin: 10px 0;
 }
-
 .bc-page-create-course-site-admin-mode-switch {
   margin-bottom: 5px;
   outline: none;
+}
+.has-error {
+  color: $bc-color-alert-error-foreground;
+  font-size: 14px;
+  font-weight: bolder;
 }
 </style>

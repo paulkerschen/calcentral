@@ -1,5 +1,5 @@
 <template>
-  <div class="cc-masthead">
+  <div :class="{'cc-masthead': $currentUser.isLoggedIn}">
     <Spinner />
     <SrAlert />
     <router-view />
