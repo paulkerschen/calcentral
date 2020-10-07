@@ -16,7 +16,7 @@
               {{ section.deptName }} {{ section.catalogId }} {{ section.instructionFormat }} {{ section.sectionNumber }}
             </h3>
             <div v-if="section.videos && section.videos.length" class="cc-widget-webcast-alert">
-              <fa icon="exclamation-triangle" class="cc-icon-gold"></fa>
+              <fa icon="exclamation-triangle" class="cc-icon-gold bc-canvas-notice-icon"></fa>
               <strong>Alert: </strong>
               Log in to YouTube with your bConnected account to watch the videos below. More information is at
               our <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0011469">help page</OutboundLink>.
