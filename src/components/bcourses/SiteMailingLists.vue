@@ -122,7 +122,7 @@
             @click="populateMailingList"
           >
             <span v-if="!isProcessing">Update membership from course site</span>
-            <span v-if="isCreating"><fa icon="spinner" class="mr-2 fa-spin"></fa> Creating ...</span>
+            <span v-if="isProcessing"><fa icon="spinner" class="mr-2 fa-spin"></fa> Creating ...</span>
           </button>
           <button 
             id="btn-cancel"
