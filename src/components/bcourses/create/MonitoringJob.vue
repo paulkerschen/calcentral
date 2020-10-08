@@ -12,7 +12,7 @@
       </div>
       <div v-if="jobStatus">
         <div>
-          <ProgressBar :percent-complete-rounded="50" />
+          <ProgressBar :percent-complete-rounded="Math.round(percentComplete * 100)" />
         </div>
         <div v-if="jobStatus === 'Error'">
           <BackgroundJobError :error-config="errorConfig" :errors="errors" />
@@ -70,6 +70,10 @@ export default {
     jobStatus: {
       required: true,
       type: String
+    },
+    percentComplete: {
+      required: true,
+      type: Number
     },
     showConfirmation: {
       required: true,

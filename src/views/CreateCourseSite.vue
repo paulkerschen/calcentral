@@ -12,7 +12,7 @@
         </div>
         <div class="order-1">
           <CreateCourseSiteHeader
-            v-if="isAdmin"
+            v-if="isAdmin && currentWorkflowStep === 'selecting'"
             :admin-mode="adminMode"
             :admin-semesters="adminSemesters"
             :current-admin-semester="currentAdminSemester || adminSemesters[0].slug"
@@ -61,6 +61,7 @@
           <MonitoringJob
             :fetch-feed="fetchFeed"
             :job-status="jobStatus"
+            :percent-complete="percentComplete"
             :show-confirmation="showConfirmation"
           />
         </div>
@@ -109,18 +110,17 @@ export default {
     currentSemester: undefined,
     currentSemesterName: undefined,
     currentWorkflowStep: undefined,
+    displayError: undefined,
     errorConfig: {
       header: undefined,
       supportAction: undefined,
       supportInfo: undefined
     },
-    displayError: undefined,
     isAdmin: undefined,
     isTeacher: undefined,
     isUidInputMode: true,
     jobStatus: undefined,
     percentComplete: undefined,
-    percentCompleteRounded: undefined,
     selectedSectionsList: undefined,
     semester: undefined,
     showMaintenanceNotice: true,
@@ -163,45 +163,36 @@ export default {
     },
     createCourseSiteJob(siteName, siteAbbreviation) {
       this.jobStatus = 'New'
+      this.percentComplete = 0
       this.currentWorkflowStep = 'monitoring_job'
       this.alertScreenReader('Creating course site. Please wait.')
-      this.monitorFocus = true
       this.showMaintenanceNotice = false
       this.updateSelected()
       const ccns = this.$_.map(this.selectedSectionsList, 'ccn')
       if (ccns.length > 0) {
-        const course = {
-          siteName,
-          siteAbbreviation,
-          'termSlug': this.currentSemester,
-          'ccns': ccns
+        const onSuccess = data => {
+          this.jobId = data.job_id
+          this.currentWorkflowStep = 'monitoring_job'
+          this.alertScreenReader('Course site created successfully')
+          this.completedFocus = true
+          this.jobStatusLoader()
         }
-        if (this.isAdmin) {
-          if (this.adminMode !== 'by_ccn' && this.admin_acting_as) {
-            course.admin_acting_as = this.admin_acting_as
-          } else if (this.adminMode === 'by_ccn' && this.adminByCcns) {
-            course.admin_by_ccns = this.admin_by_ccns.match(/\w+/g)
-            course.admin_term_slug = this.currentAdminSemester
-          }
-        }
-        const errorHandler = error => {
-          this.$_.assignIn(this, error)
-          this.percentComplete = this.percentCompleteRounded = 0
+        const onError = error => {
+          this.percentComplete = 0
           this.currentWorkflowStep = 'monitoring_job'
           this.jobStatus = 'Error'
           this.displayError = 'Failed to create course provisioning job.'
           return this.$errorHandler(error)
         }
-        courseCreate(course).then(
-          data => {
-            this.$_.assignIn(this, data)
-            this.currentWorkflowStep = 'monitoring_job'
-            this.alertScreenReader('Course site created successfully')
-            this.completedFocus = true
-            this.jobStatusLoader()
-          },
-          errorHandler
-        )
+        courseCreate(
+          this.isAdmin && this.adminMode === 'act_as' ? this.adminActingAs : null,
+          this.isAdmin && this.adminMode === 'by_ccn' ? this.adminByCcns : null,
+          this.isAdmin && this.adminMode === 'by_ccn' ? this.currentAdminSemester : null,
+          ccns,
+          siteAbbreviation,
+          siteName,
+          this.currentSemester
+        ).then(onSuccess, onError)
       }
     },
     fetchFeed() {
@@ -285,13 +276,15 @@ export default {
     },
     jobStatusLoader() {
       const onSuccess = data => {
-        this.$_.assignIn(this, data)
-        this.percentCompleteRounded = Math.round(this.percentComplete * 100)
+        this.jobId = data.jobId
+        this.jobStatus = data.jobStatus
+        this.completedSteps = data.completedSteps
+        this.percentComplete = data.percentComplete
         if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
           this.jobStatusLoader()
         } else {
           this.$loading()
-          this.percentCompleteRounded = undefined
+          this.percentComplete = undefined
           clearTimeout(this.timeoutPromise)
           if (this.jobStatus === 'Completed') {
             if (this.courseSite && this.courseSite.url) {
@@ -309,12 +302,13 @@ export default {
       const onError = data => {
         this.alertScreenReader('Course section loading failed')
         this.displayError = 'failure'
-        this.percentComplete = this.percentCompleteRounded = 0
+        this.percentComplete = 0
         this.jobStatus = 'Error'
         this.displayError = 'Failed to create course provisioning job.'
         return this.$errorHandler(data)
       }
-      this.timeoutPromise = setTimeout(() => courseProvisionJobStatus(this.jobId).then(onSuccess, onError), 2000)
+      const handler = () => courseProvisionJobStatus(this.jobId).then(onSuccess, onError)
+      this.timeoutPromise = setTimeout(handler, 2000)
     },
     loadCourseLists() {
       this.courseSemester = false
