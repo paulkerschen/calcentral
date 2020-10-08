@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import utils from '@/api/api-utils'
 
 // Shared
@@ -114,7 +115,7 @@ export function getCourseSections(canvasCourseId) {
 
 export function getSections(
   adminActingAs: string,
-  adminByCcns: string,
+  adminByCcns: number[],
   adminMode: string,
   currentAdminSemester: string,
   isAdmin: boolean
@@ -124,7 +125,8 @@ export function getSections(
     if ((adminMode === 'act_as') && adminActingAs) {
       feedUrl = '/api/academics/canvas/course_provision_as/' + adminActingAs
     } else if ((adminMode !== 'act_as') && adminByCcns) {
-      feedUrl = `/api/academics/canvas/course_provision?admin_by_ccns[]=${adminByCcns}&admin_term_slug=${currentAdminSemester}`
+      feedUrl = `/api/academics/canvas/course_provision?admin_term_slug=${currentAdminSemester}`
+      _.each(adminByCcns, ccn => feedUrl += `admin_by_ccns[]=${ccn}`)
     }
   }
   return utils.get(feedUrl)

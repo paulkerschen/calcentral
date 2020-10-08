@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid>
+  <b-container class="cc-page-splash" fluid>
     <b-row class="d-flex flex-column-reverse p-3 text-center w-50">
       <div class="pb-5">
         <h1>ETS Support Utilities</h1>

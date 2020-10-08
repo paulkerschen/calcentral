@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <ToolboxHeader />
-    <b-row class="ml-4 mt-4">
+    <b-row class="ml-4 mt-4 pt-4">
       <b-col>
         <div class="d-flex">
           <div class="pr-3 pt-2">
@@ -13,12 +13,12 @@
         </div>
       </b-col>
     </b-row>
-    <b-row class="cc-text-big ml-4 mt-4">
+    <b-row class="cc-text-big ml-4 mt-4 pb-2">
       <b-col>
         <span id="error-message" aria-live="polite" role="alert">{{ message || 'Uh oh, there was a problem.' }}</span>
       </b-col>
     </b-row>
-    <b-row class="cc-text-big ml-4 mt-4">
+    <b-row class="cc-text-big ml-4 mt-4 pb-5">
       <b-col>
         If you need assistance then please <a id="contact-us" href="https://dls.berkeley.edu/services/bcourses-0" target="_blank">contact us</a>.
       </b-col>

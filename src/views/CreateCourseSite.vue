@@ -1,13 +1,13 @@
 <template>
   <div class="bc-canvas-application bc-page-create-course-site p-5">
-    <div v-if="!loading && !error" class="bc-accessibility-no-outline">
+    <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
       <CreateCourseSiteHeader
-        :set-admin-acting-as="setAdminActingAs"
         :admin-mode="adminMode"
         :admin-semesters="adminSemesters"
-        :current-admin-semester="currentAdminSemester"
+        :current-admin-semester="currentAdminSemester || adminSemesters[0].slug"
         :is-admin="isAdmin"
         :fetch-feed="fetchFeed"
+        :set-admin-acting-as="setAdminActingAs"
         :set-admin-by-ccns="setAdminByCcns"
         :set-admin-mode="setAdminMode"
         :show-maintenance-notice="showMaintenanceNotice"
@@ -55,8 +55,8 @@
         </div>
       </div>
     </div>
-    <div v-if="error" class="bc-alert-container pt-5">
-      <CanvasErrors :message="error" />
+    <div v-if="displayError" class="bc-alert-container pt-5">
+      <CanvasErrors :message="displayError" />
     </div>
   </div>
 </template>
@@ -101,8 +101,7 @@ export default {
       supportAction: undefined,
       supportInfo: undefined
     },
-    error: undefined,
-    errors: undefined,
+    displayError: undefined,
     isAdmin: undefined,
     isTeacher: undefined,
     isUidInputMode: true,
@@ -351,9 +350,11 @@ export default {
     },
     setAdminActingAs(uid) {
       this.adminActingAs = uid
+      this.adminByCcns = null
     },
     setAdminByCcns(ccns) {
       this.adminByCcns = ccns
+      this.adminActingAs = null
     },
     setAdminMode(adminMode) {
       this.adminMode = adminMode

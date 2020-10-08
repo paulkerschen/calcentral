@@ -1,19 +1,19 @@
 <template>
   <b-container fluid>
     <ToolboxHeader />
-    <b-row class="ml-4 mt-4">
+    <b-row class="ml-4 mt-4 pt-4">
       <b-col>
         <div class="d-flex">
           <div class="pr-3 pt-2">
             <fa class="text-warning" icon="exclamation-triangle" size="2x" />
           </div>
           <div>
-            <h1 class="cc-text-xl text-secondary">404</h1>
+            <h1 class="cc-text-xl text-secondary">Page Not Found</h1>
           </div>
         </div>
       </b-col>
     </b-row>
-    <b-row class="cc-text-big ml-4 mt-4">
+    <b-row class="cc-text-big ml-4 mt-4 pb-5">
       <b-col>
         <span id="error-message" aria-live="polite" role="alert">
           <span v-if="$route.redirectedFrom">
