@@ -2,18 +2,16 @@
   <b-container class="pl-0 pr-0" fluid>
     <ToolboxHeader />
     <b-row class="mb-2 mt-4" no-gutters>
-      <b-col>
+      <b-col class="pl-3">
         <h1 class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col v-if="canActAs || canOec" sm="6">
+    <b-row v-if="canActAs || canOec">
+      <b-col v-if="canActAs" sm="6">
         <ActAs />
       </b-col>
-      <b-col :sm="canActAs ? 6 : 12">
-        <div v-if="$currentUser.isSuperuser">
-          <Oec />
-        </div>
+      <b-col v-if="canOec" sm="6">
+        <Oec />
       </b-col>
     </b-row>
     <b-row v-if="!canActAs && !canOec">
@@ -42,7 +40,7 @@ export default {
   }),
   created() {
     this.canActAs = this.$currentUser.isDirectlyAuthenticated && (this.$currentUser.isSuperuser || this.$currentUser.isViewer)
-    this.canOec = this.$currentUser.isSuperuser
+    this.canOec = this.$currentUser.isDirectlyAuthenticated && this.$currentUser.isSuperuser
     this.$ready('Toolbox')
   }
 }
