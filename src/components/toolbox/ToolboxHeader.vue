@@ -1,5 +1,5 @@
 <template>
-  <b-row class="bg-header" no-gutters>
+  <b-row v-if="!isInIframe" class="bg-header" no-gutters>
     <b-col sm="8">
       <div class="header-text mt-1 pl-3 pt-2">
         ETS bCourses Utilities
@@ -22,11 +22,12 @@
 
 <script>
 import Context from '@/mixins/Context'
+import Iframe from '@/mixins/Iframe'
 import {logOut} from '@/api/auth'
 
 export default {
   name: 'ToolboxHeader',
-  mixins: [Context],
+  mixins: [Context, Iframe],
   methods: {
     exit() {
       this.alertScreenReader('Logging out.')
