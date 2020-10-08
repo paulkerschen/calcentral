@@ -74,9 +74,14 @@
           <b-col id="mailing-list-canvas-code-and-term" sm="12" md="4">{{ canvasSite.codeAndTerm }}</b-col>
           <b-col id="mailing-list-canvas-course-id" sm="12" md="6">Site ID: {{ canvasSite.canvasCourseId }}</b-col>
         </b-row>
-        <a v-if="!listCreated" :href="canvasSite.url" @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)">
+        <OutboundLink
+          v-if="!listCreated"
+          id="view-course-site-link"
+          :href="canvasSite.url"
+          @click="trackExternalLink('Canvas Site Mailing List', 'bCourses', canvasSite.url)"
+        >
           View course site
-        </a>
+        </OutboundLink>
       </div>
 
       <div v-if="!listCreated" class="bc-page-site-mailing-list-text">
