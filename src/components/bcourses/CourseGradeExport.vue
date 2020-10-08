@@ -7,8 +7,8 @@
         <p>
           <fa icon="exclamation-triangle" class="text-warning"></fa> {{ errorStatus }}
         </p>
-        <p v-if="contactSupport">Please contact <a href="http://www.ets.berkeley.edu/discover-services/bcourses">bCourses support</a> for further assistance.</p>
-        <p v-if="unexpectedContactSupport">If this is not expected, please contact <a href="http://www.ets.berkeley.edu/discover-services/bcourses">bCourses support</a> for further assistance.</p>
+        <p v-if="showRetryOption"><a @click="retrySelection">Retry</a></p>
+        <p v-if="contactSupport">If this is not expected, please contact <OutboundLink href="http://www.ets.berkeley.edu/discover-services/bcourses">bCourses support</OutboundLink> for further assistance.</p>
       </div>
     </div>
 
@@ -305,7 +305,7 @@ export default {
     selectedPnpCutoffGrade: '',
     selectedSection: null,
     selectedType: null,
-    unexpectedContactSupport: false
+    showRetryOption: null
   }),
   methods: {
     downloadGrades() {
@@ -371,7 +371,7 @@ export default {
       if (!sectionTerms || !sectionTerms.length) {
         this.appState = 'error'
         this.errorStatus = 'No sections found in this course representing a currently maintained campus term.'
-        this.unexpectedContactSupport = true
+        this.contactSupport = true
       } else if (sectionTerms.length > 1) {
         this.appState = 'error'
         this.errorStatus = 'This course site contains sections from multiple terms. Only sections from a single term should be present.'
@@ -393,12 +393,19 @@ export default {
             this.startExportJob()
           } else {
             this.appState = 'error'
-            this.contactSupport = true
-            this.errorStatus = 'Grade preloading request failed'
+            this.errorStatus = 'Grade download request failed'
+            this.showRetryOption = true
+            this.contactSupport = false
           }
         },
         this.$errorHandler
       )
+    },
+    retrySelection() {
+      this.appState = 'selection'
+      this.contactSupport = false
+      this.errorStatus = null
+      this.showRetryOption = false
     },
     startExportJob() {
       this.exportTimer = setInterval(() => {
