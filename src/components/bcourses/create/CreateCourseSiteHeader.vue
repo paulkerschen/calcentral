@@ -1,111 +1,99 @@
 <template>
-  <div class="d-flex flex-column">
-    <div class="order-3">
-      <h1 class="bc-page-create-course-site-header bc-page-create-course-site-header1">Create a Course Site</h1>
-    </div>
-    <div class="order-2">
-      <div v-if="showMaintenanceNotice" role="alert">
-        <MaintenanceNotice />
+  <div class="bc-page-create-course-site-admin-options">
+    <h2 class="cc-visuallyhidden">Administrator Options</h2>
+    <b-button
+      aria-controls="bc-page-create-course-site-admin-section-loader-form"
+      class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch pb-2 ptl-3 pr-2 pt-2"
+      @click="setMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
+    >
+      Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
+    </b-button>
+    <div id="bc-page-create-course-site-admin-section-loader-form">
+      <div v-if="adminMode === 'act_as'" class="pt-3">
+        <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
+        <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit.prevent="submit">
+          <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
+          <b-form-input
+            id="instructor-uid"
+            v-model="uid"
+            placeholder="Instructor UID"
+            role="search"
+          ></b-form-input>
+          <div>
+            <b-button
+              id="sections-by-uid-button"
+              class="bc-canvas-button bc-canvas-button-primary"
+              :disabled="!uid"
+              aria-label="Load official sections for instructor"
+              aria-controls="bc-page-create-course-site-steps-container"
+              @click="submit"
+            >
+              As instructor
+            </b-button>
+          </div>
+        </form>
       </div>
-    </div>
-    <div class="order-1">
-      <div v-if="isAdmin" class="bc-page-create-course-site-admin-options">
-        <h2 class="cc-visuallyhidden">Administrator Options</h2>
-        <b-button
-          aria-controls="bc-page-create-course-site-admin-section-loader-form"
-          class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch pb-2 ptl-3 pr-2 pt-2"
-          @click="setMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"
-        >
-          Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
-        </b-button>
-        <div id="bc-page-create-course-site-admin-section-loader-form">
-          <div v-if="adminMode === 'act_as'" class="pt-3">
-            <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
-            <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit.prevent="submit">
-              <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
-              <b-form-input
-                id="instructor-uid"
-                v-model="uid"
-                placeholder="Instructor UID"
-                role="search"
-              ></b-form-input>
-              <div>
-                <b-button
-                  id="sections-by-uid-button"
-                  class="bc-canvas-button bc-canvas-button-primary"
-                  :disabled="!uid"
-                  aria-label="Load official sections for instructor"
-                  aria-controls="bc-page-create-course-site-steps-container"
-                  @click="submit"
-                >
-                  As instructor
-                </b-button>
-              </div>
-            </form>
-          </div>
-          <div v-if="adminMode === 'by_ccn'">
-            <h3 id="load-sections-by-ccn" class="cc-visuallyhidden" tabindex="0">Load Sections By Course Control Numbers (CCN)</h3>
-            <form class="bc-canvas-page-form" @submit.prevent="submit">
-              <div v-if="$_.size(adminSemesters)">
-                <div class="bc-buttonset">
-                  <span v-for="(semester, index) in adminSemesters" :key="index">
-                    <input
-                      :id="`semester${index}`"
-                      type="radio"
-                      name="adminSemester"
-                      class="cc-visuallyhidden"
-                      :aria-selected="currentAdminSemester === semester.slug"
-                      role="tab"
-                      @click="switchAdminSemester(semester)"
-                    />
-                    <label
-                      :for="`semester${index}`"
-                      class="bc-buttonset-button"
-                      role="button"
-                      aria-disabled="false"
-                      :class="{
-                        'bc-buttonset-button-active': currentAdminSemester === semester.slug,
-                        'bc-buttonset-corner-left': index === 0,
-                        'bc-buttonset-corner-right': index === ($_.size(adminSemesters) - 1)
-                      }"
-                    >
-                      {{ semester.name }}
-                    </label>
-                  </span>
-                </div>
-                <label
-                  for="bc-page-create-course-site-ccn-list"
+      <div v-if="adminMode === 'by_ccn'">
+        <h3 id="load-sections-by-ccn" class="cc-visuallyhidden" tabindex="0">Load Sections By Course Control Numbers (CCN)</h3>
+        <form class="bc-canvas-page-form" @submit.prevent="submit">
+          <div v-if="$_.size(adminSemesters)">
+            <div class="bc-buttonset">
+              <span v-for="(semester, index) in adminSemesters" :key="index">
+                <input
+                  :id="`semester${index}`"
+                  type="radio"
+                  name="adminSemester"
                   class="cc-visuallyhidden"
+                  :aria-selected="currentAdminSemester === semester.slug"
+                  role="tab"
+                  @click="switchAdminSemester(semester)"
+                />
+                <label
+                  :for="`semester${index}`"
+                  class="bc-buttonset-button"
+                  role="button"
+                  aria-disabled="false"
+                  :class="{
+                    'bc-buttonset-button-active': currentAdminSemester === semester.slug,
+                    'bc-buttonset-corner-left': index === 0,
+                    'bc-buttonset-corner-right': index === ($_.size(adminSemesters) - 1)
+                  }"
                 >
-                  Provide CCN List Separated by Commas or Spaces
+                  {{ semester.name }}
                 </label>
-                <textarea
-                  id="bc-page-create-course-site-ccn-list"
-                  v-model="ccns"
-                  placeholder="Paste your list of CCNs here, separated by commas or spaces"
-                ></textarea>
-                <b-button
-                  id="sections-by-ids-button"
-                  class="bc-canvas-button bc-canvas-button-primary"
-                  aria-controls="bc-page-create-course-site-steps-container"
-                  :disabled="!$_.trim(ccns)"
-                  type="submit"
-                  @click="submit"
-                >
-                  Review matching CCNs
-                </b-button>
-              </div>
-            </form>
+              </span>
+            </div>
+            <label
+              for="bc-page-create-course-site-ccn-list"
+              class="cc-visuallyhidden"
+            >
+              Provide CCN List Separated by Commas or Spaces
+            </label>
+            <textarea
+              id="bc-page-create-course-site-ccn-list"
+              v-model="ccns"
+              placeholder="Paste your list of CCNs here, separated by commas or spaces"
+            ></textarea>
+            <b-button
+              id="sections-by-ids-button"
+              class="bc-canvas-button bc-canvas-button-primary"
+              aria-controls="bc-page-create-course-site-steps-container"
+              :disabled="!$_.trim(ccns)"
+              type="submit"
+              @click="submit"
+            >
+              Review matching CCNs
+            </b-button>
           </div>
-          <div
-            v-if="error"
-            aria-live="polite"
-            class="has-error pl-2 pt-2"
-            role="alert"
-          >
-            {{ error }}
-          </div>
-        </div>
+        </form>
+      </div>
+      <div
+        v-if="error"
+        aria-live="polite"
+        class="has-error pl-2 pt-2"
+        role="alert"
+      >
+        {{ error }}
       </div>
     </div>
   </div>
@@ -113,13 +101,11 @@
 
 <script>
 import Context from '@/mixins/Context'
-import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'CreateCourseSiteHeader',
   mixins: [Context, Utils],
-  components: {MaintenanceNotice},
   watch: {
     ccns() {
       this.error = null
@@ -134,16 +120,13 @@ export default {
       type: String
     },
     adminSemesters: {
-      required: true,
+      default: undefined,
+      required: false,
       type: Array
     },
     currentAdminSemester: {
       required: true,
       type: String
-    },
-    isAdmin: {
-      required: true,
-      type: Boolean
     },
     fetchFeed: {
       required: true,
