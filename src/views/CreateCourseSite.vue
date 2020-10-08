@@ -1,5 +1,5 @@
 <template>
-  <div class="bc-canvas-application bc-page-create-course-site p-5">
+  <div class="bc-canvas-application bc-page-create-course-site pl-5 pr-5 pt-3 pb-3">
     <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
       <div class="d-flex flex-column">
         <div class="order-3">
@@ -38,7 +38,6 @@
             :show-confirmation="showConfirmation"
             :switch-semester="switchSemester"
             :teaching-semesters="teachingSemesters"
-            :toggle-course-sections-with-update="toggleCourseSectionsWithUpdate"
             :update-selected="updateSelected"
           />
         </div>
@@ -135,11 +134,14 @@ export default {
       this.adminSemesters = data.admin_semesters
       this.isAdmin = data.is_admin
       this.teachingSemesters = data.teachingSemesters
-      if (!this.isAdmin) {
+      if (this.isAdmin) {
+        this.$ready('First, enter instructor UID or a list of CCNs.')
+      } else {
+        this.fillCourseSites(this.teachingSemesters)
         this.switchSemester(this.teachingSemesters[0])
         this.currentWorkflowStep = 'selecting'
+        this.$ready('Select sections for your new Canvas course site.')
       }
-      this.$ready('Create a Course Site')
     })
   },
   methods: {
@@ -242,7 +244,7 @@ export default {
         this.$ready()
       })
     },
-    fillCourseSites(semestersFeed, canvasCourseId) {
+    fillCourseSites(semestersFeed, canvasCourseId=null) {
       this.$_.each(semestersFeed, semester => {
         this.$_.each(semester.classes, course => {
           course.allSelected = false
@@ -396,11 +398,8 @@ export default {
       this.coursesList = semester.classes
       this.selectedSectionsList = []
       this.currentSemesterName = semester.name
-      this.alertScreenReader(`'Course sections for ${semester.name} loaded'`)
+      this.alertScreenReader(`Course sections for ${semester.name} loaded`)
       this.updateSelected()
-    },
-    toggleCourseSectionsWithUpdate() {
-      // TODO
     },
     updateSelected() {
       this.selectedSectionsList = this.selectedSections(this.coursesList)
@@ -416,13 +415,11 @@ export default {
   .cc-button {
     padding: 10px;
   }
-
   .cc-page-button-grey {
     background: linear-gradient($bc-color-button-grey-gradient-1, $bc-color-button-grey-gradient-2);
     border: 1px solid $bc-color-button-grey-border;
     color: $bc-color-button-grey-text;
   }
-
   .bc-page-create-course-site-choices {
     overflow: hidden;
     li {
@@ -436,13 +433,22 @@ export default {
       }
     }
   }
-
   .bc-page-create-course-site-form-course-button {
     color: $bc-color-body-black;
 
     &:focus, &:hover {
       text-decoration: none;
     }
+  }
+  .bc-page-create-course-site-header {
+    color: $bc-color-headers;
+    font-family: $bc-base-font-family;
+    font-weight: normal;
+    line-height: 40px;
+    margin: 5px 0;
+  }
+  .bc-page-create-course-site-header1 {
+    font-size: 23px;
   }
 }
 </style>

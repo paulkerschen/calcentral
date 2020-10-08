@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="bc-alert bc-alert-info" role="alert">
-      <!-- TODO: data-cc-focus-reset-directive -->
-      <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="confirmFocus">Confirm Course Site Details</h2>
+      <h2 class="cc-visuallyhidden">Confirm Course Site Details</h2>
       <strong>
         You are about to create a {{ currentSemesterName }} course site with {{ pluralize('section', selectedSectionsList.length) }}:
       </strong>
@@ -84,12 +83,13 @@
 </template>
 
 <script>
+import Context from '@/mixins/Context'
 import Iframe from '@/mixins/Iframe'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'ConfirmationStep',
-  mixins: [Iframe, Utils],
+  mixins: [Context, Iframe, Utils],
   props: {
     createCourseSiteJob: {
       required: true,
@@ -113,13 +113,13 @@ export default {
     siteName: undefined
   }),
   created() {
-    // TODO: put focus
-    // $scope.confirmFocus = true;
     const section = this.selectedSectionsList[0]
     this.siteName = `${section.courseTitle} (${this.currentSemesterName})`
     this.siteAbbreviation = `${section.courseCode}-${section.instruction_format}-${section.section_number}`
     this.currentWorkflowStep = 'confirmation'
     this.iframeScrollToTop()
+    this.$putFocusNextTick('siteName')
+    this.alertScreenReader('Decide on the name of your new course site.')
   },
   methods: {
     create() {

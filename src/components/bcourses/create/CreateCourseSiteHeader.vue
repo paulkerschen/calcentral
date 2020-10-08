@@ -210,23 +210,16 @@ export default {
 .bc-page-create-course-site-admin-options {
   margin-bottom: 15px;
 }
+.bc-page-create-course-site-admin-mode-switch {
+  margin-bottom: 5px;
+  outline: none;
+}
 .bc-page-create-course-site-header {
   color: $bc-color-headers;
   font-family: $bc-base-font-family;
   font-weight: normal;
   line-height: 40px;
   margin: 5px 0;
-}
-.bc-page-create-course-site-header1 {
-  font-size: 23px;
-}
-.bc-page-create-course-site-header2 {
-  font-size: 18px;
-  margin: 10px 0;
-}
-.bc-page-create-course-site-admin-mode-switch {
-  margin-bottom: 5px;
-  outline: none;
 }
 .has-error {
   color: $bc-color-alert-error-foreground;
