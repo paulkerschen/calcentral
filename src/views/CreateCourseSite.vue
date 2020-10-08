@@ -1,18 +1,30 @@
 <template>
   <div class="bc-canvas-application bc-page-create-course-site p-5">
     <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
-      <CreateCourseSiteHeader
-        :admin-mode="adminMode"
-        :admin-semesters="adminSemesters"
-        :current-admin-semester="currentAdminSemester || adminSemesters[0].slug"
-        :is-admin="isAdmin"
-        :fetch-feed="fetchFeed"
-        :set-admin-acting-as="setAdminActingAs"
-        :set-admin-by-ccns="setAdminByCcns"
-        :set-admin-mode="setAdminMode"
-        :show-maintenance-notice="showMaintenanceNotice"
-        :switch-admin-semester="switchAdminSemester"
-      />
+      <div class="d-flex flex-column">
+        <div class="order-3">
+          <h1 class="bc-page-create-course-site-header bc-page-create-course-site-header1">Create a Course Site</h1>
+        </div>
+        <div class="order-2">
+          <div v-if="showMaintenanceNotice" role="alert">
+            <MaintenanceNotice />
+          </div>
+        </div>
+        <div class="order-1">
+          <CreateCourseSiteHeader
+            v-if="isAdmin"
+            :admin-mode="adminMode"
+            :admin-semesters="adminSemesters"
+            :current-admin-semester="currentAdminSemester || adminSemesters[0].slug"
+            :fetch-feed="fetchFeed"
+            :set-admin-acting-as="setAdminActingAs"
+            :set-admin-by-ccns="setAdminByCcns"
+            :set-admin-mode="setAdminMode"
+            :show-maintenance-notice="showMaintenanceNotice"
+            :switch-admin-semester="switchAdminSemester"
+          />
+        </div>
+      </div>
       <div id="bc-page-create-course-site-steps-container" class="p-0">
         <div
           v-if="currentWorkflowStep === 'selecting'"
@@ -67,6 +79,7 @@ import ConfirmationStep from '@/components/bcourses/create/ConfirmationStep'
 import Context from '@/mixins/Context'
 import CreateCourseSiteHeader from '@/components/bcourses/create/CreateCourseSiteHeader'
 import Iframe from '@/mixins/Iframe'
+import MaintenanceNotice from '@/components/bcourses/shared/MaintenanceNotice'
 import MonitoringJob from '@/components/bcourses/create/MonitoringJob'
 import SelectSectionsStep from '@/components/bcourses/create/SelectSectionsStep'
 import Utils from '@/mixins/Utils'
@@ -79,6 +92,7 @@ export default {
     CanvasErrors,
     ConfirmationStep,
     CreateCourseSiteHeader,
+    MaintenanceNotice,
     MonitoringJob,
     SelectSectionsStep
   },
@@ -121,6 +135,10 @@ export default {
       this.adminSemesters = data.admin_semesters
       this.isAdmin = data.is_admin
       this.teachingSemesters = data.teachingSemesters
+      if (!this.isAdmin) {
+        this.switchSemester(this.teachingSemesters[0])
+        this.currentWorkflowStep = 'selecting'
+      }
       this.$ready('Create a Course Site')
     })
   },
