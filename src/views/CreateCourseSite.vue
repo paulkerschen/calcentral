@@ -59,9 +59,9 @@
           :aria-expanded="currentWorkflowStep === 'monitoring_job'"
         >
           <MonitoringJob
-            fetch-feed="fetchFeed"
-            job-status="jobStatus"
-            show-confirmation="showConfirmation"
+            :fetch-feed="fetchFeed"
+            :job-status="jobStatus"
+            :show-confirmation="showConfirmation"
           />
         </div>
       </div>
@@ -162,6 +162,7 @@ export default {
       this.showMaintenanceNotice = true
     },
     createCourseSiteJob(siteName, siteAbbreviation) {
+      this.jobStatus = 'New'
       this.currentWorkflowStep = 'monitoring_job'
       this.alertScreenReader('Creating course site. Please wait.')
       this.monitorFocus = true
@@ -345,17 +346,17 @@ export default {
       }
     },
     selectedSections(coursesList) {
-      const selectedSectionsList = []
+      const selected = []
       this.$_.each(coursesList, course => {
         this.$_.each(course.sections, section => {
           if (section.selected) {
             section.courseTitle = course.title
             section.courseCatalog = course.course_catalog
-            selectedSectionsList.push(section)
+            selected.push(section)
           }
         })
       })
-      return selectedSectionsList
+      return selected
     },
     selectAllSections() {
       const newSelectedCourses = []

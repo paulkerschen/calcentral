@@ -43,7 +43,7 @@
                 class="ml-2"
                 name="section-ccn"
                 size="sm"
-                :value="section"
+                :value="section.ccn"
               />
             </td>
             <td class="bc-template-sections-table-cell-course-code">
@@ -235,6 +235,9 @@ export default {
         this.allSelected = false
         this.indeterminate = true
       }
+      this.$_.each(this.sections, section => {
+        section.selected = this.$_.includes(this.selected, section.ccn)
+      })
       this.updateSelected()
     }
   },
