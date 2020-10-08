@@ -59,6 +59,7 @@
         <div class="d-flex flex-row-reverse">
           <div>
             <b-button
+              id="create-course-site-button"
               aria-controls="bc-page-create-course-site-steps-container"
               aria-label="Create Course Site"
               class="bc-canvas-button bc-canvas-button-primary"

@@ -2,6 +2,7 @@
   <div class="bc-page-create-course-site-admin-options">
     <h2 class="cc-visuallyhidden">Administrator Options</h2>
     <b-button
+      id="toggle-admin-mode-button"
       aria-controls="bc-page-create-course-site-admin-section-loader-form"
       class="bc-canvas-button bc-canvas-button-small bc-page-create-course-site-admin-mode-switch pb-2 ptl-3 pr-2 pt-2"
       @click="setMode(adminMode === 'act_as' ? 'by_ccn' : 'act_as')"

@@ -1,7 +1,7 @@
 <template>
   <div class="bc-canvas-application bc-page-create-course-site pl-5 pr-5 pt-3 pb-3">
     <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column pt-3">
         <div class="order-3">
           <h1 class="bc-page-create-course-site-header bc-page-create-course-site-header1">Create a Course Site</h1>
         </div>
@@ -12,10 +12,10 @@
         </div>
         <div class="order-1">
           <CreateCourseSiteHeader
-            v-if="isAdmin && currentWorkflowStep === 'selecting'"
+            v-if="isAdmin && currentWorkflowStep !== 'monitoring_job'"
             :admin-mode="adminMode"
             :admin-semesters="adminSemesters"
-            :current-admin-semester="currentAdminSemester || adminSemesters[0].slug"
+            :current-admin-semester="currentSemester"
             :fetch-feed="fetchFeed"
             :set-admin-acting-as="setAdminActingAs"
             :set-admin-by-ccns="setAdminByCcns"
@@ -130,13 +130,14 @@ export default {
   created() {
     this.$loading()
     getCourseProvisioningMetadata().then(data => {
-      this.adminActingAs = data.admin_acting_as
-      this.adminSemesters = data.admin_semesters
       this.isAdmin = data.is_admin
-      this.teachingSemesters = data.teachingSemesters
       if (this.isAdmin) {
+        this.adminActingAs = data.admin_acting_as
+        this.adminSemesters = data.admin_semesters
+        this.switchSemester(this.adminSemesters[0])
         this.$ready('First, enter instructor UID or a list of CCNs.')
       } else {
+        this.teachingSemesters = data.teachingSemesters
         this.fillCourseSites(this.teachingSemesters)
         this.switchSemester(this.teachingSemesters[0])
         this.currentWorkflowStep = 'selecting'
@@ -198,28 +199,30 @@ export default {
     fetchFeed() {
       this.clearCourseSiteJob()
       this.$loading()
-      this.feedFetched = false
       this.currentWorkflowStep = 'selecting'
       this.selectedSectionsList = []
       this.alertScreenReader('Loading courses and sections')
 
       const onSuccess = data => {
-        data.usersClassCount = this.classCount(data.teachingSemesters)
+        this.usersClassCount = this.classCount(data.teachingSemesters)
         this.teachingSemesters = data.teachingSemesters
         this.canvasCourse = data.canvas_course
         const canvasCourseId = this.canvasCourse ? this.canvasCourse.canvasCourseId : ''
         this.fillCourseSites(data.teachingSemesters, canvasCourseId)
-        this.feedFetched = true
-        this.selectFocus = true
         this.alertScreenReader('Course section loaded successfully')
         if (this.$_.size(this.teachingSemesters) > 0) {
           this.switchSemester(this.teachingSemesters[0])
         }
-        if (!this.currentAdminSemester && this.$_.size(this.adminSemesters) > 0) {
-          this.switchAdminSemester(this.adminSemesters[0])
+        if (this.$_.size(this.adminSemesters) > 0) {
+          this.switchAdminSemester(this.currentAdminSemester || this.adminSemesters[0])
         }
         if (this.adminMode === 'by_ccn' && this.adminByCcns) {
-          this.selectAllSections()
+          this.$_.each(this.coursesList, course => {
+            this.$_.each(course.sections, section => {
+              section.selected = this.$_.includes(this.adminByCcns, section.ccn)
+            })
+          })
+          this.updateSelected()
         }
         if (!this.isAdmin && !this.usersClassCount) {
           this.displayError = 'Sorry, you are not an admin user and you have no classes.'
@@ -238,7 +241,7 @@ export default {
         this.adminActingAs,
         this.adminByCcns,
         this.adminMode,
-        this.currentAdminSemester,
+        this.currentSemester,
         this.isAdmin
       ).then(onSuccess, onError)
     },
@@ -360,17 +363,6 @@ export default {
         })
       })
       return selected
-    },
-    selectAllSections() {
-      const newSelectedCourses = []
-      this.$_.each(this.coursesList, course => {
-        this.$_.each(course.sections, section => {
-          section.selected = true
-        })
-        newSelectedCourses.push(course)
-      })
-      this.coursesList = newSelectedCourses
-      this.updateSelected()
     },
     setAdminActingAs(uid) {
       this.adminActingAs = uid

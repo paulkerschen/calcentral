@@ -55,7 +55,7 @@
               <label
                 v-if="mode === 'createCourseForm'"
                 class="bc-template-sections-table-cell-section-label-label"
-                for="`cc-template-canvas-manage-sections-checkbox-${section.ccn}`"
+                :for="`cc-template-canvas-manage-sections-checkbox-${section.ccn}`"
               >
                 {{ section.section_label }}
               </label>
@@ -242,10 +242,13 @@ export default {
     }
   },
   data: () => ({
-    selected: [],
+    selected: undefined,
     allSelected: false,
     indeterminate: false
   }),
+  created() {
+    this.selected = this.$_.map(this.$_.filter(this.sections, 'selected'), 'ccn')
+  },
   methods: {
     noCurrentSections() {
       if (this.sections.length < 1) {

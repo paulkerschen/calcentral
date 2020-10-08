@@ -9,7 +9,7 @@ export function getStatus(taskId) {
 }
 
 export function runTask(taskName: string, termName: string, departmentCode) {
-  return utils.post('/api/oec/tasks/${taskName}', {
+  return utils.post(`/api/oec/tasks/${taskName}`, {
     departmentCode,
     term: termName
   })
