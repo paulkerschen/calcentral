@@ -74,14 +74,20 @@ export default {
   methods: {
     createMailingList() {
       this.isCreating = true
-      createSiteMailingList(this.canvasCourseId, this.mailingList).then(response => {
-        this.updateDisplay(response)
-      })
+      createSiteMailingList(this.canvasCourseId, this.mailingList).then(
+        response => {
+          this.updateDisplay(response)
+        },
+        this.$errorHandler
+      )
     },
     getMailingList() {
-      return getSiteMailingList(this.canvasCourseId).then(response => {
-        this.updateDisplay(response)
-      })
+      return getSiteMailingList(this.canvasCourseId).then(
+        response => {
+          this.updateDisplay(response)
+        },
+        this.$errorHandler
+      )
     },
     updateDisplay(data) {
       this.mailingList = data.mailingList || {}

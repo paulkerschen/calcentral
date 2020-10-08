@@ -70,6 +70,8 @@ const axiosErrorHandler = error => {
   }
 }
 
+Vue.prototype.$errorHandler = axiosErrorHandler
+
 axios.interceptors.response.use(
   response => response,
   error => {
