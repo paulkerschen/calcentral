@@ -1,6 +1,7 @@
 <template>
   <div class="bc-alert">
     <button
+      id="maintenance-notice-button"
       class="bc-button-link bc-template-canvas-maintenance-notice-button"
       aria-controls="maintenance-details"
       :aria-expanded="!maintenanceCollapsed"

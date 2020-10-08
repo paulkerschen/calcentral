@@ -88,8 +88,16 @@ export function getRosterCsv(courseId: number) {
 }
 
 // Site creation
-export function courseCreate(course) {
-  return utils.post('/api/academics/canvas/course_provision/create', course)
+export function courseCreate(adminActingAs, adminByCcns, adminTermSlug, ccns, siteAbbreviation, siteName, termSlug) {
+  return utils.post('/api/academics/canvas/course_provision/create', {
+    admin_acting_as: adminActingAs,
+    admin_by_ccns: adminByCcns,
+    admin_term_slug: adminTermSlug,
+    ccns,
+    siteAbbreviation,
+    siteName,
+    termSlug
+  })
 }
 
 export function createProjectSite(name) {
@@ -97,7 +105,7 @@ export function createProjectSite(name) {
 }
 
 export function courseProvisionJobStatus(jobId) {
-  return utils.get(`/api/academics/canvas/course_provision/status.json?jobId=${jobId}`)
+  return utils.get(`/api/academics/canvas/course_provision/status?jobId=${jobId}`)
 
 }
 
