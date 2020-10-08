@@ -154,7 +154,7 @@
             :class="rowClassLogic({mode: mode, section: section})"
           >
             <td colspan="7" class="bc-template-sections-table-sites-cell">
-              <div v-for="site in section.sites" :key="site.name" class="bc-template-sections-table-sites-container ml-4 pl-3">
+              <div v-for="(site, index) in section.sites" :key="index" class="bc-template-sections-table-sites-container ml-4 pl-3">
                 <fa icon="info-circle" class="bc-template-sections-table-sited-icon mr-1" size="sm"></fa>
                 This section is already in use by <a :href="site.site_url">{{ site.name }}</a>
               </div>
