@@ -184,22 +184,24 @@ export default {
             course.admin_term_slug = this.currentAdminSemester
           }
         }
-        courseCreate(course).then(data => {
-          this.$_.assignIn(this, data)
+        const errorHandler = error => {
+          this.$_.assignIn(this, error)
+          this.percentComplete = this.percentCompleteRounded = 0
           this.currentWorkflowStep = 'monitoring_job'
-          this.alertScreenReader('Course site created successfully')
-          this.completedFocus = true
-          this.jobStatusLoader()
-        })
-        // TODO: error handling
-        //   function errorCallback() {
-        //     this.$_.assignIn(this, {
-        //       percentCompleteRounded: 0,
-        //       currentWorkflowStep: 'monitoring_job',
-        //       jobStatus: 'Error',
-        //       error: 'Failed to create course provisioning job.'
-        //     });
-        //   }
+          this.jobStatus = 'Error'
+          this.displayError = 'Failed to create course provisioning job.'
+          return this.$errorHandler(error)
+        }
+        courseCreate(course).then(
+          data => {
+            this.$_.assignIn(this, data)
+            this.currentWorkflowStep = 'monitoring_job'
+            this.alertScreenReader('Course site created successfully')
+            this.completedFocus = true
+            this.jobStatusLoader()
+          },
+          errorHandler
+        )
       }
     },
     fetchFeed() {
@@ -209,13 +211,8 @@ export default {
       this.currentWorkflowStep = 'selecting'
       this.selectedSectionsList = []
       this.alertScreenReader('Loading courses and sections')
-      getSections(
-        this.adminActingAs,
-        this.adminByCcns,
-        this.adminMode,
-        this.currentAdminSemester,
-        this.isAdmin
-      ).then(data => {
+
+      const onSuccess = data => {
         data.usersClassCount = this.classCount(data.teachingSemesters)
         this.teachingSemesters = data.teachingSemesters
         this.canvasCourse = data.canvas_course
@@ -223,12 +220,6 @@ export default {
         this.fillCourseSites(data.teachingSemesters, canvasCourseId)
         this.feedFetched = true
         this.selectFocus = true
-        // TODO: Error handling?
-        // if (this.sectionsFeed.status !== 200) {
-        //   this.alertScreenReader('Course section loading failed');
-        //   $scope.isLoading = false;
-        //   $scope.displayError = 'failure';
-        // } else {
         this.alertScreenReader('Course section loaded successfully')
         if (this.$_.size(this.teachingSemesters) > 0) {
           this.switchSemester(this.teachingSemesters[0])
@@ -243,7 +234,22 @@ export default {
           this.displayError = 'Sorry, you are not an admin user and you have no classes.'
         }
         this.$ready()
-      })
+      }
+
+      const onError = data => {
+        this.alertScreenReader('Course section loading failed')
+        this.displayError = 'failure'
+        this.$ready()
+        return this.$errorHandler(data)
+      }
+
+      getSections(
+        this.adminActingAs,
+        this.adminByCcns,
+        this.adminMode,
+        this.currentAdminSemester,
+        this.isAdmin
+      ).then(onSuccess, onError)
     },
     fillCourseSites(semestersFeed, canvasCourseId=null) {
       this.$_.each(semestersFeed, semester => {
@@ -278,34 +284,37 @@ export default {
       })
     },
     jobStatusLoader() {
-      this.timeoutPromise = setTimeout(
-        () => {
-          return courseProvisionJobStatus(this.jobId).then(data => {
-            this.$_.assignIn(this, data)
-            this.percentCompleteRounded = Math.round(this.percentComplete * 100)
-            if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
-              this.jobStatusLoader()
-            } else {
-              this.$loading()
-              this.percentCompleteRounded = undefined
-              clearTimeout(this.timeoutPromise)
-              if (this.jobStatus === 'Completed') {
-                if (this.courseSite && this.courseSite.url) {
-                  if (this.isInIframe) {
-                    this.iframeParentLocation(this.courseSite.url)
-                  } else {
-                    window.location.href = this.courseSite.url
-                  }
-                } else {
-                  this.displayError = 'failure'
-                }
+      const onSuccess = data => {
+        this.$_.assignIn(this, data)
+        this.percentCompleteRounded = Math.round(this.percentComplete * 100)
+        if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
+          this.jobStatusLoader()
+        } else {
+          this.$loading()
+          this.percentCompleteRounded = undefined
+          clearTimeout(this.timeoutPromise)
+          if (this.jobStatus === 'Completed') {
+            if (this.courseSite && this.courseSite.url) {
+              if (this.isInIframe) {
+                this.iframeParentLocation(this.courseSite.url)
+              } else {
+                window.location.href = this.courseSite.url
               }
+            } else {
+              this.displayError = 'failure'
             }
-            // TODO: error handling
-            //   this.displayError = 'failure'
-            //
-          })
-        }, 2000)
+          }
+        }
+      }
+      const onError = data => {
+        this.alertScreenReader('Course section loading failed')
+        this.displayError = 'failure'
+        this.percentComplete = this.percentCompleteRounded = 0
+        this.jobStatus = 'Error'
+        this.displayError = 'Failed to create course provisioning job.'
+        return this.$errorHandler(data)
+      }
+      this.timeoutPromise = setTimeout(() => courseProvisionJobStatus(this.jobId).then(onSuccess, onError), 2000)
     },
     loadCourseLists() {
       this.courseSemester = false

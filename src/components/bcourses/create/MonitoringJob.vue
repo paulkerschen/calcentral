@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- TODO: data-cc-focus-reset-directive -->
-    <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="confirmFocus">Course Site Creation</h2>
+    <h2 class="cc-visuallyhidden">Course Site Creation</h2>
     <div aria-live="polite">
       <div v-show="!jobStatus" class="bc-page-create-course-site-pending-request">
         <fa icon="spinner" spin></fa>
@@ -23,7 +22,7 @@
                 <button
                   class="bc-canvas-button bc-canvas-button-primary"
                   type="button"
-                  aria-control="bc-page-create-course-site-selecting-step"
+                  aria-controls="bc-page-create-course-site-selecting-step"
                   aria-label="Start over course site creation process"
                   @click="fetchFeed"
                 >
@@ -32,7 +31,7 @@
                 <button
                   class="cc-button cc-page-button-grey"
                   type="button"
-                  aria-control="bc-page-create-course-site-confirmation-step"
+                  aria-controls="bc-page-create-course-site-confirmation-step"
                   aria-label="Go Back to Site Details Confirmation"
                   @click="showConfirmation"
                 >
@@ -45,8 +44,7 @@
       </div>
     </div>
     <div v-if="jobStatus === 'Completed'" :aria-expanded="jobStatus === 'Completed'">
-      <!-- TODO: data-cc-spinner-directive -->
-      <div data-cc-spinner-directive></div>
+      <b-spinner size="sm"></b-spinner>
       <div class="cc-visuallyhidden" role="alert">
         Redirecting to new course site.
       </div>
