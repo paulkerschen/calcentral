@@ -1,6 +1,22 @@
 <template>
   <div class="bc-template-sections-table-container">
     <b-form-group>
+      <template v-if="sections.length > 1" #label>
+        <div class="d-flex pl-2">
+          <b-form-checkbox
+            :id="`select-all-toggle-${sections[0].ccn}`"
+            v-model="allSelected"
+            :aria-label="`${allSelected ? 'Un-select' : 'Select'} all course sections`"
+            class="my-2"
+            :indeterminate="indeterminate"
+            @change="toggleAll"
+          >
+            <div class="text-secondary">
+              Select {{ allSelected ? 'None' : 'All' }}
+            </div>
+          </b-form-checkbox>
+        </div>
+      </template>
       <table class="bc-template-sections-table bg-white">
         <thead class="cc-visuallyhidden">
           <tr>
@@ -27,7 +43,7 @@
                 class="ml-2"
                 name="section-ccn"
                 size="sm"
-                :value="section.ccn"
+                :value="section"
               />
             </td>
             <td class="bc-template-sections-table-cell-course-code">
@@ -208,15 +224,24 @@ export default {
     }
   },
   watch: {
-    selected(ccns) {
-      this.$_.each(this.sections, section => {
-        section.selected = this.$_.includes(ccns, section.ccn)
-      })
+    selected(objects) {
+      if (!objects.length) {
+        this.allSelected = false
+        this.indeterminate = false
+      } else if (objects.length === this.sections.length) {
+        this.allSelected = true
+        this.indeterminate = false
+      } else {
+        this.allSelected = false
+        this.indeterminate = true
+      }
       this.updateSelected()
     }
   },
   data: () => ({
-    selected: []
+    selected: [],
+    allSelected: false,
+    indeterminate: false
   }),
   methods: {
     noCurrentSections() {
@@ -226,6 +251,9 @@ export default {
       return !this.sections.some(section => {
         return (section.isCourseSection && section.stagedState !== 'delete') || (!section.isCourseSection && section.stagedState === 'add')
       })
+    },
+    toggleAll(checked) {
+      this.selected = checked ? this.sections.slice() : []
     }
   }
 }
@@ -235,35 +263,28 @@ export default {
 td {
   padding-top: 5px;
 }
-
 .bc-template-sections-table-cell-checkbox {
   width: 30px;
 }
-
 .bc-template-sections-table-row-disabled td {
   color: $bc-color-grey-disabled;
 }
-
 .bc-template-sections-table-row-added td {
   background-color: $bc-color-yellow-row-highlighted;
 }
-
 .bc-template-sections-table-row-deleted td {
   background-color: $bc-color-red-row-highlighted;
 }
-
 .bc-template-sections-table-cell-section-action-option {
   height: 45px;
   text-align: right;
 }
-
 .bc-template-sections-table-button {
   font-size: 12px;
   margin: 0;
   padding: 2px 8px;
   white-space: nowrap;
 }
-
 .bc-template-sections-table-button-undo-add {
   background-color: $bc-color-orange-button-bg;
   border: $bc-color-orange-button-border solid 1px;
@@ -273,7 +294,6 @@ td {
     border-color: $bc-color-orange-button-border-selected;
   }
 }
-
 .bc-template-sections-table-button-undo-delete {
   background-color: $bc-color-red-button-bg;
   border: $bc-color-red-button-border solid 1px;
@@ -283,47 +303,37 @@ td {
     border-color: $bc-color-red-button-border-selected;
   }
 }
-
 .bc-template-sections-table-cell-course-code {
   font-size: 13px;
   width: 115px;
 }
-
 .bc-template-sections-table-cell-section-ccn {
   width: 70px;
 }
-
 .bc-template-sections-table-cell-section-timestamps {
   width: 155px;
 }
-
 .bc-template-sections-table-cell-section-locations {
   width: 150px;
 }
-
 .bc-template-sections-table-cell-section-instructors {
   width: 183px;
 }
-
 .bc-template-sections-table-cell-section-label {
   padding-top: 7px;
 }
-
 .bc-template-sections-table-cell-section-label-label {
   cursor: pointer;
   font-size: 13px;
   margin: 0;
   text-align: left;
 }
-
 .bc-template-sections-table-sited-icon {
   color: $bc-color-help-link-blue;
 }
-
 .bc-template-sections-table-sites-cell {
   padding: 0 14px;
 }
-
 .bc-template-sections-table-sites-container {
   margin-bottom: 5px;
 }

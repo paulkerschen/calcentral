@@ -1,20 +1,12 @@
 <template>
   <div>
-    <!-- TODO: data-cc-spinner-directive -->
-    <div data-cc-spinner-directive></div>
     <div v-if="!$_.size(teachingSemesters)" role="alert">
       <p>You are currently not listed as the instructor of record for any courses, so you cannot create a course site in bCourses.</p>
     </div>
     <div v-if="$_.size(teachingSemesters)">
-      <div class="medium-5 columns">
+      <div>
         <div class="bc-buttonset">
-          <!-- TODO: data-cc-focus-reset-directive -->
-          <h2
-            class="bc-page-create-course-site-header bc-page-create-course-site-header2 bc-accessibility-no-outline"
-            data-cc-focus-reset-directive="selectFocus"
-          >
-            Term
-          </h2>
+          <h2 class="bc-page-create-course-site-header bc-page-create-course-site-header2">Term</h2>
           <span v-for="(semester, index) in teachingSemesters" :key="index">
             <input
               :id="`semester${index}`"
@@ -40,7 +32,7 @@
           </span>
         </div>
       </div>
-      <div class="medium-12 columns">
+      <div class="pt-2">
         <h2 class="bc-page-create-course-site-header bc-page-create-course-site-header2">Official Sections</h2>
         <p>All official sections you select below will be put in ONE, single course site.</p>
         <div class="bc-page-help-notice bc-page-create-course-site-help-notice">
@@ -81,7 +73,7 @@
           </div>
         </div>
       </div>
-      <div class="medium-12 columns">
+      <div>
         <form class="bc-canvas-page-form" @submit="showConfirmation">
           <ul class="bc-page-create-course-site-section-margin">
             <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
@@ -105,17 +97,6 @@
                 </div>
               </div>
               <b-collapse :id="course.course_id" v-model="course.visible">
-                <div v-if="course.sections.length > 1" class="bc-page-create-course-site-form-select-all-option">
-                  Select:
-                  <button
-                    :aria-label="`Select ${course.selectToggleText} of the course sections`"
-                    class="bc-button-link bc-page-create-course-site-form-select-all-option-button"
-                    type="button"
-                    @click="toggleCourseSectionsWithUpdate(course)"
-                  >
-                    {{ course.selectToggleText }}
-                  </button>
-                </div>
                 <CourseSectionsTable
                   mode="createCourseForm"
                   :sections="course.sections"
@@ -184,10 +165,6 @@ export default {
       required: true,
       type: Array
     },
-    toggleCourseSectionsWithUpdate: {
-      required: true,
-      type: Function
-    },
     updateSelected: {
       required: true,
       type: Function
@@ -220,22 +197,26 @@ export default {
     margin-bottom: 7px;
   }
 }
-
 .bc-page-create-course-site-form-select-all-option {
   font-size: 12px;
   font-weight: normal;
   margin: 6px 0 4px 2px;
 }
-
-.bc-page-create-course-site-form-select-all-option-button {
-  outline: none;
+.bc-page-create-course-site-header {
+  color: $bc-color-headers;
+  font-family: $bc-base-font-family;
+  font-weight: normal;
+  line-height: 40px;
+  margin: 5px 0;
 }
-
+.bc-page-create-course-site-header2 {
+  font-size: 18px;
+  margin: 10px 0;
+}
 .bc-page-create-course-site-section-margin {
   margin: 0;
   overflow: hidden;
 }
-
 .toggle-show-hide {
   width: 30px
 }
