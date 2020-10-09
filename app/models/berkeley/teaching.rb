@@ -1,8 +1,8 @@
 module Berkeley
   class Teaching < UserSpecificModel
 
-    def merge(data)
-      feed = EdoOracle::UserCourses::All.new(user_id: @uid).get_all_campus_courses
+    def merge(data, terms=nil)
+      feed = EdoOracle::UserCourses::Instructing.new(user_id: @uid).get_courses_instructing(terms)
       teaching_semesters = format_teaching_semesters feed
       if teaching_semesters.present?
         data[:teachingSemesters] = teaching_semesters

@@ -11,27 +11,13 @@ module EdoOracle
         !uid.blank?
       end
 
-      def merge_enrollments(campus_classes)
-        return if @terms.empty?
-        previous_item = {}
-
-        EdoOracle::Queries.get_enrolled_sections(@uid, @terms).each do |row|
-          if (item = row_to_feed_item(row, previous_item))
-            item[:role] = 'Student'
-            # Cross-listed courses may lack descriptive names. Students, unlike instructors, will
-            # not get the correctly named course elsewhere in their feed.
-            merge_cross_listed_titles item
-            merge_feed_item(item, campus_classes)
-            previous_item = item
-          end
-        end
-      end
-
-      def merge_instructing(campus_classes)
+      def merge_instructing(campus_classes, requested_terms=nil)
         return if @terms.empty?
         previous_item = {}
         cross_listing_tracker = {}
-        EdoOracle::Queries.get_instructing_sections(@uid, @terms).each do |row|
+        requested_slugs = requested_terms && requested_terms.map { |t| t[:slug] }
+        query_terms = requested_slugs ? @terms.select { |t| requested_slugs.include? t.slug } : @terms
+        EdoOracle::Queries.get_instructing_sections(@uid, query_terms).each do |row|
           if (item = row_to_feed_item(row, previous_item, cross_listing_tracker))
             item[:role] = 'Instructor'
             merge_feed_item(item, campus_classes)
@@ -208,14 +194,6 @@ module EdoOracle
         end
 
         section_data
-      end
-
-      def remove_duplicate_sections(campus_classes)
-        campus_classes.each_value do |semester|
-          semester.each do |course|
-            course[:sections].uniq!
-          end
-        end
       end
 
       def merge_cross_listed_titles(course)

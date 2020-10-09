@@ -330,7 +330,7 @@ module CanvasCsv
         # sites, sorted in a useful fashion.
         semesters = []
         academics_feed = {}
-        Berkeley::Teaching.new(@uid).merge academics_feed
+        Berkeley::Teaching.new(@uid).merge(academics_feed, current_terms)
         Berkeley::Teaching.new(@uid).merge_canvas_sites academics_feed
         if (teaching_semesters = academics_feed[:teachingSemesters])
           current_terms.each do |term|
