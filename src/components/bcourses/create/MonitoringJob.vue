@@ -17,7 +17,7 @@
         <div v-if="jobStatus === 'Error'">
           <BackgroundJobError :error-config="errorConfig" :errors="errors" />
           <div class="bc-page-create-course-site-step-options">
-            <div class="medium-12 columns">
+            <div>
               <div class="bc-form-actions">
                 <button
                   id="start-over-button"
@@ -70,7 +70,8 @@ export default {
       type: Function
     },
     jobStatus: {
-      required: true,
+      default: undefined,
+      required: false,
       type: String
     },
     percentComplete: {

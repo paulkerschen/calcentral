@@ -47,7 +47,7 @@
           :aria-expanded="currentWorkflowStep === 'confirmation'"
         >
           <ConfirmationStep
-            :create-course-site-job="startCourseSiteJob"
+            :start-course-site-job="startCourseSiteJob"
             :current-semester-name="currentSemesterName"
             :go-back="showSelecting"
             :selected-sections-list="selectedSectionsList"
@@ -105,7 +105,6 @@ export default {
     canvasCourseId: undefined,
     course: undefined,
     coursesList: undefined,
-    courseSite: undefined,
     currentAdminSemester: undefined,
     currentSemester: undefined,
     currentSemesterName: undefined,
@@ -162,40 +161,6 @@ export default {
       this.completedSteps = undefined
       this.percentComplete = undefined
       this.showMaintenanceNotice = true
-    },
-    startCourseSiteJob(siteName, siteAbbreviation) {
-      this.jobStatus = 'New'
-      this.percentComplete = 0
-      this.currentWorkflowStep = 'monitoring_job'
-      this.alertScreenReader('Creating course site. Please wait.')
-      this.showMaintenanceNotice = false
-      this.updateSelected()
-      const ccns = this.$_.map(this.selectedSectionsList, 'ccn')
-      if (ccns.length > 0) {
-        const onSuccess = data => {
-          this.jobId = data.job_id
-          this.currentWorkflowStep = 'monitoring_job'
-          this.alertScreenReader('Course site created successfully')
-          this.completedFocus = true
-          this.jobStatusLoader()
-        }
-        const onError = error => {
-          this.percentComplete = 0
-          this.currentWorkflowStep = 'monitoring_job'
-          this.jobStatus = 'Error'
-          this.displayError = 'Failed to create course provisioning job.'
-          return this.$errorHandler(error)
-        }
-        courseCreate(
-          this.isAdmin && this.adminMode === 'act_as' ? this.adminActingAs : null,
-          this.isAdmin && this.adminMode === 'by_ccn' ? this.adminByCcns : null,
-          this.isAdmin && this.adminMode === 'by_ccn' ? this.currentAdminSemester : null,
-          ccns,
-          siteAbbreviation,
-          siteName,
-          this.currentSemester
-        ).then(onSuccess, onError)
-      }
     },
     fetchFeed() {
       this.clearCourseSiteJob()
@@ -285,21 +250,20 @@ export default {
         this.completedSteps = data.completedSteps
         this.percentComplete = data.percentComplete
         if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
+          this.alertScreenReader(`${Math.round(this.percentComplete * 100)} percent done in creating new course site.`)
           this.jobStatusLoader()
         } else {
-          this.$loading()
-          this.percentComplete = undefined
           clearTimeout(this.timeoutPromise)
-          if (this.jobStatus === 'Completed') {
-            if (this.courseSite && this.courseSite.url) {
-              if (this.isInIframe) {
-                this.iframeParentLocation(this.courseSite.url)
-              } else {
-                window.location.href = this.courseSite.url
-              }
+          const courseSiteUrl =  this.$_.get(data.courseSite, 'url')
+          if (this.jobStatus === 'Completed' && courseSiteUrl) {
+            this.alertScreenReader('Done. Loading new course site now.')
+            if (this.isInIframe) {
+              this.iframeParentLocation(courseSiteUrl)
             } else {
-              this.displayError = 'failure'
+              window.location.href = courseSiteUrl
             }
+          } else {
+            this.displayError = 'failure'
           }
         }
       }
@@ -383,6 +347,40 @@ export default {
     },
     showSelecting() {
       this.currentWorkflowStep = 'selecting'
+    },
+    startCourseSiteJob(siteName, siteAbbreviation) {
+      // this.jobStatus = 'New'
+      this.percentComplete = 0
+      this.currentWorkflowStep = 'monitoring_job'
+      this.alertScreenReader('Creating course site. Please wait.')
+      this.showMaintenanceNotice = false
+      this.updateSelected()
+      const ccns = this.$_.map(this.selectedSectionsList, 'ccn')
+      if (ccns.length > 0) {
+        const onSuccess = data => {
+          this.jobId = data.job_id
+          this.currentWorkflowStep = 'monitoring_job'
+          this.alertScreenReader('Course site created successfully')
+          this.completedFocus = true
+          this.jobStatusLoader()
+        }
+        const onError = error => {
+          this.percentComplete = 0
+          this.currentWorkflowStep = null
+          this.jobStatus = 'Error'
+          this.displayError = 'Failed to create course provisioning job.'
+          return this.$errorHandler(error)
+        }
+        courseCreate(
+          this.isAdmin && this.adminMode === 'act_as' ? this.adminActingAs : null,
+          this.isAdmin && this.adminMode === 'by_ccn' ? this.adminByCcns : null,
+          this.isAdmin && this.adminMode === 'by_ccn' ? this.currentAdminSemester : null,
+          ccns,
+          siteAbbreviation,
+          siteName,
+          this.currentSemester
+        ).then(onSuccess, onError)
+      }
     },
     switchAdminSemester(semester) {
       this.currentAdminSemester = semester.slug
