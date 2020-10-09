@@ -19,12 +19,14 @@
       </div>
       <div v-if="student.email">
         <div class="cc-page-roster-student-name">
-          <a :href="`mailto:${student.email}`">
+          <OutboundLink :id="`student-email-${student.student_id}-first-name`" :href="`mailto:${student.email}`">
             {{ student.first_name }}
-          </a>
+          </OutboundLink>
         </div>
         <div class="cc-page-roster-student-name font-weight-bolder">
-          <a :id="`student-email-${student.student_id}`" :href="`mailto:${student.email}`">{{ student.last_name }}</a>
+          <OutboundLink :id="`student-email-${student.student_id}`" :href="`mailto:${student.email}`">
+            {{ student.last_name }}
+          </OutboundLink>
         </div>
       </div>
       <div :id="`student-id-${student.student_id}`" class="cc-print-hide">
@@ -42,11 +44,12 @@
 </template>
 
 <script>
+import OutboundLink from '@/components/util/OutboundLink'
 import RosterPhoto from '@/components/bcourses/roster/RosterPhoto'
 
 export default {
   name: 'RosterPhotos',
-  components: {RosterPhoto},
+  components: {OutboundLink, RosterPhoto},
   props: {
     courseId: {
       required: true,
