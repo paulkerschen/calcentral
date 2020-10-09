@@ -259,7 +259,7 @@ export default {
       })
     },
     toggleAll(checked) {
-      this.selected = checked ? this.sections.slice() : []
+      this.selected = checked ? this.$_.map(this.sections, 'ccn').slice() : []
     }
   }
 }

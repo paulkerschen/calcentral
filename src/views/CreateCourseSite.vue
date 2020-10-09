@@ -47,7 +47,7 @@
           :aria-expanded="currentWorkflowStep === 'confirmation'"
         >
           <ConfirmationStep
-            :create-course-site-job="createCourseSiteJob"
+            :create-course-site-job="startCourseSiteJob"
             :current-semester-name="currentSemesterName"
             :go-back="showSelecting"
             :selected-sections-list="selectedSectionsList"
@@ -135,14 +135,15 @@ export default {
         this.adminActingAs = data.admin_acting_as
         this.adminSemesters = data.admin_semesters
         this.switchSemester(this.adminSemesters[0])
-        this.$ready('First, enter instructor UID or a list of CCNs.')
+        this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
       } else {
         this.teachingSemesters = data.teachingSemesters
         this.fillCourseSites(this.teachingSemesters)
         this.switchSemester(this.teachingSemesters[0])
         this.currentWorkflowStep = 'selecting'
-        this.$ready('Select sections for your new Canvas course site.')
+        this.alertScreenReader('Select sections for your new Canvas course site.')
       }
+      this.$ready('Create Canvas Course Site')
     })
   },
   methods: {
@@ -162,7 +163,7 @@ export default {
       this.percentComplete = undefined
       this.showMaintenanceNotice = true
     },
-    createCourseSiteJob(siteName, siteAbbreviation) {
+    startCourseSiteJob(siteName, siteAbbreviation) {
       this.jobStatus = 'New'
       this.percentComplete = 0
       this.currentWorkflowStep = 'monitoring_job'
