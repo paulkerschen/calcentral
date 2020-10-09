@@ -71,6 +71,7 @@
           </div>
           <div class="pr-2">
             <b-button
+              id="go-back-button"
               class="bc-canvas-button"
               @click="goBack"
             >
@@ -92,19 +93,19 @@ export default {
   name: 'ConfirmationStep',
   mixins: [Context, Iframe, Utils],
   props: {
-    createCourseSiteJob: {
-      required: true,
-      type: Function
-    },
     currentSemesterName: {
       required: true,
       type: String
+    },
+    goBack: {
+      required: true,
+      type: Function
     },
     selectedSectionsList: {
       required: true,
       type: Array
     },
-    goBack: {
+    startCourseSiteJob: {
       required: true,
       type: Function
     }
@@ -117,14 +118,13 @@ export default {
     const section = this.selectedSectionsList[0]
     this.siteName = `${section.courseTitle} (${this.currentSemesterName})`
     this.siteAbbreviation = `${section.courseCode}-${section.instruction_format}-${section.section_number}`
-    this.currentWorkflowStep = 'confirmation'
     this.iframeScrollToTop()
     this.$putFocusNextTick('siteName')
-    this.alertScreenReader('Decide on the name of your new course site.')
+    this.alertScreenReader('Confirm the course site name.')
   },
   methods: {
     create() {
-      this.createCourseSiteJob(this.siteName, this.siteAbbreviation)
+      this.startCourseSiteJob(this.siteName, this.siteAbbreviation)
     }
   }
 }
