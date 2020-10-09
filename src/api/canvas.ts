@@ -125,16 +125,16 @@ export function getSections(
   adminActingAs: string,
   adminByCcns: number[],
   adminMode: string,
-  currentAdminSemester: string,
+  currentSemester: string,
   isAdmin: boolean
 ) {
   let feedUrl = '/api/academics/canvas/course_provision'
   if (isAdmin) {
-    if ((adminMode === 'act_as') && adminActingAs) {
+    if (adminMode === 'act_as' && adminActingAs) {
       feedUrl = '/api/academics/canvas/course_provision_as/' + adminActingAs
     } else if ((adminMode !== 'act_as') && adminByCcns) {
-      feedUrl = `/api/academics/canvas/course_provision?admin_term_slug=${currentAdminSemester}`
-      _.each(adminByCcns, ccn => feedUrl += `admin_by_ccns[]=${ccn}`)
+      feedUrl = `/api/academics/canvas/course_provision?admin_term_slug=${currentSemester}`
+      _.each(adminByCcns, ccn => feedUrl += `&admin_by_ccns[]=${ccn}`)
     }
   }
   return utils.get(feedUrl)

@@ -20,6 +20,7 @@
             <div class="medium-12 columns">
               <div class="bc-form-actions">
                 <button
+                  id="start-over-button"
                   class="bc-canvas-button bc-canvas-button-primary"
                   type="button"
                   aria-controls="bc-page-create-course-site-selecting-step"
@@ -29,6 +30,7 @@
                   Start Over
                 </button>
                 <button
+                  id="go-back-button"
                   class="cc-button cc-page-button-grey"
                   type="button"
                   aria-controls="bc-page-create-course-site-confirmation-step"

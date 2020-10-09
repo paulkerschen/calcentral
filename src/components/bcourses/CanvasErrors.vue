@@ -1,7 +1,12 @@
 <template>
   <div class="bc-alert-container">
     <i class="fa fa-warning bc-alert-error-icon"></i>
-    <div aria-live="polite" class="bc-notice-text-container" role="alert">
+    <div
+      id="canvas-error-container"
+      aria-live="polite"
+      class="bc-notice-text-container"
+      role="alert"
+    >
       <h1 class="bc-notice-text-header">{{ decamelize(errorType) }}</h1>
       <p v-if="message" class="pt-2">{{ message }}</p>
       <p v-if="!message && errorType === 'unauthorized'" class="pt-2">

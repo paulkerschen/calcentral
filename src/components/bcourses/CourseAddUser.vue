@@ -16,7 +16,11 @@
           <div v-if="noUserSelectedAlert" class="bc-alert bc-alert-error bc-page-course-add-user-alert">
             Please select a user.
             <div class="bc-alert-close-button-container">
-              <button class="bc-close-button" @click="noUserSelectedAlert = ''">
+              <button
+                id="hide-select-user-alert-button"
+                class="bc-close-button"
+                @click="noUserSelectedAlert = ''"
+              >
                 <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
@@ -28,7 +32,11 @@
             {{ searchTypeNotice }}
             Please try again.
             <div class="bc-alert-close-button-container">
-              <button class="bc-close-button" @click="noSearchResultsNotice = ''">
+              <button
+                id="hide-search-alert-button"
+                class="bc-close-button"
+                @click="noSearchResultsNotice = ''"
+              >
                 <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
               </button>
@@ -45,7 +53,7 @@
             {{ userSearchResultsCount }} user search results loaded.
           </div>
 
-          <div v-if="additionSuccessMessage" class="bc-alert bc-alert-success bc-page-course-add-user-alert">
+          <div v-if="additionSuccessMessage" id="success-message" class="bc-alert bc-alert-success bc-page-course-add-user-alert">
             {{ userAdded.fullName }} was added to the
             &ldquo;{{ userAdded.sectionName }}&rdquo; section of this course as a {{ userAdded.role }}.
             <div class="bc-alert-close-button-container">
