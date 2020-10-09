@@ -1,6 +1,6 @@
-describe EdoOracle::UserCourses::All do
+describe EdoOracle::UserCourses::Instructing do
 
-  subject { described_class.new(user_id: random_id).get_all_campus_courses }
+  subject { described_class.new(user_id: random_id).get_courses_instructing }
 
   before do
     allow(Settings.terms).to receive(:legacy_cutoff).and_return 'fall-2013'

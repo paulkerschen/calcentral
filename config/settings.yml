@@ -202,7 +202,7 @@ cache:
     Berkeley::LegacyTerms: <%= 29.days %>
 
     EdoOracle::CourseSections: <%= 8.hours %>
-    EdoOracle::UserCourses::All: <%= 8.hours %>
+    EdoOracle::UserCourses::Instructing: <%= 8.hours %>
 
     Canvas::MergedUserSites: <%= 30.minutes %>
     Canvas::UserCourses: <%= 30.minutes %>

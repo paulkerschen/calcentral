@@ -64,7 +64,7 @@ describe Berkeley::Teaching do
   context 'academic data from Campus Solutions' do
     before do
       allow(Settings.terms).to receive(:legacy_cutoff).and_return 'fall-2009'
-      expect(EdoOracle::UserCourses::All).to receive(:new).and_return double(get_all_campus_courses: edo_courses)
+      expect(EdoOracle::UserCourses::Instructing).to receive(:new).and_return double(get_courses_instructing: edo_courses)
     end
     let(:uid) { '242881' }
     let(:edo_courses) do
