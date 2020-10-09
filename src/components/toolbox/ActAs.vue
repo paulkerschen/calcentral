@@ -68,7 +68,7 @@ import {
   getMyStoredUsers,
   removeAllRecentUsers,
   removeAllSavedUsers,
-  removeSavedUser, storeUserAsRecent,
+  removeSavedUser,
   storeUserAsSaved
 } from '@/api/act'
 
@@ -120,10 +120,8 @@ export default {
       })
     },
     actAsUser(uid) {
-      actAs(uid).then(() => {
-        this.alertScreenReader(`Prepare to act as user ${uid}.`)
-        storeUserAsRecent(uid).then(() => window.location.href = '/')
-      })
+      this.alertScreenReader(`Prepare to act as user ${uid}.`)
+      actAs(uid).then(() => window.location.href = '/')
     }
   }
 }
