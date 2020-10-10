@@ -1,5 +1,5 @@
 <template>
-  <div class="cc-page-roster">
+  <div v-if="!loading" class="cc-page-roster">
     <b-container v-if="roster && !error" fluid>
       <b-row align-v="start" class="cc-page-roster cc-print-hide cc-roster-search" no-gutters>
         <b-col class="pb-2 pr-2" sm="3">
@@ -108,7 +108,7 @@ import Context from '@/mixins/Context'
 import RosterList from '@/components/bcourses/roster/RosterList'
 import RosterPhotos from '@/components/bcourses/roster/RosterPhotos'
 import Utils from '@/mixins/Utils'
-import {getRoster, getRosterCsv} from '@/api/canvas'
+import {getCourseUserRoles, getRoster, getRosterCsv} from '@/api/canvas'
 
 export default {
   name: 'Roster',
@@ -132,7 +132,19 @@ export default {
     viewMode: 'photos'
   }),
   created() {
+    this.$loading()
     this.getCanvasCourseId()
+    if (this.canvasCourseId === 'embedded') {
+      getCourseUserRoles(this.canvasCourseId).then(
+        data => {
+          this.canvasCourseId = data.courseId
+          this.$ready('Roster Photos')
+        },
+        this.$errorHandler
+      )
+    } else {
+      this.$ready('Roster Photos')
+    }
   },
   mounted() {
     getRoster(this.canvasCourseId).then(data => {

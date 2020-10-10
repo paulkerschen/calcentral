@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import Vue from 'vue'
 import axios from 'axios'
+import Vue from 'vue'
 
 export default {
   apiBaseUrl: () => Vue.prototype.$config.apiBaseUrl,
@@ -9,10 +9,8 @@ export default {
   downloadViaGet(path: string, filename: string) {
     const fileDownload = require('js-file-download')
     return axios.get(`${Vue.prototype.$config.apiBaseUrl}${path}`).then(
-      response => {
-        fileDownload(response.data, filename)
-      },
-      () => null
+        response => fileDownload(response.data, filename),
+        Vue.prototype.$errorHandler
     )
   },
   termCodeToName(termCode: string) {
