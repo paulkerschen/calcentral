@@ -43,7 +43,8 @@ gem 'signet', '~> 0.10.0'
 gem 'ims-lti', git: 'https://github.com/instructure/ims-lti.git', branch: '1.2.x'
 
 # for memcached connection
-gem 'dalli', '~> 2.7.2'
+gem 'dalli', '~> 2.7.11'
+gem 'connection_pool', '~> 2.2.3'
 
 # We fork Log4r, which is no longer actively maintained at the source.
 gem 'log4r', '~> 1.1', git: 'https://github.com/ets-berkeley-edu/log4r'
