@@ -27,21 +27,6 @@ module Oec
     validate('COURSE_ID') { |row| 'Invalid' unless row['COURSE_ID'] =~ /\A20\d{2}-[ABCD]-\d{5}(_(A|B|GSI|CHEM|MCB|MID))?\Z/ }
     validate('COURSE_ID_2') { |row| 'Non-matching' unless row['COURSE_ID'] == row['COURSE_ID_2'] }
 
-    validate('EVALUATION_TYPE') do |row|
-      case row['DEPT_FORM']
-        when 'LAW'
-          'Unexpected for LAW department form:' unless row['EVALUATION_TYPE'].in? %w(1 1A 2 2A 3 3A 4 4A)
-        when 'SPANISH'
-          'Unexpected for SPANISH department form:' unless row['EVALUATION_TYPE'].in? %w(LANG LECT SEMI WRIT)
-        else
-          if row['COURSE_ID'].end_with? '_GSI'
-            'Unexpected for _GSI course:' unless row['EVALUATION_TYPE'] == 'G'
-          else
-            'Unexpected' unless row['EVALUATION_TYPE'].in? %w(F G)
-          end
-      end
-    end
-
     validate('END_DATE') do |row|
       start_date = Date.strptime(row['START_DATE'], WORKSHEET_DATE_FORMAT)
       end_date = Date.strptime(row['END_DATE'], WORKSHEET_DATE_FORMAT)
@@ -52,5 +37,10 @@ module Oec
       end
     end
 
+    validate('EVALUATION_TYPE') do |row|
+      if row['COURSE_ID'].end_with?('_GSI') && !row['DEPT_FORM'].in?(%w(LAW SPANISH)) && row['EVALUATION_TYPE'] != 'G'
+        'Unexpected for _GSI course:'
+      end
+    end
   end
 end

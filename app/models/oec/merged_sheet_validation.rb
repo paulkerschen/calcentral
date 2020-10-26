@@ -83,6 +83,15 @@ module Oec
           dept_supervisors = supervisors.matching_dept_form(confirmation['DEPT_FORM'])
           validate('courses', confirmation['COURSE_ID']) do |errors|
             log :warn, "DEPT_FORM #{confirmation['DEPT_FORM']} not found among participating departments" unless participating_dept_forms.include? confirmation['DEPT_FORM']
+            report_eval_type = "#{confirmation['EVALUATION_TYPE']} in course #{confirmation['COURSE_ID']}"
+            case confirmation['DEPT_FORM']
+              when 'LAW'
+                log :warn, "Unexpected evaluation type for LAW department form: #{report_eval_type}" unless confirmation['EVALUATION_TYPE'].in? %w(1 1A 2 2A 3 3A 4 4A)
+              when 'SPANISH'
+                log :warn, "Unexpected evaluation type for SPANISH department form: #{report_eval_type}" unless confirmation['EVALUATION_TYPE'].in? %w(LANG LECT SEMI WRIT)
+              else
+                log :warn, "Unexpected evaluation type: #{report_eval_type}" unless confirmation['EVALUATION_TYPE'].in? %w(F G)
+            end
             errors.add "No supervisors found for DEPT_FORM #{confirmation['DEPT_FORM']}" if dept_supervisors.none?
             dept_supervisors.each do |supervisor|
               course_supervisor_row = {
