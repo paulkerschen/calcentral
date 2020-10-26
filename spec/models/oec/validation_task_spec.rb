@@ -40,6 +40,15 @@ describe Oec::ValidationTask do
     end
   end
 
+  shared_examples 'validation warning logging' do
+    it 'should log warning' do
+      merged_course_confirmations_csv.concat invalid_row
+      allow(Rails.logger).to receive(:warn)
+      expect(Rails.logger).to receive(:warn).with(/#{Regexp.quote expected_message}/)
+      task.run
+    end
+  end
+
   context 'conflicting instructor data' do
     let(:invalid_row) { '2015-B-32960,2015-B-32960,GWS 103 LEC 001 IDENTITY ACROSS DIF,,,GWS,103,LEC,001,P,104033,UID:104033,BAD_FIRST_NAME,Ffff,ffff@berkeley.edu,23,Y,GWS,F,,01-26-2015,05-11-2015' }
     let(:sheet_name) { 'instructors' }
@@ -136,36 +145,36 @@ describe Oec::ValidationTask do
       context 'LAW evaluation type for non-LAW course' do
         let(:dept_form) { 'GWS' }
         let(:evaluation_type) { '1A' }
-        let(:expected_message) { 'Unexpected EVALUATION_TYPE 1A' }
-        include_examples 'validation error logging'
+        let(:expected_message) { 'Unexpected evaluation type: 1A in course 2015-B-99999' }
+        include_examples 'validation warning logging'
       end
 
       context 'SPANISH evaluation type for non-SPANISH course' do
         let(:dept_form) { 'GWS' }
         let(:evaluation_type) { 'LANG' }
-        let(:expected_message) { 'Unexpected EVALUATION_TYPE LANG' }
-        include_examples 'validation error logging'
+        let(:expected_message) { 'Unexpected evaluation type: LANG in course 2015-B-99999' }
+        include_examples 'validation warning logging'
       end
 
       context 'generic evaluation type for SPANISH course' do
         let(:dept_form) { 'SPANISH' }
         let(:evaluation_type) { 'F' }
-        let(:expected_message) { 'Unexpected for SPANISH department form: EVALUATION_TYPE F' }
-        include_examples 'validation error logging'
+        let(:expected_message) { 'Unexpected evaluation type for SPANISH department form: F in course 2015-B-99999' }
+        include_examples 'validation warning logging'
       end
 
       context 'generic evaluation type for LAW course' do
         let(:dept_form) { 'LAW' }
         let(:evaluation_type) { 'F' }
-        let(:expected_message) { 'Unexpected for LAW department form: EVALUATION_TYPE F' }
-        include_examples 'validation error logging'
+        let(:expected_message) { 'Unexpected evaluation type for LAW department form: F in course 2015-B-99999' }
+        include_examples 'validation warning logging'
       end
 
       context 'wholly unexpected evaluation type' do
         let(:dept_form) { 'GWS' }
         let(:evaluation_type) { 'GAUNTLET' }
-        let(:expected_message) { 'Unexpected EVALUATION_TYPE GAUNTLET' }
-        include_examples 'validation error logging'
+        let(:expected_message) { 'Unexpected evaluation type: GAUNTLET in course 2015-B-99999' }
+        include_examples 'validation warning logging'
       end
     end
 
