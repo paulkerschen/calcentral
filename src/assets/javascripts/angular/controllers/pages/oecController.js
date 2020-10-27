@@ -14,6 +14,7 @@ angular.module('calcentral.controllers').controller('OecController', function(ap
         $scope.displayError = null;
         $scope.oecTaskStatus = null;
         $scope.participatingDepartments = _.filter(response.data.oecDepartments, 'participating');
+        $scope.pollingErrorCount = 0;
         $scope.taskParameters = {
           options: {
             term: response.data.currentTerm
@@ -33,6 +34,7 @@ angular.module('calcentral.controllers').controller('OecController', function(ap
   };
 
   var handleTaskStatus = function(response) {
+    $scope.pollingErrorCount = 0;
     angular.extend($scope.oecTaskStatus, _.get(response, 'data.oecTaskStatus'));
     if ($scope.oecTaskStatus.status === 'In progress') {
       pollTaskStatus();
@@ -48,7 +50,12 @@ angular.module('calcentral.controllers').controller('OecController', function(ap
       return oecFactory.oecTaskStatus($scope.oecTaskStatus.id).then(
         handleTaskStatus,
         function errorCallback() {
-          $scope.displayError = 'failure';
+          $scope.pollingErrorCount++;
+          if ($scope.pollingErrorCount === 3) {
+            $scope.displayError = 'failure';
+          } else {
+            pollTaskStatus();
+          }
         }
       );
     }, 2000);
