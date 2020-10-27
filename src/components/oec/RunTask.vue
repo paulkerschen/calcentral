@@ -57,6 +57,7 @@ export default {
   },
   data: () => ({
     googleDriveUrl: undefined,
+    pollingErrorCount: 0,
     output: undefined,
     status: undefined,
     taskId: undefined,
@@ -84,9 +85,15 @@ export default {
         this.output = data.oecTaskStatus.log
         this.status = data.oecTaskStatus.status
         if (this.isInProgress) {
+          this.pollingErrorCount = 0
           this.taskMonitor = setTimeout(this.getTaskStatus, 1500)
         } else if (this.status === 'Error') {
-          // this.done()
+          this.pollingErrorCount++
+          if (this.pollingErrorCount === 3) {
+            // this.done()
+          } else {
+            this.taskMonitor = setTimeout(this.getTaskStatus, 1500)
+          }
         }
         setTimeout(() => {
           let element = document.getElementById('log-output')
