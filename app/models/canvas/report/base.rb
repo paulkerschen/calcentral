@@ -7,7 +7,7 @@ module Canvas
         super options
         @account_id = options.delete(:account_id) || settings.account_id
         @download_to_file_name = options.delete(:download_to_file)
-        @options = options
+        @options = options.merge(ssl: {cert_store: SSL_CERTIFICATE_STORE})
       end
 
       def get_sis_export_csv(object_type, term_id = nil)
