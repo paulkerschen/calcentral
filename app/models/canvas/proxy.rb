@@ -111,9 +111,11 @@ module Canvas
     end
 
     def request_internal(api_path, fetch_options = {})
+      connection = Faraday.new(ssl: {cert_store: SSL_CERTIFICATE_STORE})
       fetch_options.reverse_merge!(
-        :method => :get,
-        :uri => "#{api_root}/#{api_path}"
+        connection: connection,
+        method: :get,
+        uri: "#{api_root}/#{api_path}"
       )
       logger.info "Making request with @fake = #{@fake}, options = #{fetch_options}, cache expiration #{self.class.expires_in}"
       response = ActiveSupport::Notifications.instrument('proxy', {url: fetch_options[:uri], class: self.class}) do
