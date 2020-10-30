@@ -9,7 +9,7 @@ module Mailgun
     end
 
     def get_connection
-      Faraday.new do |c|
+      Faraday.new(ssl: {cert_store: SSL_CERTIFICATE_STORE}) do |c|
         c.request :multipart
         c.request :url_encoded
         c.adapter :net_http

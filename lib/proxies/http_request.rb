@@ -6,6 +6,9 @@ module Proxies
       Settings.application.layer == 'production'
     end
 
+    # See /config/initializers/ssl_store.rb
+    default_options[:cert_store] = SSL_CERTIFICATE_STORE
+
     default_options[:verify] = verify_ssl?
     default_timeout Settings.application.outgoing_http_timeout
     headers 'Accept' => '*/*', 'User-Agent' => 'Ruby'
