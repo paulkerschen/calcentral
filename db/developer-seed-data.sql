@@ -6,7 +6,7 @@ INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_o
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (5, 'AGR CHM', '', 'MEPMB', true, '2015-09-21 13:23:12.257', '2015-09-21 13:23:12.257');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (6, 'AHMA', '', 'HTAHN', false, '2015-09-21 13:23:12.262', '2015-09-21 13:23:12.262');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (7, 'ALTAIC', '', 'HGEAL', true, '2015-09-21 13:23:12.267', '2015-09-21 13:23:12.267');
-INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (8, 'AMERSTD', '', 'AMERSTD', false, '2015-09-21 13:23:12.272', '2017-02-02 19:16:48.221');
+INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (8, 'AMERSTD', '', 'AMERSTD', true, '2015-09-21 13:23:12.272', '2017-02-02 19:16:48.221');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (9, 'ANTHRO', '', 'SZANT', true, '2015-09-21 13:23:12.277', '2016-04-27 16:46:00.085');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (10, 'ARABIC', '', 'HNNES', true, '2015-09-21 13:23:12.282', '2015-09-21 13:23:12.282');
 INSERT INTO oec_course_codes (id, dept_name, catalog_id, dept_code, include_in_oec, created_at, updated_at) VALUES (11, 'ARCH', '', 'DBARC', true, '2015-09-21 13:23:12.287', '2015-09-21 13:23:12.287');
