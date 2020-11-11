@@ -1,7 +1,7 @@
 <template>
   <div class="bc-template-sections-table-container">
     <b-form-group>
-      <template v-if="sections.length > 1" #label>
+      <template v-if="mode === 'createCourseForm' && sections.length > 1" #label>
         <div class="d-flex pl-2">
           <b-form-checkbox
             :id="`select-all-toggle-${sections[0].ccn}`"
@@ -32,8 +32,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-for="section in $_.filter(sections, s => rowDisplayLogic({mode: mode, section: s}))" :key="section.ccn">
-          <tr :class="rowClassLogic({mode: mode, section: section})">
+        <tbody v-for="section in displayableSections" :key="section.ccn">
+          <tr :class="sectionDisplayClass[section.ccn]">
             <td v-if="mode === 'createCourseForm'" class="align-top bc-template-sections-table-cell-checkbox pl-2">
               <b-form-checkbox
                 :id="`cc-template-canvas-manage-sections-checkbox-${section.ccn}`"
@@ -47,9 +47,7 @@
               />
             </td>
             <td class="bc-template-sections-table-cell-course-code">
-              <div class="pb-2 pt-1">
-                {{ section.courseCode }}
-              </div>
+              {{ section.courseCode }}
             </td>
             <td class="bc-template-sections-table-cell-section-label">
               <label
@@ -78,7 +76,7 @@
                   v-if="section.nameDiscrepancy && section.stagedState !== 'update'"
                   :aria-label="`Include '${section.courseCode} ${section.section_label}' in the list of sections to be updated`"
                   class="bc-canvas-button bc-template-sections-table-button bc-canvas-no-decoration"
-                  @click="stageUpdateAction({section: section})"
+                  @click="stageUpdate(section)"
                 >
                   Update
                 </button>
@@ -86,7 +84,7 @@
                   v-if="section.stagedState === 'update'"
                   :aria-label="`Remove '${section.courseCode} ${section.section_label}' from list of sections to be updated from course site`"
                   class="bc-canvas-button bc-template-sections-table-button bc-template-sections-table-button-undo-delete bc-canvas-no-decoration"
-                  @click="unstageAction({section: section})"
+                  @click="unstage(section)"
                 >
                   Undo Update
                 </button>
@@ -94,7 +92,7 @@
                   v-if="section.stagedState !== 'update'"
                   :aria-label="`Include '${section.courseCode} ${section.section_label}' in the list of sections to be deleted from course site`"
                   class="bc-canvas-button bc-template-sections-table-button bc-canvas-no-decoration"
-                  @click="stageDeleteAction({section: section})"
+                  @click="stageDelete(section)"
                 >
                   Delete
                 </button>
@@ -104,7 +102,7 @@
                 <button
                   class="bc-canvas-button bc-template-sections-table-button bc-template-sections-table-button-undo-add bc-canvas-no-decoration"
                   :aria-label="`Remove '${section.courseCode} ${section.section_label}' from list of sections to be added to course site`"
-                  @click="unstageAction({section: section})"
+                  @click="unstage(section)"
                 >
                   Undo Add
                 </button>
@@ -115,7 +113,7 @@
                 <button
                   class="bc-canvas-button bc-template-sections-table-button bc-template-sections-table-button-undo-delete bc-canvas-no-decoration"
                   :aria-label="`Remove '${section.courseCode} ${section.section_label}' from list of sections to be deleted from course site`"
-                  @click="unstageAction({section: section})"
+                  @click="unstage(section)"
                 >
                   Undo Delete
                 </button>
@@ -130,7 +128,7 @@
                   class="bc-canvas-button bc-canvas-button-primary bc-template-sections-table-button bc-canvas-no-decoration"
                   :class="{'bc-template-sections-table-button-undo-add': section.stagedState === 'add'}"
                   :aria-label="`Include '${section.courseCode} ${section.section_label}' in the list of sections to be added to course site`"
-                  @click="stageAddAction({section: section})"
+                  @click="stageAdd(section)"
                 >
                   Add
                 </button>
@@ -139,7 +137,7 @@
           </tr>
           <tr
             v-if="mode === 'currentStaging' && section.nameDiscrepancy && section.stagedState !== 'update'"
-            :class="rowClassLogic({mode: mode, section: section})"
+            :class="sectionDisplayClass[section.ccn]"
           >
             <td colspan="7" class="bc-template-sections-table-sites-cell">
               <div class="bc-template-sections-table-sites-container">
@@ -151,7 +149,7 @@
           </tr>
           <tr
             v-if="(mode !== 'preview' && mode !== 'currentStaging' && section.sites)"
-            :class="rowClassLogic({mode: mode, section: section})"
+            :class="sectionDisplayClass[section.ccn]"
           >
             <td colspan="7" class="bc-template-sections-table-sites-cell">
               <div v-for="(site, index) in section.sites" :key="index" class="bc-template-sections-table-sites-container ml-4 pl-3">
@@ -163,7 +161,7 @@
         </tbody>
         <tbody v-if="mode === 'preview' && sections.length < 1">
           <tr>
-            <td colspan="7">There are no currently maintained official sections in this course site</td>
+            <td colspan="7">There are no currently maintained official sections in this course site.</td>
           </tr>
         </tbody>
         <tbody v-if="mode === 'currentStaging' && noCurrentSections()">
@@ -219,7 +217,8 @@ export default {
       type: Function
     },
     updateSelected: {
-      required: true,
+      default: () => {},
+      required: false,
       type: Function
     }
   },
@@ -244,10 +243,14 @@ export default {
   data: () => ({
     selected: undefined,
     allSelected: false,
-    indeterminate: false
+    indeterminate: false,
+    displayableSections: [],
+    sectionDisplayClass: {}
   }),
   created() {
     this.selected = this.$_.map(this.$_.filter(this.sections, 'selected'), 'ccn')
+    this.updateSectionDisplay()
+    this.$eventHub.on('sections-table-updated', this.updateSectionDisplay)
   },
   methods: {
     noCurrentSections() {
@@ -258,8 +261,30 @@ export default {
         return (section.isCourseSection && section.stagedState !== 'delete') || (!section.isCourseSection && section.stagedState === 'add')
       })
     },
+    stageAdd(section) {
+      this.stageAddAction(section)
+      this.$eventHub.emit('sections-table-updated')
+    },
+    stageUpdate(section) {
+      this.stageUpdateAction(section)
+      this.$eventHub.emit('sections-table-updated')
+    },
+    stageDelete(section) {
+      this.stageDeleteAction(section)
+      this.$eventHub.emit('sections-table-updated')
+    },
     toggleAll(checked) {
       this.selected = checked ? this.$_.map(this.sections, 'ccn').slice() : []
+    },
+    updateSectionDisplay() {
+      this.displayableSections = this.$_.filter(this.sections, s => this.rowDisplayLogic(this.mode, s))
+      this.displayableSections.forEach(s => {
+        this.sectionDisplayClass[s.ccn] = this.rowClassLogic(this.mode, s)
+      })
+    },
+    unstage(section) {
+      this.unstageAction(section)
+      this.$eventHub.emit('sections-table-updated')
     }
   }
 }
@@ -267,7 +292,30 @@ export default {
 
 <style scoped lang="scss">
 td {
-  padding-top: 5px;
+  padding: 10px;
+}
+.bc-template-sections-table {
+  border: 1px solid $bc-color-container-grey-border;
+  border-collapse: separate;
+  border-radius: 3px;
+  border-spacing: 0;
+  margin: 0;
+  width: 100%;
+
+  // disable alternating row color
+  tr:nth-of-type(even) {
+    background: inherit;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: $bc-color-item-group-item-border solid 1px;
+    vertical-align: top;
+  }
+
+  tbody:last-child tr:last-child td {
+    border-bottom: 0;
+    vertical-align: top;
+  }
 }
 .bc-template-sections-table-cell-checkbox {
   width: 30px;
@@ -324,9 +372,6 @@ td {
 }
 .bc-template-sections-table-cell-section-instructors {
   width: 183px;
-}
-.bc-template-sections-table-cell-section-label {
-  padding-top: 7px;
 }
 .bc-template-sections-table-cell-section-label-label {
   cursor: pointer;

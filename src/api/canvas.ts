@@ -109,7 +109,6 @@ export function createProjectSite(name) {
 
 export function courseProvisionJobStatus(jobId) {
   return utils.get(`/api/academics/canvas/course_provision/status?jobId=${jobId}`)
-
 }
 
 export function getSiteCreationAuthorizations() {

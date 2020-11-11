@@ -4,6 +4,7 @@ import BaseView from '@/views/BaseView.vue'
 import CourseAddUser from '@/components/bcourses/CourseAddUser.vue'
 import CourseCaptures from '@/components/bcourses/CourseCaptures.vue'
 import CourseGradeExport from '@/components/bcourses/CourseGradeExport.vue'
+import CourseManageOfficialSections from '@/components/bcourses/CourseManageOfficialSections.vue'
 import CreateCourseSite from '@/views/CreateCourseSite.vue'
 import CreateProjectSite from '@/views/CreateProjectSite.vue'
 import EmbeddedLti from '@/views/EmbeddedLti.vue'
@@ -93,6 +94,13 @@ const router = new Router({
               }
             },
             {
+              component: CourseManageOfficialSections,
+              path: '/canvas/course_manage_official_sections/:id',
+              meta: {
+                title: 'Official Sections'
+              }
+            },
+            {
               component: Roster,
               path: '/canvas/rosters/:id',
               meta: {
@@ -158,6 +166,10 @@ const router = new Router({
             {
               component: CourseGradeExport,
               path: '/canvas/embedded/course_grade_export'
+            },
+            {
+              component: CourseManageOfficialSections,
+              path: '/canvas/embedded/course_manage_official_sections'
             },
             {
               component: Roster,

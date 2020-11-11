@@ -550,33 +550,6 @@ h3.bc-sections-course-title {
   width: 100%;
 }
 
-.bc-template-sections-table-container {
-
-  .bc-template-sections-table {
-    border: 1px solid $bc-color-container-grey-border;
-    border-radius: 3px;
-    border-spacing: 0;
-    margin: 0;
-    width: 100%;
-
-    // disable alternating row color
-    tr:nth-of-type(even) {
-      background: inherit;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: $bc-color-item-group-item-border solid 1px;
-      vertical-align: top;
-    }
-
-    tbody:last-child tr:last-child td {
-      border-bottom: 0;
-      vertical-align: top;
-    }
-  }
-
-}
-
 // Collapsed / Toggled Help Notice
 .bc-page-help-notice {
   margin: 6px 1px;
