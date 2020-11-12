@@ -8,7 +8,7 @@
         <b-form class="bg-white border-0" @submit="actAsUser(uidInput)">
           <div>
             <b-form-input
-              id="basic-auth-uid"
+              id="cc-toolbox-view-as-uid"
               v-model="uidInput"
               placeholder="Enter UID or SID"
               size="sm"
