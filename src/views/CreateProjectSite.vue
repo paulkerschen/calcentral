@@ -1,5 +1,6 @@
 <template>
   <div class="bc-canvas-application bc-page-create-project-site">
+    <div v-if="loading" class="cc-spinner"></div>
     <div v-if="!loading && !error">
       <h1 class="bc-header bc-header2">Create a Project Site</h1>
       <form class="bg-transparent border-0 bc-canvas-form">
