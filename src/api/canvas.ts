@@ -142,6 +142,19 @@ export function getSections(
   return utils.get(feedUrl)
 }
 
+export function updateSiteSections(
+  canvasCourseId: string,
+  addCcns: string[],
+  deleteCcns: string[],
+  updateCcns: string[]
+) {
+  return utils.post(`/api/academics/canvas/course_provision/edit_sections/${canvasCourseId}`, {
+    ccns_to_remove: deleteCcns,
+    ccns_to_add: addCcns,
+    ccns_to_update: updateCcns
+  })
+}
+
 // User provision
 
 export function canUserCreateSite() {
