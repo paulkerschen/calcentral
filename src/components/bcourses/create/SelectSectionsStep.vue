@@ -108,7 +108,7 @@
           <div class="bc-form-actions">
             <b-button
               class="bc-canvas-button bc-canvas-button-primary"
-              type="submit"
+              type="button"
               :disabled="!selectedSectionsList.length"
               aria-controls="bc-page-create-course-site-steps-container"
               aria-label="Continue to next step"
