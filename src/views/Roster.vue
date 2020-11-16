@@ -83,6 +83,7 @@
       </b-row>
     </b-container>
     <div v-if="!roster & !error">
+      <div class="cc-spinner"></div>
       <b-alert aria-live="polite" role="alert" show>Downloading rosters. This may take a minute for larger classes.</b-alert>
       <b-card>
         <b-skeleton animation="fade" width="85%"></b-skeleton>

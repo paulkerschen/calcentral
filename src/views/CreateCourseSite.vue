@@ -1,5 +1,6 @@
 <template>
   <div class="bc-canvas-application bc-page-create-course-site pl-5 pr-5 pt-3 pb-3">
+    <div v-if="loading" class="cc-spinner"></div>
     <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
       <div class="d-flex flex-column pt-3">
         <div class="order-3">
