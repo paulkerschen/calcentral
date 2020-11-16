@@ -27,10 +27,16 @@
       striped
     >
       <template #cell(last_name)="data">
-        {{ data.item.last_name }}, {{ data.item.first_name }}
+        <span :id="`student-name-${data.item.student_id}`">
+          {{ data.item.last_name }}, {{ data.item.first_name }}
+        </span>
       </template>
       <template #cell(sections)="data">
-        <div v-for="section in data.item.sections" :key="section.ccn">
+        <div
+          v-for="section in data.item.sections"
+          :id="`student-${data.item.student_id}-section-${section.ccn}`"
+          :key="section.ccn"
+        >
           {{ section.name }} ({{ section.ccn }})
         </div>
       </template>

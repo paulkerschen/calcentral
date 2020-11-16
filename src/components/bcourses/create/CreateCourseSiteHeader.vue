@@ -35,7 +35,7 @@
         </form>
       </div>
       <div v-if="adminMode === 'by_ccn'">
-        <h3 id="load-sections-by-ccn" class="cc-visuallyhidden" tabindex="0">Load Sections By Course Control Numbers (CCN)</h3>
+        <h3 id="load-sections-by-ccn" class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h3>
         <form class="bc-canvas-page-form" @submit.prevent="submit">
           <div v-if="$_.size(adminSemesters)">
             <div class="bc-buttonset">

@@ -6,16 +6,17 @@
           <b-input
             id="roster-search"
             v-model="search"
+            aria-label="Search people by name or SID"
             placeholder="Search People"
             size="lg"
-          >
-          </b-input>
+          />
         </b-col>
         <b-col class="pb-2" sm="3">
           <div v-if="roster.sections">
             <b-form-select
               id="section-select"
               v-model="section"
+              aria-label="Search specific section (defaults to all sections)"
               :options="roster.sections"
               size="lg"
               text-field="name"
