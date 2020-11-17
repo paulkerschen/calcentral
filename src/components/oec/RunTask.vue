@@ -13,20 +13,26 @@
       id="log-output"
       class="alert-box m-2 overflow-auto"
       show
-      :variant="(!status || isInProgress) ? 'info' : isError ? 'danger' : 'success'"
+      :variant="(!status || status === 'In progress') ? 'info' : status === 'Error' ? 'danger' : 'success'"
     >
       <div v-if="$_.size(output)">
         <div v-for="(row, index) in output" :key="index">
           <span v-if="index < output.length - 1">{{ row }}</span>
           <span v-if="index === output.length - 1" aria-live="polite" role="alert">{{ row }}</span>
         </div>
+        <div
+          v-if="status !== 'In progress'"
+          class="font-weight-bolder py-2 task-status"
+        >
+          {{ status }}
+        </div>
       </div>
       <div v-if="!$_.size(output)">
         Loading...
       </div>
     </b-alert>
-    <div v-if="!isInProgress" class="pt-2">
-      <b-button size="sm" variant="primary" @click="done">Back</b-button>
+    <div v-if="this.status !== 'In progress'" class="pt-2">
+      <b-button size="sm" variant="primary" @click="onFinish">Back</b-button>
     </div>
   </div>
 </template>
@@ -42,7 +48,7 @@ export default {
       required: false,
       type: [Array, String]
     },
-    done: {
+    onFinish: {
       required: true,
       type: Function
     },
@@ -57,20 +63,13 @@ export default {
   },
   data: () => ({
     googleDriveUrl: undefined,
-    pollingErrorCount: 0,
+    isDone: false,
     output: undefined,
+    pollingErrorCount: 0,
     status: undefined,
     taskId: undefined,
     taskMonitor: undefined
   }),
-  computed: {
-    isError() {
-      return this.status === 'Error'
-    },
-    isInProgress() {
-      return this.status === 'In progress'
-    }
-  },
   created() {
     runTask(this.task.name, this.term, this.departmentCode).then(data => {
       this.googleDriveUrl = data.oecDriveUrl
@@ -82,18 +81,23 @@ export default {
   methods: {
     getTaskStatus() {
       getStatus(this.taskId).then(data => {
+        clearTimeout(this.taskMonitor)
         this.output = data.oecTaskStatus.log
-        this.status = data.oecTaskStatus.status
-        if (this.isInProgress) {
+        this.status = ['Error', 'In progress', 'Success'].includes(data.oecTaskStatus.status) ? data.oecTaskStatus.status : 'Error'
+
+        if (this.status === 'In progress') {
           this.pollingErrorCount = 0
           this.taskMonitor = setTimeout(this.getTaskStatus, 1500)
         } else if (this.status === 'Error') {
           this.pollingErrorCount++
           if (this.pollingErrorCount === 3) {
-            // this.done()
+            this.isDone = true
           } else {
             this.taskMonitor = setTimeout(this.getTaskStatus, 1500)
           }
+        } else {
+          // Success!
+          this.isDone = true
         }
         setTimeout(() => {
           let element = document.getElementById('log-output')
@@ -110,5 +114,8 @@ export default {
 <style scoped>
 .alert-box {
   height: 300px;
+}
+.task-status {
+  font-size: 14px;
 }
 </style>
