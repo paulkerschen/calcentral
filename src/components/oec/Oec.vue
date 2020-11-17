@@ -8,7 +8,7 @@
         <RunTask
           :key="taskName"
           :department-code="departmentCode || departmentCodes"
-          :done="taskRunDone"
+          :on-finish="taskRunDone"
           :task="getTaskObject(taskName)"
           :term="term"
         />
