@@ -3,7 +3,7 @@
     <div v-if="loading" class="cc-spinner"></div>
     <div v-if="!loading && !error">
       <h1 class="bc-header bc-header2">Create a Project Site</h1>
-      <form class="bg-transparent border-0 bc-canvas-form">
+      <form class="bg-transparent border-0 bc-canvas-form" @submit.prevent="createProjectSite">
         <b-container>
           <b-row>
             <b-col class="float-right" sm="3">
@@ -28,13 +28,13 @@
             aria-controls="cc-page-reader-alert"
             class="bc-canvas-button bc-canvas-button-primary"
             type="submit"
-            @click="createProjectSite"
           >
             <span v-if="!isCreating">Create a Project Site</span>
             <span v-if="isCreating"><fa class="mr-1" icon="spinner" spin></fa> Creating...</span>
           </button>
           <b-button
             id="cancel-and-return-to-site-creation"
+            type="button"
             aria-label="Cancel and return to Site Creation Overview"
             class="bc-canvas-button"
             variant="link"

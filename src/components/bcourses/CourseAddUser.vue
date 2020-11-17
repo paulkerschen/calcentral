@@ -79,7 +79,7 @@
 
       <b-row v-if="showSearchForm" no-gutters>
         <b-col md="6">
-          <form class="bc-canvas-page-form">
+          <form class="bc-canvas-page-form" @submit.prevent="searchUsers">
             <b-row class="bc-horizontal-form" no-gutters>
               <b-col md="4">
                 <label for="search-text" class="cc-visuallyhidden">Search users</label>
@@ -113,10 +113,9 @@
               <b-col md="2" class="bc-column-align-center">
                 <button
                   id="submit-search"
-                  type="button"
+                  type="submit"
                   class="bc-canvas-button bc-canvas-button-primary bc-full-wide"
                   aria-label="Perform User Search"
-                  @click="searchUsers"
                 >
                   Go
                 </button>
