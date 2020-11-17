@@ -16,6 +16,7 @@
         }
       },
       pluralize: (noun, count, substitutions = {}, pluralSuffix = 's') => {
+        count = count || 0
         return (`${substitutions[count] || substitutions['other'] || count} ` + (count !== 1 ? `${noun}${pluralSuffix}` : noun))
       },
       printPage(filename) {
