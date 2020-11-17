@@ -7,7 +7,7 @@
       <div v-if="isTaskRunning">
         <RunTask
           :key="taskName"
-          :department-code="departmentCode"
+          :department-code="departmentCode || departmentCodes"
           :done="taskRunDone"
           :task="getTaskObject(taskName)"
           :term="term"
@@ -22,7 +22,7 @@
             placeholder="Choose a task"
             text-field="friendlyName"
             value-field="name"
-            @change="departmentCode = null"
+            @change="resetModelObjects"
           >
             <template #first>
               <b-form-select-option :value="null">Select task...</b-form-select-option>
@@ -73,7 +73,7 @@
         </div>
         <div v-if="taskName === 'MergeConfirmationSheetsTask'" class="pt-2">
           <b-form-select
-            v-model="departmentMultiSelect"
+            v-model="departmentCodes"
             :options="departments"
             multiple
             :select-size="10"
@@ -87,7 +87,7 @@
         <div class="p-2">
           <b-button
             id="oec-run-task-button"
-            :disabled="!taskName || !term || (taskName === 'MergeConfirmationSheetsTask' && !departmentMultiSelect.length)"
+            :disabled="!taskName || !term || (taskName === 'MergeConfirmationSheetsTask' && !departmentCodes.length)"
             size="sm"
             variant="primary"
             @click="run"
@@ -110,6 +110,7 @@ export default {
   data: () => ({
     currentTerm: null,
     departmentCode: null,
+    departmentCodes: [],
     departmentsParticipating: [],
     taskName: null,
     term: undefined,
@@ -126,8 +127,6 @@ export default {
       this.term = this.currentTerm = data.currentTerm
       this.terms = data.oecTerms
       this.tasks = data.oecTasks
-
-      this.departmentsParticipating = []
       this.$_.each(this.departments, department => {
         if (department.participating) {
           this.departmentsParticipating.push(department)
@@ -138,6 +137,10 @@ export default {
   methods: {
     getTaskObject(name) {
       return name && this.$_.find(this.tasks, ['name', name])
+    },
+    resetModelObjects() {
+      this.departmentCode = null
+      this.departmentCodes = []
     },
     run() {
       this.isTaskRunning = true
