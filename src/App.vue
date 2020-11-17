@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="cc-accessibility-links">
+    <div v-if="!isInIframe" class="cc-accessibility-links">
       <a
         id="skip-to-content-link"
         href="#cc-main-content"
@@ -16,10 +16,12 @@
 </template>
 
 <script>
+import Iframe from '@/mixins/Iframe'
 import VueScrollTo from 'vue-scrollto'
 
 export default {
   name: 'App',
+  mixins: [Iframe],
   methods: {
     skipTo: anchor => VueScrollTo.scrollTo(anchor, 400)
   }
