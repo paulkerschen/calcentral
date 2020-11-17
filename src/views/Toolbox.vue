@@ -40,7 +40,7 @@ export default {
   }),
   created() {
     this.canActAs = this.$currentUser.isDirectlyAuthenticated && (this.$currentUser.isSuperuser || this.$currentUser.isViewer)
-    this.canOec = this.$currentUser.isDirectlyAuthenticated && this.$currentUser.isSuperuser
+    this.canOec = this.$currentUser.canAdministerOec
     this.$ready('Toolbox')
   }
 }
