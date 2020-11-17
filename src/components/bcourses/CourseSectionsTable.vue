@@ -154,7 +154,7 @@
             <td colspan="7" class="bc-template-sections-table-sites-cell">
               <div v-for="(site, index) in section.sites" :key="index" class="bc-template-sections-table-sites-container ml-4 pl-3">
                 <fa icon="info-circle" class="bc-template-sections-table-sited-icon mr-1" size="sm"></fa>
-                This section is already in use by <a :href="site.site_url">{{ site.name }}</a>
+                This section is already in use by <OutboundLink :href="site.site_url">{{ site.name }}</OutboundLink>
               </div>
             </td>
           </tr>
@@ -175,8 +175,11 @@
 </template>
 
 <script>
+import OutboundLink from '@/components/util/OutboundLink'
+
 export default {
   name: 'CourseSectionsTable',
+  components: {OutboundLink},
   props: {
     mode: {
       required: true,
