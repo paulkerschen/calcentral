@@ -11,7 +11,6 @@
 
     <div v-if="!showError">
       <b-row v-if="showAlerts" role="alert">
-        <b-col v-if="isLoading" md="12" class="cc-spinner"></b-col>
         <b-col v-if="!isLoading" md="12">
           <div v-if="noUserSelectedAlert" class="bc-alert bc-alert-error bc-page-course-add-user-alert">
             Please select a user.
@@ -27,15 +26,15 @@
             </div>
           </div>
 
-          <div v-if="noSearchResultsNotice" class="bc-alert bc-alert-error bc-page-course-add-user-alert">
-            Your search did not match any users with a CalNet ID.
+          <div v-if="searchAlert" class="bc-alert bc-alert-error bc-page-course-add-user-alert">
+            {{ searchAlert }}
             {{ searchTypeNotice }}
             Please try again.
             <div class="bc-alert-close-button-container">
               <button
                 id="hide-search-alert-button"
                 class="bc-close-button"
-                @click="noSearchResultsNotice = ''"
+                @click="searchAlert = null"
               >
                 <fa icon="times-circle"></fa>
                 <span class="cc-visuallyhidden">Hide Alert</span>
@@ -114,6 +113,7 @@
                 <button
                   id="submit-search"
                   type="submit"
+                  :disabled="!searchText"
                   class="bc-canvas-button bc-canvas-button-primary bc-full-wide"
                   aria-label="Perform User Search"
                 >
@@ -167,8 +167,9 @@
         </b-col>
       </b-row>
 
+      <div v-if="isLoading" class="cc-spinner"></div>
+
       <b-row v-if="showUsersArea" no-gutters>
-        <b-col v-if="isLoading" md="12" class="cc-spinner"></b-col>
         <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="searchResultsFocus">User Search Results</h2>
         <b-col v-if="userSearchResults.length > 0" md="12">
           <form class="bc-canvas-page-form">
@@ -284,8 +285,8 @@ export default {
     errorStatus: null,
     grantingRoles: [],
     isLoading: null,
-    noSearchResultsNotice: null,
     noUserSelectedAlert: null,
+    searchAlert: null,
     searchText: null,
     searchTextType: 'text',
     searchType: 'name',
@@ -302,7 +303,7 @@ export default {
     },
     userAdded: {},
     userSearchResultsCount: 0,
-    userSearchResults: []
+    userSearchResults: [],
   }),
   methods: {
     isAuthorized(response) {
@@ -328,8 +329,8 @@ export default {
       this.additionFailureMessage = false
     },
     resetSearchState() {
-      this.noSearchResultsNotice = false
       this.noUserSelectedAlert = false
+      this.searchAlert = null
       this.selectedUser = null
       this.showUsersArea = false
       this.userSearchResults = []
@@ -338,36 +339,47 @@ export default {
     searchUsers() {
       this.resetSearchState()
       this.resetImportState()
-      this.alertScreenReader('Loading user search results')
-      this.showUsersArea = true
-      this.isLoading = true
-      searchUsers(this.canvasCourseId, this.searchText, this.searchType).then(response => {
-        this.userSearchResults = response.users
-        if (response.users && response.users.length) {
-          this.userSearchResultsCount = response.users[0].resultCount
-          this.selectedUser = response.users[0]
-        } else {
-          this.setSearchTypeNotice()
-          this.userSearchResultsCount = 0
-          this.noSearchResultsNotice = true
-        }
-        this.isLoading = false
-        this.showAlerts = true
-        this.searchResultsFocus = true
-      }, () => {
-        this.showError = true
-        this.errorStatus = 'User search failed.'
-        this.isLoading = false
-        this.showAlerts = true
-      })
+      if (!this.$_.trim(this.searchText)) {
+        this.showSearchAlert('You did not enter any search terms.')
+      } else if (this.searchType === 'ldap_user_id' && !isFinite(this.searchText)) {
+        this.showSearchAlert('UID search terms must be numeric.')
+      } else {
+        this.alertScreenReader('Loading user search results')
+        this.showUsersArea = true
+        this.isLoading = true
+        searchUsers(this.canvasCourseId, this.searchText, this.searchType).then(response => {
+          this.userSearchResults = response.users
+          if (response.users && response.users.length) {
+            this.userSearchResultsCount = response.users[0].resultCount
+            this.selectedUser = response.users[0]
+          } else {
+            this.userSearchResultsCount = 0
+            let noResultsAlert = 'Your search did not match any users with a CalNet ID.'
+            if (this.searchType === 'ldap_user_id') {
+              noResultsAlert += ' CalNet UIDs must be an exact match.'
+            }
+            this.showSearchAlert(noResultsAlert)
+          }
+          this.isLoading = false
+          this.showAlerts = true
+          this.searchResultsFocus = true
+        }, () => {
+          this.showErrorStatus('User search failed.')
+        })
+      }
     },
-    setSearchTypeNotice() {
-      this.searchTypeNotice = (this.searchType === 'ldap_user_id') ? 'CalNet UIDs must be an exact match.' : ''
-    },
-    showUnauthorized() {
+    showErrorStatus(message) {
       this.isLoading = false
       this.showError = true
-      this.errorStatus = 'Authorization check failed.'
+      this.errorStatus = message
+    },
+    showSearchAlert(message) {
+      this.showAlerts = true
+      this.searchAlert = message
+      this.isLoading = false
+    },
+    showUnauthorized() {
+      this.showErrorStatus('Authorization check failed.')
     },
     submitUser() {
       this.iframeScrollToTop()
