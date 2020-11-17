@@ -1,6 +1,8 @@
 <template>
   <div class="bc-main">
-    <ToolboxHeader />
+    <div class="cc-print-hide">
+      <ToolboxHeader />
+    </div>
     <b-row class="cc-off-canvas-container" no-gutters>
       <b-col class="bg-white cc-offcanvas-right pb-5">
         <div id="cc-main-content" class="cc-container-main cc-container-standalone" role="main">
