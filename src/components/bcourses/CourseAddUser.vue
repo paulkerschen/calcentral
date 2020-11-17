@@ -184,28 +184,28 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(user, index) in userSearchResults" :key="user.ldapUid">
-                    <td>
+                  <tr v-for="(user, index) in userSearchResults" :id="`bc-user-search-result-row-${index}`" :key="user.ldapUid">
+                    <td :id="`bc-user-search-result-row-select-${index}`">
                       <input
-                        :id="`bc-user-search-result-${index}`"
+                        :id="`bc-user-search-result-input-${index}`"
                         v-model="selectedUser"
                         type="radio"
                         name="selectedUser"
                         :value="user"
-                        :aria-labelled-by="`bc-user-search-result-${index} bc-user-search-result-ldap-uid-${index}`"
+                        :aria-labelled-by="`bc-user-search-result-row-name-${index} bc-user-search-result-row-ldap-uid-${index}`"
                       >
                     </td>
-                    <td>
-                      <label :for="`bc-user-search-result-${index}`" class="bc-form-input-label-no-align">
+                    <td :id="`bc-user-search-result-row-name-${index}`">
+                      <label :for="`bc-user-search-result-${index}-input`" class="bc-form-input-label-no-align">
                         {{ user.firstName }} {{ user.lastName }}
                       </label>
                     </td>
-                    <td>
-                      <span :id="`bc-user-search-result-ldap-uid-${index}`">
-                        {{ user.ldapUid }}
-                      </span>
+                    <td :id="`bc-user-search-result-row-ldap-uid-${index}`">
+                      {{ user.ldapUid }}
                     </td>
-                    <td>{{ user.emailAddress }}</td>
+                    <td :id="`bc-user-search-result-row-email-${index}`">
+                      {{ user.emailAddress }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
