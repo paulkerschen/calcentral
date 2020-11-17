@@ -1,7 +1,7 @@
 <template>
   <div v-if="!loading" class="cc-page-roster">
     <b-container v-if="roster && !error" fluid>
-      <b-row align-v="start" class="cc-page-roster cc-print-hide cc-roster-search" no-gutters>
+      <b-row align-v="start" class="cc-page-roster cc-print-hide cc-roster-search pb-3" no-gutters>
         <b-col class="pb-2 pr-2" sm="3">
           <b-input
             id="roster-search"
@@ -73,11 +73,11 @@
         </b-col>
       </b-row>
       <b-row no-gutters>
-        <b-col class="pt-5" sm="12">
-          <div v-if="viewMode === 'list'">
+        <b-col sm="12">
+          <div v-if="viewMode === 'list'" class="pt-2">
             <RosterList :course-id="canvasCourseId" :students="studentsFiltered" />
           </div>
-          <div v-if="viewMode === 'photos'">
+          <div v-if="viewMode === 'photos'" class="pt-3">
             <RosterPhotos :course-id="canvasCourseId" :students="studentsFiltered" />
           </div>
         </b-col>
@@ -153,7 +153,7 @@ export default {
       this.roster = data
       const students = []
       this.$_.each(this.roster.students, student => {
-        student.idx = this.idx(`${student.first_name} ${student.last_name}`)
+        student.idx = this.idx(`${student.first_name} ${student.last_name} ${student.student_id}`)
         students.push(student)
       })
       this.studentsFiltered = this.sort(students)
