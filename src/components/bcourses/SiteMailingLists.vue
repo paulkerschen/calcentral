@@ -20,7 +20,7 @@
     </div>
 
     <div v-if="!siteSelected">
-      <form class="bc-page-site-mailing-list-form">
+      <form class="bc-page-site-mailing-list-form" @submit.prevent="findSiteMailingList">
         <b-row no-gutters>
           <b-col sm="12" md="3">
             <label for="bc-page-site-mailing-list-site-id" class="bc-page-site-mailing-list-form-label">Course Site ID:</label>
@@ -37,10 +37,9 @@
             >
             <button 
               id="btn-get-mailing-list"
-              type="button"
+              type="submit"
               class="bc-canvas-button bc-canvas-button-primary"
               :disabled="isProcessing || !canvasSite.canvasCourseId"
-              @click="findSiteMailingList"
             >
               <span v-if="!isProcessing">Get Mailing List</span>
               <span v-if="isProcessing"><i class="fa fa-spinner fa-spin"></i> Finding ...</span>

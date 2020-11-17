@@ -15,7 +15,7 @@
       <form
         name="createCourseSiteForm"
         class="bc-canvas-page-form"
-        @submit="create"
+        @submit.prevent="create"
       >
         <b-container>
           <b-row>
@@ -60,11 +60,11 @@
           <div>
             <b-button
               id="create-course-site-button"
+              type="submit"
               aria-controls="bc-page-create-course-site-steps-container"
               aria-label="Create Course Site"
               class="bc-canvas-button bc-canvas-button-primary"
               :disabled="!$_.trim(siteName) || !$_.trim(siteAbbreviation)"
-              @click="create"
             >
               Create Course Site
             </b-button>

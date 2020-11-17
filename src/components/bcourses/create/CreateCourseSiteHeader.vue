@@ -23,11 +23,11 @@
           <div>
             <b-button
               id="sections-by-uid-button"
+              type="submit"
               class="bc-canvas-button bc-canvas-button-primary"
               :disabled="!uid"
               aria-label="Load official sections for instructor"
               aria-controls="bc-page-create-course-site-steps-container"
-              @click="submit"
             >
               As instructor
             </b-button>
@@ -48,6 +48,7 @@
                   :aria-selected="currentAdminSemester === semester.slug"
                   role="tab"
                   @click="switchAdminSemester(semester)"
+                  @keyup.enter="switchAdminSemester(semester)"
                 />
                 <label
                   :for="`semester${index}`"
@@ -81,7 +82,6 @@
               aria-controls="bc-page-create-course-site-steps-container"
               :disabled="!$_.trim(ccns)"
               type="submit"
-              @click="submit"
             >
               Review matching CCNs
             </b-button>
