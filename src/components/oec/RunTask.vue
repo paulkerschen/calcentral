@@ -40,7 +40,7 @@ export default {
     departmentCode: {
       default: undefined,
       required: false,
-      type: Object
+      type: [Array, String]
     },
     done: {
       required: true,
