@@ -21,9 +21,10 @@ class UserController < ApplicationController
     end
 
     status.merge!({
-      :isBasicAuthEnabled => Settings.developer_auth.enabled,
-      :isLoggedIn => !!user_id,
-      :features => features
+      canAdministerOec: current_user.policy.can_administer_oec?,
+      features: features,
+      isBasicAuthEnabled: Settings.developer_auth.enabled,
+      isLoggedIn: !!user_id
     })
     render :json => status.to_json
   end
