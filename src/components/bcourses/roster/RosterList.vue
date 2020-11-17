@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="cc-academics-class-enrollment-table">
     <b-table
       :fields="[
         {

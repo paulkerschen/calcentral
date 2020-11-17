@@ -85,21 +85,21 @@
     </b-container>
     <div v-if="!roster & !error">
       <div class="cc-spinner"></div>
-      <b-alert aria-live="polite" role="alert" show>Downloading rosters. This may take a minute for larger classes.</b-alert>
-      <b-card>
-        <b-skeleton animation="fade" width="85%"></b-skeleton>
-        <b-skeleton animation="fade" width="55%"></b-skeleton>
-        <b-skeleton animation="fade" width="70%"></b-skeleton>
-      </b-card>
+      <div aria-live="polite" class="pt-5 text-center w-100" role="alert">
+        Downloading rosters. This may take a minute for larger classes.
+      </div>
     </div>
     <div v-if="error" role="alert">
-      <fa icon="exclamation-triangle" class="cc-icon-red"></fa> You must be a teacher in this bCourses course to view official student rosters.
+      <fa icon="exclamation-triangle" class="cc-icon-red"></fa>
+      You must be a teacher in this bCourses course to view official student rosters.
     </div>
     <div v-if="!error && roster && !roster.sections" role="alert">
-      <fa icon="exclamation-circle" class="cc-icon-gold"></fa> There are no currently maintained official sections in this course site.
+      <fa icon="exclamation-circle" class="cc-icon-gold"></fa>
+      There are no currently maintained official sections in this course site.
     </div>
     <div v-if="!error && roster && roster.sections && !roster.students" role="alert">
-      <fa icon="exclamation-circle" class="cc-icon-gold"></fa> Students have not yet signed up for this class.
+      <fa icon="exclamation-circle" class="cc-icon-gold"></fa>
+      Students have not yet signed up for this class.
     </div>
   </div>
 </template>

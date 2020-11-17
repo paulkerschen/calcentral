@@ -6,6 +6,7 @@
       :alt="`Photo of ${student.first_name} ${student.last_name}`"
       :aria-label="`Photo of ${student.first_name} ${student.last_name}`"
       class="photo"
+      :class="{'cc-page-roster-image-unavailable': !this.student.photo}"
       :src="photoUrl"
       @error="imageError"
     />
@@ -25,7 +26,11 @@ export default {
     photoUrl: undefined
   }),
   mounted() {
-    this.photoUrl = (this.$config.apiBaseUrl ? `${this.$config.apiBaseUrl}${this.student.photo}` : this.student.photo) || this.imageError()
+    if (this.student.photo) {
+      this.photoUrl = this.$config.apiBaseUrl ? `${this.$config.apiBaseUrl}${this.student.photo}` : this.student.photo
+    } else {
+      this.imageError()
+    }
   },
   methods: {
     imageError() {

@@ -15,6 +15,10 @@
     &:visited {
       text-decoration: underline;
     }
+    &[href] {
+      font-weight: normal;
+      text-decoration: none;
+    }
     &[href]::after {
       content: " (" attr(href) ")";
     }

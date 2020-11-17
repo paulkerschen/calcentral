@@ -1,6 +1,6 @@
 <template>
-  <ul v-if="students.length" class="align-content-start d-flex flex-wrap">
-    <li v-for="student in students" :key="student.student_id" class="pl-5 pr-5 text-center">
+  <ul v-if="students.length" class="align-content-start d-flex flex-wrap ml-3 pt-3">
+    <li v-for="student in students" :key="student.student_id" class="list-item pb-3 text-center">
       <div v-if="student.profile_url">
         <a
           :id="`student-profile-url-${student.student_id}`"
@@ -23,7 +23,7 @@
         <div class="cc-page-roster-student-name">{{ student.first_name }}</div>
         <div class="cc-page-roster-student-name font-weight-bolder">{{ student.last_name }}</div>
       </div>
-      <div v-if="student.email">
+      <div v-if="student.email" class="pt-2">
         <div class="cc-page-roster-student-name">
           <OutboundLink :id="`student-email-${student.student_id}-first-name`" :href="`mailto:${student.email}`">
             {{ student.first_name }}
@@ -79,3 +79,9 @@ export default {
   })
 }
 </script>
+
+<style scoped>
+.list-item {
+  width: 180px;
+}
+</style>
