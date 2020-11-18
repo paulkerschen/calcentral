@@ -56,7 +56,7 @@
           <span v-if="listCreated" class="cc-ellipsis">{{ mailingList.name }}@{{ mailingList.domain }}</span>
         </h2>
         <div v-if="listCreated">
-          <div id="mailing-list-member-count">{{ pluralize('member', mailingList.membersCount, {'other': 'No'}) }} </div>
+          <div id="mailing-list-member-count">{{ pluralize('member', mailingList.membersCount, {0: 'No'}) }}</div>
           <div>Membership last updated: <strong id="mailing-list-membership-last-updated">{{ listLastPopulated }}</strong></div>
           <div>
             Course site:
