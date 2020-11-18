@@ -129,7 +129,7 @@
       </b-row>
       <b-row v-if="officialSections.length > 1" no-gutters>
         <b-col md="5">
-          <select id="course-sections" v-model="selectedSection" class="bc-form-input-select">
+          <select id="course-sections" v-model="selectedSection" class="bc-form-input-select w-100">
             <option v-for="section in officialSections" :key="section.display_name" :value="section">
               {{ section.display_name }}
             </option>

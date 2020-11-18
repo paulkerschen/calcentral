@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bg-light p-3">
+    <div class="cc-widget-title">
       <h2 class="cc-text-big">View As</h2>
     </div>
     <div class="bg-white p-3">

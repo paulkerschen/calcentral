@@ -22,7 +22,6 @@
     }
   }
   .cc-offcanvas-left, .cc-offcanvas-right {
-    @include cc-column-sameheight-nopadding;
     transition: margin .2s ease;
     will-change: transform;
   }

@@ -16,7 +16,6 @@ body {
     }
     ul {
       list-style-type: disc;
-      margin-top: 20px;
       padding-left: 18px;
     }
     .cc-footer-acting-as {
@@ -64,6 +63,9 @@ body {
       a {
         color: $cc-color-french-pass;
       }
+      form {
+        background: $cc-color-trout;      
+      }
       .cc-footer-copyright {
         color: $cc-color-whisper;
         float: right;
@@ -98,6 +100,12 @@ body {
         h3 {
           color: $cc-color-white;
         }
+      }
+      h4 {
+        color: $cc-color-whisper
+      }
+      .text-secondary {
+        color: $cc-color-whisper !important;
       }
       .fa-facebook-square {
         color: $cc-color-white !important;
