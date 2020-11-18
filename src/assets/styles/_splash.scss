@@ -54,9 +54,6 @@
     margin: 0 auto;
     overflow: hidden;
     padding-top: 10px;
-    > .columns {
-      @include cc-column-sameheight;
-    }
   }
   .cc-page-splash-container-left {
     border-right: 2px solid $cc-color-whisper;

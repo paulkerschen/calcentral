@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2 class="bg-light cc-text-big p-3">
-      OEC
-    </h2>
+    <div class="cc-widget-title">
+      <h2 class="cc-text-big">OEC</h2>
+    </div>
     <div class="bg-white p-3">
       <div v-if="isTaskRunning">
         <RunTask

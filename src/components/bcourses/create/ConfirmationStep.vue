@@ -17,18 +17,18 @@
         class="bc-canvas-page-form"
         @submit.prevent="create"
       >
-        <b-container>
+        <b-container fluid>
           <b-row>
-            <b-col class="pr-1" sm="3">
+            <b-col class="pr-1" md="3">
               <label for="siteName" class="right">
                 Site Name:
               </label>
             </b-col>
-            <b-col class="pl-0" sm="9">
+            <b-col class="pl-0" md="6">
               <b-form-input
                 id="siteName"
                 v-model="siteName"
-                class="w-50"
+                class="w-100"
                 name="siteName"
                 :required="true"
               />
@@ -39,14 +39,14 @@
             </b-col>
           </b-row>
           <b-row>
-            <b-col class="pr-1" sm="3">
+            <b-col class="pr-1" md="3">
               <label for="siteAbbreviation" class="right">Site Abbreviation:</label>
             </b-col>
-            <b-col class="pl-0" sm="9">
+            <b-col class="pl-0" md="6">
               <b-form-input
                 id="siteAbbreviation"
                 v-model="siteAbbreviation"
-                class="w-50"
+                class="w-100"
                 :required="true"
               />
               <div v-if="!$_.trim(siteAbbreviation)" class="bc-alert bc-notice-error">

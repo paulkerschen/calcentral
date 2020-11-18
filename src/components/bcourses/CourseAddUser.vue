@@ -92,7 +92,7 @@
               </b-col>
               <b-col md="6">
                 <b-row no-gutters>
-                  <b-col md="2">
+                  <b-col class="d-none d-sm-none d-md-block" md="2">
                     <label for="search-type" class="bc-label bc-label-horizontal bc-form-entities">By:</label>
                   </b-col>
                   <b-col md="10">

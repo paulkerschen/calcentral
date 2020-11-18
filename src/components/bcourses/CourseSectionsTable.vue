@@ -60,13 +60,13 @@
               <span v-if="mode !== 'createCourseForm'">{{ section.section_label }}</span>
             </td>
             <td class="bc-template-sections-table-cell-section-ccn">{{ section.ccn }}</td>
-            <td class="bc-template-sections-table-cell-section-timestamps show-for-medium-up">
+            <td class="bc-template-sections-table-cell-section-timestamps d-none d-sm-none d-md-table-cell">
               <div v-for="(schedule, index) in section.schedules.recurring" :key="index">{{ schedule.schedule }}</div>
             </td>
-            <td class="bc-template-sections-table-cell-section-locations show-for-medium-up">
+            <td class="bc-template-sections-table-cell-section-locations d-none d-sm-none d-md-table-cell">
               <div v-for="(schedule, index) in section.schedules.recurring" :key="index">{{ schedule.buildingName }} {{ schedule.roomNumber }}</div>
             </td>
-            <td class="bc-template-sections-table-cell-section-instructors show-for-large-up">
+            <td class="bc-template-sections-table-cell-section-instructors d-none d-sm-none d-lg-table-cell">
               <div v-for="instructor in section.instructors" :key="instructor.uid">{{ instructor.name }}</div>
             </td>
             <td v-if="mode !== 'createCourseForm' && mode !== 'preview'" class="bc-template-sections-table-cell-section-action-option">
@@ -152,7 +152,7 @@
             :class="sectionDisplayClass[section.ccn]"
           >
             <td colspan="7" class="bc-template-sections-table-sites-cell">
-              <div v-for="(site, index) in section.sites" :key="index" class="bc-template-sections-table-sites-container ml-4 pl-3">
+              <div v-for="(site, index) in section.sites" :key="index" class="bc-template-sections-table-sites-container">
                 <fa icon="info-circle" class="bc-template-sections-table-sited-icon mr-1" size="sm"></fa>
                 This section is already in use by <OutboundLink :href="site.site_url">{{ site.name }}</OutboundLink>
               </div>

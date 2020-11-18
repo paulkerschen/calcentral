@@ -10,28 +10,34 @@
       Switch to {{ adminMode === 'act_as' ? 'CCN input' : 'acting as instructor' }}
     </b-button>
     <div id="bc-page-create-course-site-admin-section-loader-form">
-      <div v-if="adminMode === 'act_as'" class="pt-3">
+      <div v-if="adminMode === 'act_as'">
         <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
-        <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form d-flex" @submit.prevent="submit">
-          <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
-          <b-form-input
-            id="instructor-uid"
-            v-model="uid"
-            placeholder="Instructor UID"
-            role="search"
-          ></b-form-input>
-          <div>
-            <b-button
-              id="sections-by-uid-button"
-              type="submit"
-              class="bc-canvas-button bc-canvas-button-primary"
-              :disabled="!uid"
-              aria-label="Load official sections for instructor"
-              aria-controls="bc-page-create-course-site-steps-container"
-            >
-              As instructor
-            </b-button>
-          </div>
+        <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form" @submit.prevent="submit">
+          <b-row no-gutters>
+            <b-col cols="auto">
+              <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
+              <b-form-input
+                id="instructor-uid"
+                v-model="uid"
+                placeholder="Instructor UID"
+                role="search"
+              ></b-form-input>
+            </b-col>
+            <b-col cols="auto">
+              <div>
+                <b-button
+                  id="sections-by-uid-button"
+                  type="submit"
+                  class="bc-canvas-button bc-canvas-button-primary"
+                  :disabled="!uid"
+                  aria-label="Load official sections for instructor"
+                  aria-controls="bc-page-create-course-site-steps-container"
+                >
+                  As instructor
+                </b-button>
+              </div>
+            </b-col>
+          </b-row>
         </form>
       </div>
       <div v-if="adminMode === 'by_ccn'">
