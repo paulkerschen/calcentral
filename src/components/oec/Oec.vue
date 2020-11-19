@@ -64,7 +64,7 @@
             </b-button>
             <b-collapse id="participating-collapse" class="mt-2">
               <b-alert class="alert-box m-2 overflow-auto" show variant="info">
-                <ul class="cc-text-small participating-list">
+                <ul id="cc-page-oec-departments-participating" class="cc-text-small participating-list">
                   <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
                 </ul>
               </b-alert>
@@ -73,6 +73,7 @@
         </div>
         <div v-if="taskName === 'MergeConfirmationSheetsTask'" class="pt-2">
           <b-form-select
+            id="cc-page-oec-department-multiselect"
             v-model="departmentCodes"
             :options="departments"
             multiple

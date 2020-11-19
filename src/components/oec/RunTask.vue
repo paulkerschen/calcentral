@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="cc-oec-text">
+    <div id="oec-task-started-notice" class="cc-oec-text">
       Your <span class="font-weight-bolder">{{ task.friendlyName }}</span> task has started.
       Results will appear in
       <a
-        id="google-drive=href"
+        id="oec-google-drive-href"
         :href="googleDriveUrl"
         target="_blank"
       >your Google Drive account<span class="sr-only"> (link will open a new browser tab)</span></a>.
@@ -32,7 +32,12 @@
       </div>
     </b-alert>
     <div v-if="this.status !== 'In progress'" class="pt-2">
-      <b-button size="sm" variant="primary" @click="onFinish">Back</b-button>
+      <b-button
+        id="oec-task-complete-back-button"
+        size="sm"
+        variant="primary"
+        @click="onFinish"
+      >Back</b-button>
     </div>
   </div>
 </template>
