@@ -22,6 +22,7 @@ class UserController < ApplicationController
 
     status.merge!({
       canAdministerOec: current_user.policy.can_administer_oec?,
+      canViewAs: current_user.policy.can_view_as?,
       features: features,
       isBasicAuthEnabled: Settings.developer_auth.enabled,
       isLoggedIn: !!user_id

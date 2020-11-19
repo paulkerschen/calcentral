@@ -6,15 +6,15 @@
         <h1 class="cc-text-xl text-secondary">{{ $currentUser.firstName }}'s Toolbox</h1>
       </b-col>
     </b-row>
-    <b-row v-if="canActAs || canOec">
-      <b-col v-if="canActAs" sm="6">
+    <b-row v-if="canViewAs || this.$currentUser.canAdministerOec">
+      <b-col v-if="canViewAs" sm="6">
         <ActAs />
       </b-col>
-      <b-col v-if="canOec" sm="6">
+      <b-col v-if="this.$currentUser.canAdministerOec" sm="6">
         <Oec />
       </b-col>
     </b-row>
-    <b-row v-if="!canActAs && !canOec">
+    <b-row v-if="!canViewAs && !this.$currentUser.canAdministerOec">
       <b-col sm="12">
         <div class="text-center">
           <img class="w-50" src="@/assets/images/conjunction-junction.jpg" alt="Image of train junction" />
@@ -35,12 +35,10 @@ export default {
   name: 'Toolbox',
   components: {ActAs, Footer, Oec, ToolboxHeader},
   data: () => ({
-    canActAs: undefined,
-    canOec: undefined
+    canViewAs: undefined
   }),
   created() {
-    this.canActAs = this.$currentUser.isDirectlyAuthenticated && (this.$currentUser.isSuperuser || this.$currentUser.isViewer)
-    this.canOec = this.$currentUser.canAdministerOec
+    this.canViewAs = this.$currentUser.isDirectlyAuthenticated && this.$currentUser.canViewAs
     this.$ready('Toolbox')
   }
 }

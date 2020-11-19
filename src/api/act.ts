@@ -28,10 +28,6 @@ export function stopActAs() {
   return utils.post('/stop_act_as')
 }
 
-export function storeUserAsRecent(uid) {
-  return utils.post('/api/view_as/store_user_as_recent', {uid})
-}
-
 export function storeUserAsSaved(uid) {
   return utils.post('/api/view_as/store_user_as_saved', {uid})
 }

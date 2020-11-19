@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
       delete_reauth_cookie
       return
     end
-    reauthenticate(redirect_path: '/') if session_state_requires_reauthentication?
+    reauthenticate(redirect_path: Settings.vue.localhost_base_url || '/') if session_state_requires_reauthentication?
   end
 
   def allow_if_classic_view_as?

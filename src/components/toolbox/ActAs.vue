@@ -5,11 +5,12 @@
     </div>
     <div class="bg-white p-3">
       <div>
-        <b-form class="bg-white border-0" @submit="actAsUser(uidInput)">
+        <b-form class="bg-white border-0" @submit="submit">
           <div>
             <b-form-input
               id="cc-toolbox-view-as-uid"
               v-model="uidInput"
+              aria-label="Enter UID or SID"
               placeholder="Enter UID or SID"
               size="sm"
               required
@@ -22,7 +23,7 @@
                 :disabled="!uidInput || uidInput === $currentUser.uid"
                 size="sm"
                 variant="primary"
-                @click="actAsUser"
+                @click="submit"
               >
                 Submit
               </b-button>
@@ -85,6 +86,10 @@ export default {
     this.refresh()
   },
   methods: {
+    actAsUser(uid) {
+      this.alertScreenReader(`Prepare to act as user ${uid}.`)
+      actAs(uid).then(() => window.location.href = '/')
+    },
     clearRecentUsers() {
       removeAllRecentUsers().then(() => {
         this.refresh().then(() => {
@@ -119,9 +124,8 @@ export default {
         })
       })
     },
-    actAsUser(uid) {
-      this.alertScreenReader(`Prepare to act as user ${uid}.`)
-      actAs(uid).then(() => window.location.href = '/')
+    submit() {
+      this.actAsUser(this.uidInput)
     }
   }
 }
