@@ -8,7 +8,7 @@
         </div>
         <div class="order-2">
           <div v-if="showMaintenanceNotice" role="alert">
-            <MaintenanceNotice />
+            <MaintenanceNotice course-action-verb="site is created" />
           </div>
         </div>
         <div class="order-1">
@@ -16,7 +16,7 @@
             v-if="isAdmin && currentWorkflowStep !== 'monitoring_job'"
             :admin-mode="adminMode"
             :admin-semesters="adminSemesters"
-            :current-admin-semester="currentSemester"
+            :current-admin-semester="currentAdminSemester"
             :fetch-feed="fetchFeed"
             :set-admin-acting-as="setAdminActingAs"
             :set-admin-by-ccns="setAdminByCcns"
@@ -25,6 +25,9 @@
             :switch-admin-semester="switchAdminSemester"
           />
         </div>
+      </div>
+      <div v-if="isAdmin && !currentWorkflowStep">
+        Use inputs above to choose courses by CCN or as an instructor. 
       </div>
       <div id="bc-page-create-course-site-steps-container" class="p-0">
         <div
@@ -129,22 +132,7 @@ export default {
   }),
   created() {
     this.$loading()
-    getCourseProvisioningMetadata().then(data => {
-      this.isAdmin = data.is_admin
-      if (this.isAdmin) {
-        this.adminActingAs = data.admin_acting_as
-        this.adminSemesters = data.admin_semesters
-        this.switchSemester(this.adminSemesters[0])
-        this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
-      } else {
-        this.teachingSemesters = data.teachingSemesters
-        this.fillCourseSites(this.teachingSemesters)
-        this.switchSemester(this.teachingSemesters[0])
-        this.currentWorkflowStep = 'selecting'
-        this.alertScreenReader('Select sections for your new Canvas course site.')
-      }
-      this.$ready('Create Canvas Course Site')
-    })
+    this.setMetadata().then(() => this.$ready('Create Canvas Course Site'))
   },
   methods: {
     classCount(semesters) {
@@ -194,13 +182,13 @@ export default {
         if (!this.isAdmin && !this.usersClassCount) {
           this.displayError = 'Sorry, you are not an admin user and you have no classes.'
         }
-        this.$ready()
+        this.setMetadata().then(() => this.$ready())
       }
 
       const onError = data => {
         this.alertScreenReader('Course section loading failed')
         this.displayError = 'failure'
-        this.$ready()
+        this.setMetadata().then(() => this.$ready())
         return this.$errorHandler(data)
       }
 
@@ -341,6 +329,23 @@ export default {
     setAdminMode(adminMode) {
       this.adminMode = adminMode
     },
+    setMetadata() {
+      return getCourseProvisioningMetadata().then(data => {
+        this.isAdmin = data.is_admin
+        if (this.isAdmin) {
+          this.adminActingAs = data.admin_acting_as
+          this.adminSemesters = data.admin_semesters
+          this.switchAdminSemester(this.adminSemesters[0])
+          this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
+        } else {
+          this.teachingSemesters = data.teachingSemesters
+          this.fillCourseSites(this.teachingSemesters)
+          this.switchSemester(this.teachingSemesters[0])
+          this.currentWorkflowStep = 'selecting'
+          this.alertScreenReader('Select sections for your new Canvas course site.')
+        }
+      })
+    },
     showConfirmation() {
       this.updateSelected()
       this.alertScreenReader('Course site details form loaded.')
@@ -385,6 +390,7 @@ export default {
     },
     switchAdminSemester(semester) {
       this.currentAdminSemester = semester.slug
+      this.currentSemester = semester.slug
       this.selectedSectionsList = []
       this.updateSelected()
       this.alertScreenReader(`Switched to ${semester.name} for CCN input`)

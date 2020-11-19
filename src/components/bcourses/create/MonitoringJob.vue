@@ -11,7 +11,7 @@
         Course provisioning request sent. Awaiting processing....
       </div>
       <div v-if="jobStatus">
-        <div>
+        <div id="bc-page-create-course-site-progress-bar-outer">
           <ProgressBar :percent-complete-rounded="Math.round(percentComplete * 100)" />
         </div>
         <div v-if="jobStatus === 'Error'">

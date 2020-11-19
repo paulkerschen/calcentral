@@ -12,7 +12,11 @@
     <div id="bc-page-create-course-site-admin-section-loader-form">
       <div v-if="adminMode === 'act_as'">
         <h3 class="cc-visuallyhidden">Load Sections By Instructor UID</h3>
-        <form class="bc-canvas-page-form bc-page-create-course-site-act-as-form" @submit.prevent="submit">
+        <form
+          id="bc-page-create-course-site-act-as-form"
+          class="bc-canvas-page-form bc-page-create-course-site-act-as-form"
+          @submit.prevent="submit"
+        >
           <b-row no-gutters>
             <b-col cols="auto">
               <label for="instructor-uid" class="cc-visuallyhidden">Instructor UID</label>
@@ -42,7 +46,7 @@
       </div>
       <div v-if="adminMode === 'by_ccn'">
         <h3 id="load-sections-by-ccn" class="cc-visuallyhidden">Load Sections By Course Control Numbers (CCN)</h3>
-        <form class="bc-canvas-page-form" @submit.prevent="submit">
+        <form id="load-sections-by-ccn-form" class="bc-canvas-page-form" @submit.prevent="submit">
           <div v-if="$_.size(adminSemesters)">
             <div class="bc-buttonset">
               <span v-for="(semester, index) in adminSemesters" :key="index">
