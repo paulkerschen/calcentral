@@ -5,7 +5,7 @@
       <strong>
         You are about to create a {{ currentSemesterName }} course site with {{ pluralize('section', selectedSectionsList.length) }}:
       </strong>
-      <ul class="bc-page-create-course-site-section-list">
+      <ul id="bc-page-create-course-site-section-list" class="bc-page-create-course-site-section-list">
         <li v-for="section in selectedSectionsList" :key="section.ccn">
           {{ section.courseTitle }} - {{ section.courseCode }} {{ section.section_label }} ({{ section.ccn }})
         </li>
@@ -13,6 +13,7 @@
     </div>
     <div>
       <form
+        id="create-course-site-form"
         name="createCourseSiteForm"
         class="bc-canvas-page-form"
         @submit.prevent="create"

@@ -17,7 +17,7 @@
           </b-form-checkbox>
         </div>
       </template>
-      <table class="bc-template-sections-table bg-white">
+      <table id="bc-template-sections-table" class="bc-template-sections-table bg-white">
         <thead class="cc-visuallyhidden">
           <tr>
             <th v-if="mode === 'createCourseForm'">Action</th>
@@ -33,7 +33,7 @@
           </tr>
         </thead>
         <tbody v-for="section in displayableSections" :key="section.ccn">
-          <tr :class="sectionDisplayClass[section.ccn]">
+          <tr :id="`bc-template-sections-table-row-${mode.toLowerCase()}-${section.ccn}`" :class="sectionDisplayClass[section.ccn]">
             <td v-if="mode === 'createCourseForm'" class="align-top bc-template-sections-table-cell-checkbox pl-2">
               <b-form-checkbox
                 :id="`cc-template-canvas-manage-sections-checkbox-${section.ccn}`"

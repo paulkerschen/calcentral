@@ -5,7 +5,7 @@
     </div>
     <div v-if="$_.size(teachingSemesters)">
       <div>
-        <div class="bc-buttonset">
+        <div id="bc-page-create-course-select-semesters" class="bc-buttonset">
           <h2 class="bc-page-create-course-site-header bc-page-create-course-site-header2">Term</h2>
           <span v-for="(semester, index) in teachingSemesters" :key="index">
             <input
@@ -20,6 +20,7 @@
             <label
               :for="`semester${index}`"
               class="bc-buttonset-button"
+              role="button"
               aria-disabled="false"
               :class="{
                 'bc-buttonset-button-active': currentSemester === semester.slug,
@@ -107,6 +108,7 @@
           </ul>
           <div class="bc-form-actions">
             <b-button
+              id="bc-page-create-course-site-continue"
               class="bc-canvas-button bc-canvas-button-primary"
               type="button"
               :disabled="!selectedSectionsList.length"
@@ -117,6 +119,7 @@
               Next
             </b-button>
             <b-button
+              id="bc-page-create-course-site-cancel"
               aria-label="Cancel and return to Site Creation Overview"
               class="bc-canvas-button"
               variant="link"

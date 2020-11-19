@@ -37,7 +37,9 @@
         size="sm"
         variant="primary"
         @click="onFinish"
-      >Back</b-button>
+      >
+        Back
+      </b-button>
     </div>
   </div>
 </template>
