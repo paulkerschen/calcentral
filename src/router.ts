@@ -172,6 +172,14 @@ const router = new Router({
               path: '/canvas/embedded/course_manage_official_sections'
             },
             {
+              component: CreateCourseSite,
+              path: '/canvas/embedded/create_course_site'
+            },
+            {
+              component: CreateProjectSite,
+              path: '/canvas/embedded/create_project_site'
+            },            
+            {
               component: Roster,
               path: '/canvas/embedded/rosters'
             },
