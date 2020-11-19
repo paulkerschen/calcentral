@@ -199,7 +199,7 @@
         <h2 class="bc-header bc-page-course-official-sections-existing-sections-header-label">
           Updating Official Sections in Course Site
         </h2>
-        <div v-if="jobStatus === 'sendingRequest' || percentCompleteRounded === 0" class="bc-page-course-official-sections-pending-request">
+        <div v-if="jobStatus === 'sendingRequest'" class="bc-page-course-official-sections-pending-request">
           <fa icon="spinner" class="cc-icon fa-spin mr-2"></fa>
           Sending request...
         </div>
