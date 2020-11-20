@@ -166,9 +166,8 @@ class ApplicationController < ActionController::Base
   end
 
   def session_state_requires_reauthentication?
-    Settings.features.reauthentication &&
-      (current_user.classic_viewing_as?) &&
-      !cookies[:reauthenticated]
+    # TODO: Rip out all re-authentication-related code. See CLC-7648
+    false
   end
 
   def get_settings
