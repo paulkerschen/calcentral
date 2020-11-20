@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.min.css'
 import _ from 'lodash'
 import App from './App.vue'
+import auth from './auth'
 import axios from 'axios'
 import BootstrapVue from 'bootstrap-vue'
 import mitt from 'mitt'
@@ -95,24 +96,10 @@ axios.interceptors.response.use(
     }
   })
 
-axios.get(`${apiBaseUrl}/api/my/status`).then(response => {
-  Vue.prototype.$currentUser = response.data
-  Vue.prototype.$currentUser.isLoggedIn = _.get(response.data, 'isLoggedIn', false)
-
-  axios.get(`${apiBaseUrl}/api/config`).then(response => {
-    Vue.prototype.$config = response.data
-    Vue.prototype.$config.apiBaseUrl = apiBaseUrl
-    Vue.prototype.$config.isVueAppDebugMode = _.trim(process.env.VUE_APP_DEBUG).toLowerCase() === 'true'
-
-    // Set Axios CSRF headers for non-GET requests
-    axios.defaults.headers.post['X-CSRF-Token'] = response.data.csrfToken
-    axios.defaults.headers.put['X-CSRF-Token'] = response.data.csrfToken
-    axios.defaults.headers.delete['X-CSRF-Token'] = response.data.csrfToken
-
-    new Vue({
-      router,
-      store,
-      render: h => h(App)
-    }).$mount('#app')
-  })
+auth.initSession().then(() => {
+  new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app')
 })

@@ -42,10 +42,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+import auth from '@/auth'
 import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
-import Vue from 'vue'
 import {devAuthLogIn} from '@/api/auth'
 
 export default {
@@ -65,12 +64,7 @@ export default {
         devAuthLogIn(uid, password).then(
           data => {
             if (data.isLoggedIn) {
-              axios.get(`${this.$config.apiBaseUrl}/api/my/status`).then(response => {
-                axios.defaults.headers.post['X-CSRF-Token'] = response.data.csrfToken
-                axios.defaults.headers.put['X-CSRF-Token'] = response.data.csrfToken
-                axios.defaults.headers.delete['X-CSRF-Token'] = response.data.csrfToken
-
-                Vue.prototype.$currentUser = response.data
+              auth.initSession().then(() => {
                 this.alertScreenReader('You are logged in.')
                 this.$router.push({ path: '/' })
               })
