@@ -37,6 +37,7 @@ module Berkeley
         'DCCRP' =>  'Department of City and Regional Planning',
         'DFLAE' =>  'Department of Landscape Architecture and Environmental Planning',
         'DJOUR' =>  'Department of Journalism',
+        'DSDIV' =>  'Division of Computing, Data Science, and Society',
         'EAEDU' =>  'School of Education',
         'EDDNO' =>  'College of Engineering',
         'EFBIO' =>  'Department of Bioengineering',
