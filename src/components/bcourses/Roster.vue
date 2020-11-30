@@ -198,9 +198,31 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 button {
   height: 38px;
   width: 76px;
+}
+.cc-page-roster {
+  background: $cc-color-white;
+  overflow: hidden;
+  padding: 20px;
+
+  .cc-roster-search {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $cc-color-very-light-grey;
+    margin: 0 0 15px;
+    overflow: hidden;
+    padding: 7px 0 5px;
+  }
+
+  @media print {
+    overflow: visible;
+    padding: 0;
+    .cc-roster-search {
+      display: none;
+    }
+  }
 }
 </style>
