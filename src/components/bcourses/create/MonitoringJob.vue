@@ -10,7 +10,7 @@
         <fa icon="spinner" spin></fa>
         Course provisioning request sent. Awaiting processing....
       </div>
-      <div v-if="jobStatus">
+      <div v-if="jobStatus && jobStatus !== 'Completed'">
         <div id="bc-page-create-course-site-progress-bar-outer">
           <ProgressBar :percent-complete-rounded="Math.round(percentComplete * 100)" />
         </div>
@@ -46,7 +46,7 @@
       </div>
     </div>
     <div v-if="jobStatus === 'Completed'" :aria-expanded="jobStatus === 'Completed'">
-      <b-spinner size="sm"></b-spinner>
+      <div class="cc-spinner"></div>
       <div class="cc-visuallyhidden" role="alert">
         Redirecting to new course site.
       </div>
