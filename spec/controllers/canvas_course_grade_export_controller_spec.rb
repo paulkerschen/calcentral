@@ -203,7 +203,7 @@ describe CanvasCourseGradeExportController do
         [
           'ID,Name,Grade,Grading Basis,Comments',
           "872584,A. Aardvark,NP,DPN,\"\"",
-          "4000123,B. Boa,P,DPN,\"\"",
+          "4000123,B. Boa,P,CPN,\"\"",
           "872527,C. Curlew,P,DPN,\"\"",
           "872529,D. Dugong,D-,GRD,Opted for letter grade"
         ].join("\n")
@@ -268,7 +268,7 @@ describe CanvasCourseGradeExportController do
         expect(response_csv[1]['ID']).to eq '4000123'
         expect(response_csv[1]['Name']).to eq 'B. Boa'
         expect(response_csv[1]['Grade']).to eq 'P'
-        expect(response_csv[1]['Grading Basis']).to eq 'DPN'
+        expect(response_csv[1]['Grading Basis']).to eq 'CPN'
         expect(response_csv[1]['Comments']).to eq ''
 
         expect(response_csv[2]['ID']).to eq '872527'
