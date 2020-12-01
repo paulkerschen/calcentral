@@ -73,10 +73,10 @@ module CanvasLti
 
     def convert_to_basis(grade, override_grade, basis, pnp_cutoff)
       effective_grade = override_grade || grade
-      if LETTER_GRADES.include?(effective_grade) && %w(DPN EPN ESU PNP SUS).include?(basis) && pnp_cutoff != 'ignore'
+      if LETTER_GRADES.include?(effective_grade) && %w(CPN DPN EPN ESU PNP SUS).include?(basis) && pnp_cutoff != 'ignore'
         passing = LETTER_GRADES.index(effective_grade) <= LETTER_GRADES.index(pnp_cutoff)
         case basis
-          when 'DPN', 'EPN', 'PNP' then (passing ? 'P' : 'NP')
+          when 'CPN', 'DPN', 'EPN', 'PNP' then (passing ? 'P' : 'NP')
           when 'ESU', 'SUS' then (passing ? 'S' : 'U')
         end
       else
