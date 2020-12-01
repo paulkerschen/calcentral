@@ -1,6 +1,14 @@
 describe Canvas::MergedUserSites do
   let(:uid) { rand(999999).to_s }
   let(:canvas_course_id) { rand(999999) }
+  let(:terms) do
+    [{
+      name: 'Fall 2013',
+      slug: 'fall-2013',
+      term_yr: '2013',
+      term_cd: 'D' 
+    }]
+  end
   let(:canvas_course) { {
     'id' => canvas_course_id,
     'course_code' => "ANTHRO #{canvas_course_id}",
@@ -25,7 +33,7 @@ describe Canvas::MergedUserSites do
       'course_id' => canvas_course_id,
       'name' => "Section #{canvas_section_id}"
     }}
-    subject { Canvas::MergedUserSites.new(uid).merge_course_with_sections(canvas_course, [canvas_section]) }
+    subject { Canvas::MergedUserSites.new(uid, terms).merge_course_with_sections(canvas_course, [canvas_section]) }
     context 'when a Canvas section has a possible SIS link' do
       let(:ccn) { random_ccn }
       let(:canvas_section) {canvas_section_base.merge({ 'sis_section_id' => "SEC:2013-D-#{ccn}" })}
@@ -73,7 +81,7 @@ describe Canvas::MergedUserSites do
       }],
       groups: []
     }}
-    subject { Canvas::MergedUserSites.new(uid).get_group_data(canvas_group) }
+    subject { Canvas::MergedUserSites.new(uid, terms).get_group_data(canvas_group) }
     context 'when a Canvas group site is associated with a course site' do
       let(:canvas_group) {canvas_group_base.merge({ 'context_type' => 'Course', 'course_id' => canvas_course_id })}
       it_behaves_like 'a group site item'

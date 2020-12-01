@@ -67,6 +67,22 @@ describe Berkeley::Teaching do
       expect(EdoOracle::UserCourses::Instructing).to receive(:new).and_return double(get_courses_instructing: edo_courses)
     end
     let(:uid) { '242881' }
+    let(:terms) do
+      [
+        {
+          name: 'Spring 2012',
+          slug: 'spring-2012',
+          term_yr: '2012',
+          term_cd: 'B' 
+        },
+        {
+          name: 'Fall 2013',
+          slug: 'fall-2013',
+          term_yr: '2013',
+          term_cd: 'D' 
+        }
+      ]
+    end
     let(:edo_courses) do
       {
         '2013-D' => [
@@ -381,6 +397,16 @@ describe Berkeley::Teaching do
     end
     let(:fake_term_yr) {2013}
     let(:fake_term_cd) {'D'}
+    let(:terms) do
+      [
+        {
+          name: 'Fall 2013',
+          slug: 'fall-2013',
+          term_yr: '2013',
+          term_cd: 'D' 
+        }
+      ]
+    end
     let(:teaching_classes) {[]}
     let(:fake_feed) do
       {
@@ -393,7 +419,7 @@ describe Berkeley::Teaching do
     end
 
     subject do
-      Berkeley::Teaching.new(uid).merge_canvas_sites(fake_feed)
+      Berkeley::Teaching.new(uid).merge_canvas_sites(fake_feed, terms)
     end
 
     context 'with no Canvas account' do
@@ -442,7 +468,7 @@ describe Berkeley::Teaching do
         }
       end
       before { Canvas::Proxy.stub(:access_granted?).with(uid).and_return(true) }
-      before { Canvas::MergedUserSites.stub(:new).with(uid).and_return(double(get_feed: canvas_sites)) }
+      before { Canvas::MergedUserSites.stub(:new).with(uid, terms).and_return(double(get_feed: canvas_sites)) }
 
       context 'when the Canvas site has an academic term' do
         let(:term_yr) {fake_term_yr}
