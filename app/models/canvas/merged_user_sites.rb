@@ -4,13 +4,15 @@ module Canvas
     include ClassLogger
     include Cache::UserCacheExpiry
 
-    def initialize(uid)
+    def initialize(uid, terms)
       @uid = uid
+      @terms = terms
       @url_root = Settings.canvas_proxy.url_root
     end
 
     def get_feed
-      self.class.fetch_from_cache @uid do
+      cache_key = "#{@uid}-#{@terms.map{ |t| t[:slug]}.join(',')}"
+      self.class.fetch_from_cache(cache_key) do
         get_feed_internal
       end
     end
@@ -22,6 +24,7 @@ module Canvas
       }
       courses = Canvas::UserCourses.new(user_id: @uid).courses
       courses.each do |course|
+        next unless @terms.find { |t| t[:name] == course['term']['name'] }
         course_id = course['id']
         # We collect sections and CCNs as an admin, not as the user. Most site members
         # do not have access to that information.

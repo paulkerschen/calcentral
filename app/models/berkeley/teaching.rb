@@ -45,8 +45,8 @@ module Berkeley
       }
     end
 
-    def merge_canvas_sites(data)
-      if Canvas::Proxy.access_granted?(@uid) && (canvas_sites = Canvas::MergedUserSites.new(@uid).get_feed)
+    def merge_canvas_sites(data, terms)
+      if Canvas::Proxy.access_granted?(@uid) && (canvas_sites = Canvas::MergedUserSites.new(@uid, terms).get_feed)
         included_course_sites = {}
         canvas_sites[:courses].each do |course_site|
           if (merged_courses = course_site_merge(data, course_site))
