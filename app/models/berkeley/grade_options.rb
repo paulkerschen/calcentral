@@ -11,7 +11,7 @@ module Berkeley
           'Letter'
         when 'LAW'
           'Law'
-        when 'EPN', 'PNP'
+        when 'CPN', 'DPN', 'EPN', 'PNP'
           'P/NP'
         when 'ESU', 'SUS'
           'S/U'
