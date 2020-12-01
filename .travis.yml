@@ -57,8 +57,8 @@ jobs:
         - npm run build-vue
         - pip install --user awscli
         - aws configure list
-        - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc7.jar .
-        - mv ./ojdbc7.jar ./lib
+        - aws s3 cp s3://${ARTIFACTS_BUCKET}/third-party-dependencies/ojdbc8.jar .
+        - mv ./ojdbc8.jar ./lib
         - git log --pretty=format:'%H' -n 1 > versions/git.txt
         - bundle config --delete without
         - bundle install --deployment --retry 3

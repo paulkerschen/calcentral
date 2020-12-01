@@ -172,10 +172,9 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
     ```
 
 1. Install JDBC driver (for Oracle connection)
-    * Download [ojdbc7_g.jar](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html)
+    * Download [ojdbc8.jar](https://www.oracle.com/database/technologies/jdbc-ucp-122-downloads.html)
     * Note: You do not have to open the file.
-    * Rename the file to `ojdbc7.jar`
-    * Copy `ojdbc7.jar` to `~/.rvm/rubies/jruby-9.2.13.0/lib/`
+    * Copy `ojdbc8.jar` to `~/.rvm/rubies/jruby-9.2.13.0/lib/`
 
 1. Initialize PostgreSQL database tables:
 
