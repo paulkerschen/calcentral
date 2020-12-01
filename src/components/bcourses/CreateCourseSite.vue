@@ -132,7 +132,10 @@ export default {
   }),
   created() {
     this.$loading()
-    this.setMetadata().then(() => this.$ready('Create Canvas Course Site'))
+    getCourseProvisioningMetadata().then(data => {
+      this.updateMetadata(data)
+      this.$ready('Create Canvas Course Site')
+    })
   },
   methods: {
     classCount(semesters) {
@@ -159,18 +162,13 @@ export default {
       this.alertScreenReader('Loading courses and sections')
 
       const onSuccess = data => {
+        this.updateMetadata(data)
         this.usersClassCount = this.classCount(data.teachingSemesters)
         this.teachingSemesters = data.teachingSemesters
         this.canvasCourse = data.canvas_course
         const canvasCourseId = this.canvasCourse ? this.canvasCourse.canvasCourseId : ''
         this.fillCourseSites(data.teachingSemesters, canvasCourseId)
         this.alertScreenReader('Course section loaded successfully')
-        if (this.$_.size(this.teachingSemesters) > 0) {
-          this.switchSemester(this.teachingSemesters[0])
-        }
-        if (this.$_.size(this.adminSemesters) > 0) {
-          this.switchAdminSemester(this.currentAdminSemester || this.adminSemesters[0])
-        }
         if (this.adminMode === 'by_ccn' && this.adminByCcns) {
           this.$_.each(this.coursesList, course => {
             this.$_.each(course.sections, section => {
@@ -182,21 +180,23 @@ export default {
         if (!this.isAdmin && !this.usersClassCount) {
           this.displayError = 'Sorry, you are not an admin user and you have no classes.'
         }
-        this.setMetadata().then(() => this.$ready())
+        this.$ready()
       }
 
       const onError = data => {
         this.alertScreenReader('Course section loading failed')
         this.displayError = 'failure'
-        this.setMetadata().then(() => this.$ready())
+        this.$ready()
         return this.$errorHandler(data)
       }
+
+      const semester = (this.adminMode === 'by_ccn' ? this.currentAdminSemester : this.currentSemester)
 
       getSections(
         this.adminActingAs,
         this.adminByCcns,
         this.adminMode,
-        this.currentSemester,
+        semester,
         this.isAdmin
       ).then(onSuccess, onError)
     },
@@ -252,7 +252,7 @@ export default {
               window.location.href = courseSiteUrl
             }
           } else {
-            this.displayError = 'failure'
+            this.displayError = 'Failed to create course site.'
           }
         }
       }
@@ -328,23 +328,7 @@ export default {
     },
     setAdminMode(adminMode) {
       this.adminMode = adminMode
-    },
-    setMetadata() {
-      return getCourseProvisioningMetadata().then(data => {
-        this.isAdmin = data.is_admin
-        if (this.isAdmin) {
-          this.adminActingAs = data.admin_acting_as
-          this.adminSemesters = data.admin_semesters
-          this.switchAdminSemester(this.adminSemesters[0])
-          this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
-        } else {
-          this.teachingSemesters = data.teachingSemesters
-          this.fillCourseSites(this.teachingSemesters)
-          this.switchSemester(this.teachingSemesters[0])
-          this.currentWorkflowStep = 'selecting'
-          this.alertScreenReader('Select sections for your new Canvas course site.')
-        }
-      })
+      this.currentWorkflowStep = undefined
     },
     showConfirmation() {
       this.updateSelected()
@@ -355,7 +339,6 @@ export default {
       this.currentWorkflowStep = 'selecting'
     },
     startCourseSiteJob(siteName, siteAbbreviation) {
-      // this.jobStatus = 'New'
       this.percentComplete = 0
       this.currentWorkflowStep = 'monitoring_job'
       this.alertScreenReader('Creating course site. Please wait.')
@@ -366,7 +349,7 @@ export default {
         const onSuccess = data => {
           this.jobId = data.job_id
           this.currentWorkflowStep = 'monitoring_job'
-          this.alertScreenReader('Course site created successfully')
+          this.alertScreenReader('Started course site creation.')
           this.completedFocus = true
           this.jobStatusLoader()
         }
@@ -390,7 +373,6 @@ export default {
     },
     switchAdminSemester(semester) {
       this.currentAdminSemester = semester.slug
-      this.currentSemester = semester.slug
       this.selectedSectionsList = []
       this.updateSelected()
       this.alertScreenReader(`Switched to ${semester.name} for CCN input`)
@@ -402,6 +384,25 @@ export default {
       this.currentSemesterName = semester.name
       this.alertScreenReader(`Course sections for ${semester.name} loaded`)
       this.updateSelected()
+    },
+    updateMetadata(data) {
+      this.isAdmin = data.is_admin
+      this.teachingSemesters = data.teachingSemesters
+      if (this.$_.size(this.teachingSemesters) > 0) {
+        this.switchSemester(this.teachingSemesters[0])
+      }
+      this.fillCourseSites(this.teachingSemesters)
+      if (this.isAdmin) {
+        this.adminActingAs = data.admin_acting_as
+        this.adminSemesters = data.admin_semesters
+        if (this.$_.size(this.adminSemesters) > 0 && !this.currentAdminSemester) {
+          this.switchAdminSemester(this.adminSemesters[0])
+        }
+        this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
+      } else {
+        this.currentWorkflowStep = 'selecting'
+        this.alertScreenReader('Select sections for your new Canvas course site.')
+      }
     },
     updateSelected() {
       this.selectedSectionsList = this.selectedSections(this.coursesList)
