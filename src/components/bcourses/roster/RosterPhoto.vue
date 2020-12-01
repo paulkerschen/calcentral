@@ -55,4 +55,10 @@ img {
   max-width: 72px;
   object-fit: cover;
 }
+@media print {
+  .photo {
+    height: auto !important;
+    width: 50% !important;
+  }
+}
 </style>

@@ -72,3 +72,19 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@media print {
+  .cc-academics-class-enrollment-table {
+    table tr th {
+      padding: 2px;
+      vertical-align: top;
+    }
+    table tr td {
+      font-size: 10px;
+      line-height: normal;
+      padding: 2px;
+    }
+  }
+}
+</style>
