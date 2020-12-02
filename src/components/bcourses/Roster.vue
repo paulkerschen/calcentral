@@ -56,30 +56,9 @@
           </div>
         </b-col>
       </b-row>
-      <b-row class=" cc-print-hide" :class="{'sr-only': !$config.isVueAppDebugMode}" no-gutters>
-        <b-col sm="12">
-          <div class="float-right pb-2">
-            <b-form-radio-group
-              id="toggle-view-mode"
-              v-model="viewMode"
-              :options="[
-                { text: 'Photos', value: 'photos' },
-                { text: 'List', value: 'list' }
-              ]"
-              name="radio-options"
-              size="lg"
-            ></b-form-radio-group>
-          </div>
-        </b-col>
-      </b-row>
       <b-row no-gutters>
         <b-col sm="12">
-          <div v-if="viewMode === 'list'" class="pt-2">
-            <RosterList :course-id="canvasCourseId" :students="studentsFiltered" />
-          </div>
-          <div v-if="viewMode === 'photos'" class="pt-3">
-            <RosterPhotos :course-id="canvasCourseId" :students="studentsFiltered" />
-          </div>
+          <RosterPhotos :course-id="canvasCourseId" :students="studentsFiltered" />
         </b-col>
       </b-row>
     </b-container>
@@ -107,7 +86,6 @@
 <script>
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Context from '@/mixins/Context'
-import RosterList from '@/components/bcourses/roster/RosterList'
 import RosterPhotos from '@/components/bcourses/roster/RosterPhotos'
 import Utils from '@/mixins/Utils'
 import {getCourseUserRoles, getRoster, getRosterCsv} from '@/api/canvas'
@@ -115,13 +93,10 @@ import {getCourseUserRoles, getRoster, getRosterCsv} from '@/api/canvas'
 export default {
   name: 'Roster',
   mixins: [CanvasUtils, Context, Utils],
-  components: {RosterList, RosterPhotos},
+  components: {RosterPhotos},
   watch: {
     search() {
       this.updateStudentsFiltered()
-    },
-    viewMode(value) {
-      this.alertScreenReader(`View mode is '${value}'.`)
     }
   },
   data: () => ({
@@ -131,7 +106,6 @@ export default {
     roster: undefined,
     section: null,
     studentsFiltered: undefined,
-    viewMode: 'photos'
   }),
   created() {
     this.$loading()
