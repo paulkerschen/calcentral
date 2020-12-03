@@ -52,11 +52,13 @@ img {
   margin: 0 auto;
   max-width: 72px;
   object-fit: cover;
+  width: 72px;
 }
 @media print {
   .photo {
-    height: auto !important;
-    width: 50% !important;
+    height: 147px !important;
+    max-width: 110px !important;
+    width: 110px !important;
   }
 }
 </style>
