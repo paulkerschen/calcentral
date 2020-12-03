@@ -1,5 +1,5 @@
 <template>
-  <ul v-if="students.length" class="align-content-start cc-page-roster-photos-list d-flex flex-wrap ml-3 pt-3">
+  <ul class="align-content-start cc-page-roster-photos-list d-flex flex-wrap ml-3 pt-3">
     <li v-for="student in students" :key="student.student_id" class="list-item pb-3 text-center">
       <div v-if="student.profile_url">
         <a
@@ -88,13 +88,6 @@ export default {
   white-space: nowrap;
 }
 
-.cc-page-roster-image-unavailable {
-  background-image: url('~@/assets/images/svg/photo_unavailable_official_72x96.svg');
-  height: 96px;
-  margin: 0 auto;
-  max-width: 72px;
-}
-
 .cc-page-roster-photos-list {
   li {
     display: block;
@@ -113,10 +106,6 @@ export default {
 @media print {
   a[href]::after {
     content: none;
-  }
-
-  .cc-page-roster-image-unavailable::before {
-    content: url('~@/assets/images/svg/photo_unavailable_official_72x96.svg');
   }
 
   .cc-page-roster-student-name {
