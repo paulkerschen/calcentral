@@ -58,7 +58,11 @@
       </b-row>
       <b-row no-gutters>
         <b-col sm="12">
-          <RosterPhotos :course-id="canvasCourseId" :students="studentsFiltered" />
+          <RosterPhotos v-if="studentsFiltered.length" :course-id="canvasCourseId" :students="studentsFiltered" />
+          <div v-if="!studentsFiltered.length">
+            <fa icon="exclamation-circle" class="cc-icon-gold"></fa>
+            Students have not yet signed up for this class.
+          </div>
         </b-col>
       </b-row>
     </b-container>
@@ -105,7 +109,7 @@ export default {
     search: undefined,
     roster: undefined,
     section: null,
-    studentsFiltered: undefined,
+    studentsFiltered: [],
   }),
   created() {
     this.$loading()
