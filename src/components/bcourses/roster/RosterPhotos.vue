@@ -1,5 +1,5 @@
 <template>
-  <ul class="align-content-start cc-page-roster-photos-list d-flex flex-wrap ml-3 pt-3">
+  <ul class="align-content-start cc-page-roster-photos-list ml-3 pt-3">
     <li v-for="student in students" :key="student.student_id" class="list-item pb-3 text-center">
       <div v-if="student.profile_url">
         <a
@@ -94,7 +94,6 @@ export default {
     float: left;
     height: auto;
     padding: 5px;
-    text-align: center;
     width: 173px;
     img {
       height: 96px;
