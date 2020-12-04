@@ -89,16 +89,15 @@ export default {
 }
 
 .cc-page-roster-photos-list {
+  display: block;
+  overflow: hidden;
+  width: 100%;
   li {
     display: block;
     float: left;
     height: auto;
     padding: 5px;
     width: 173px;
-    img {
-      height: 96px;
-      max-width: 72px;
-    }
   }
 }
 

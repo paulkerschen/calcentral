@@ -39,26 +39,16 @@ export default {
 </script>
 
 <style scoped>
-img {
-  height: 96px;
-  width: 72px;
-}
-</style>
-<style scoped>
 .photo {
   background-image: url('~@/assets/images/svg/photo_unavailable_official_72x96.svg');
   background-size: cover;
   height: 96px;
   margin: 0 auto;
-  max-width: 72px;
-  object-fit: cover;
-  width: 72px;
+  width: auto;
 }
 @media print {
   .photo {
-    height: 147px !important;
-    max-width: 110px !important;
-    width: 110px !important;
+    height: 147px;
   }
 }
 </style>
