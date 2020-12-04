@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading" class="bc-page-site-creation">
-    <h1 class="bc-header bc-header2 bc-page-site-creation-primary-header">Create a Site</h1>
+    <h1 class="bc-header bc-page-site-creation-primary-header">Create a Site</h1>
     <b-container>
       <b-row>
         <b-col sm="3">
@@ -17,7 +17,7 @@
         </b-col>
         <b-col sm="9">
           <div class="bc-page-site-creation-feature-details mr-5 pr-5">
-            <h3 class="bc-header bc-header3">Course Sites</h3>
+            <h2 class="bc-header bc-page-site-creation-h2">Course Sites</h2>
             <div v-if="canCreateCourseSite" class="bc-page-site-creation-feature-description">
               Set up course sites to communicate with and manage the work of students enrolled in your classes.
             </div>
@@ -60,7 +60,7 @@
         </b-col>
         <b-col sm="9">
           <div class="bc-page-site-creation-feature-details mr-5 pr-5">
-            <h3 class="bc-header bc-header3">Project Sites</h3>
+            <h2 class="bc-header bc-page-site-creation-h2">Project Sites</h2>
             <div class="bc-page-site-creation-feature-description">
               Share files and collaborate with your team. Projects are best suited for instructors and GSIs who already
               use bCourses.
@@ -137,8 +137,9 @@ export default {
   }
 
   .bc-page-site-creation-primary-header {
-    margin-bottom: 25px;
-    margin-left: 10px;
+    font-size: 24px;
+    line-height: 30px;
+    margin: 15px 25px 16px 10px;
   }
 
   .bc-page-site-creation-feature-icon-box {
@@ -175,6 +176,11 @@ export default {
   .bc-page-site-creation-features-divider {
     border-top: $bc-color-button-grey-border solid 1px;
     margin: 30px 0;
+  }
+
+  .bc-page-site-creation-h2 {
+    font-size: 20px;
+    margin: 0 0 13px;
   }
 
   @media #{$small-only} {
