@@ -4,7 +4,7 @@
       id="maintenance-notice-button"
       class="bc-button-link bc-template-canvas-maintenance-notice-button"
       aria-controls="maintenance-details"
-      :aria-expanded="!maintenanceCollapsed"
+      :aria-expanded="`${!maintenanceCollapsed}`"
       aria-haspopup="true"
       @click="maintenanceCollapsed = !maintenanceCollapsed"
     >

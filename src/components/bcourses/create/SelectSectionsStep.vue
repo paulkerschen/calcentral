@@ -43,7 +43,7 @@
               class="bc-button-link"
               aria-haspopup="true"
               aria-controls="section-selection-help"
-              :aria-expanded="toggle.displayHelp"
+              :aria-expanded="`${toggle.displayHelp}`"
               @click="toggle.displayHelp = !toggle.displayHelp"
             >
               Need help deciding which official sections to select?
@@ -79,7 +79,7 @@
           <ul class="bc-page-create-course-site-section-margin">
             <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
               <b-button
-                :aria-expanded="course.visible"
+                :aria-expanded="`${course.visible}`"
                 class="d-flex p-0"
                 variant="link"
                 @click="toggleShowHide(course)"

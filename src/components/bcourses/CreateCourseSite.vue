@@ -33,7 +33,7 @@
         <div
           v-if="currentWorkflowStep === 'selecting'"
           id="bc-page-create-course-site-selecting-step"
-          :aria-expanded="currentWorkflowStep === 'selecting'"
+          :aria-expanded="`${currentWorkflowStep === 'selecting'}`"
         >
           <SelectSectionsStep
             :courses-list="coursesList"
@@ -48,7 +48,7 @@
         <div
           v-if="currentWorkflowStep === 'confirmation'"
           id="bc-page-create-course-site-confirmation-step"
-          :aria-expanded="currentWorkflowStep === 'confirmation'"
+          :aria-expanded="`${currentWorkflowStep === 'confirmation'}`"
         >
           <ConfirmationStep
             :start-course-site-job="startCourseSiteJob"
@@ -60,7 +60,7 @@
         <div
           v-if="currentWorkflowStep === 'monitoring_job'"
           id="bc-page-create-course-site-monitor-step"
-          :aria-expanded="currentWorkflowStep === 'monitoring_job'"
+          :aria-expanded="`${currentWorkflowStep === 'monitoring_job'}`"
         >
           <MonitoringJob
             :fetch-feed="fetchFeed"

@@ -133,7 +133,7 @@
               class="bc-button-link"
               aria-controls="bc-page-help-notice"
               aria-haspopup="true"
-              :aria-expanded="toggle.displayHelp"
+              :aria-expanded="`${toggle.displayHelp}`"
               @click="toggle.displayHelp = !toggle.displayHelp"
             >
               Need help finding someone?
