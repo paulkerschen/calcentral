@@ -78,25 +78,23 @@
         <form class="bc-canvas-page-form" @submit="showConfirmation">
           <ul class="bc-page-create-course-site-section-margin">
             <li v-for="course in coursesList" :key="course.course_id" class="bc-sections-course-container bc-sections-course-container-bottom-margin">
-              <div class="d-flex">
+              <b-button
+                :aria-expanded="course.visible"
+                class="d-flex p-0"
+                variant="link"
+                @click="toggleShowHide(course)"
+              >
                 <div class="toggle-show-hide">
-                  <b-button
-                    :aria-expanded="course.visible"
-                    class="pb-0 pt-0"
-                    variant="link"
-                    @click="toggleShowHide(course)"
-                  >
-                    <fa :icon="course.visible ? 'caret-down' : 'caret-right'" />
-                    <span class="sr-only">Toggle course sections list for {{ course.course_code }} {{ course.title }}</span>
-                  </b-button>
+                  <fa :icon="course.visible ? 'caret-down' : 'caret-right'" />
+                  <span class="sr-only">Toggle course sections list for {{ course.course_code }} {{ course.title }}</span>
                 </div>
-                <div class="pr-2 pt-1">
+                <div class="btn-course-title-text pr-2 pt-1">
                   <h3 class="bc-sections-course-title">{{ course.course_code }}<span v-if="course.title">: {{ course.title }}</span></h3>
                 </div>
-                <div v-if="$_.size(course.sections)" class="pt-1">
+                <div v-if="$_.size(course.sections)" class="btn-course-title-text pt-1">
                   ({{ pluralize('section', course.sections.length, {0: 'No', 1: 'One'}) }})
-                </div>
-              </div>
+                </div>                    
+              </b-button>
               <b-collapse :id="course.course_id" v-model="course.visible">
                 <CourseSectionsTable
                   mode="createCourseForm"
@@ -220,7 +218,13 @@ export default {
   margin: 0;
   overflow: hidden;
 }
+.btn-course-title-text {
+  color: $cc-color-black;
+  font-weight: 300;
+  text-decoration: none;
+}
 .toggle-show-hide {
-  width: 30px
+  line-height: 1.8;
+  width: 20px;
 }
 </style>
