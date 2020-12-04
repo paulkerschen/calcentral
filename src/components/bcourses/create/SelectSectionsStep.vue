@@ -86,7 +86,7 @@
               >
                 <div class="toggle-show-hide">
                   <fa :icon="course.visible ? 'caret-down' : 'caret-right'" />
-                  <span class="sr-only">Toggle course sections list for {{ course.course_code }} {{ course.title }}</span>
+                  <span class="sr-only">Toggle course sections list</span>
                 </div>
                 <div class="btn-course-title-text pr-2 pt-1">
                   <h3 class="bc-sections-course-title">{{ course.course_code }}<span v-if="course.title">: {{ course.title }}</span></h3>

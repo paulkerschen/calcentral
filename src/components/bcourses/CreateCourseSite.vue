@@ -398,10 +398,8 @@ export default {
         if (this.$_.size(this.adminSemesters) > 0 && !this.currentAdminSemester) {
           this.switchAdminSemester(this.adminSemesters[0])
         }
-        this.alertScreenReader('First, enter instructor UID or a list of CCNs.')
       } else {
         this.currentWorkflowStep = 'selecting'
-        this.alertScreenReader('Select sections for your new Canvas course site.')
       }
     },
     updateSelected() {
