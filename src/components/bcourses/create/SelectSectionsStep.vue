@@ -64,9 +64,9 @@
                   </li>
                   <li>
                     Create separate course sites based on instruction mode.
-                    <a target="_blank" href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010732#instructionmode">
+                    <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010732#instructionmode">
                       Learn more about instruction modes in bCourses.
-                    </a>
+                    </OutboundLink>
                   </li>
                 </ol>
               </div>
@@ -135,12 +135,13 @@
 <script>
 import CourseSectionsTable from '@/components/bcourses/CourseSectionsTable'
 import Iframe from '@/mixins/Iframe'
+import OutboundLink from '@/components/util/OutboundLink'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SelectSectionsStep',
   mixins: [Iframe, Utils],
-  components: {CourseSectionsTable},
+  components: {CourseSectionsTable, OutboundLink},
   props: {
     coursesList: {
       required: true,
