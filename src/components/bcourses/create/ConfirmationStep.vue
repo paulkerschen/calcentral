@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bc-alert bc-alert-info" role="alert">
-      <h2 class="cc-visuallyhidden">Confirm Course Site Details</h2>
+      <h2 id="confirm-course-site-details-header" class="cc-visuallyhidden" tabindex="-1">Confirm Course Site Details</h2>
       <strong>
         You are about to create a {{ currentSemesterName }} course site with {{ pluralize('section', selectedSectionsList.length) }}:
       </strong>
@@ -120,7 +120,7 @@ export default {
     this.siteName = `${section.courseTitle} (${this.currentSemesterName})`
     this.siteAbbreviation = `${section.courseCode}-${section.instruction_format}-${section.section_number}`
     this.iframeScrollToTop()
-    this.alertScreenReader('Confirm the course site name.')
+    this.$putFocusNextTick('confirm-course-site-details-header')
   },
   methods: {
     create() {
