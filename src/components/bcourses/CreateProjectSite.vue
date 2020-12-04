@@ -2,7 +2,7 @@
   <div class="bc-canvas-application bc-page-create-project-site">
     <div v-if="loading" class="cc-spinner"></div>
     <div v-if="!loading && !error">
-      <h1 class="bc-header bc-header2">Create a Project Site</h1>
+      <h1 class="bc-header bc-page-create-project-site-header">Create a Project Site</h1>
       <form class="bg-transparent border-0 bc-canvas-form" @submit.prevent="createProjectSite">
         <b-container>
           <b-row>
@@ -102,6 +102,12 @@ export default {
     font-size: 16px;
     font-weight: bold;
     text-align: right;
+  }
+
+  .bc-page-create-project-site-header {
+    font-size: 24px;
+    line-height: 30px;
+    margin: 15px 0 16px;
   }
 
   @media #{$small-only} {

@@ -6,13 +6,13 @@
           <b-form-checkbox
             :id="`select-all-toggle-${sections[0].ccn}`"
             v-model="allSelected"
-            :aria-label="`${allSelected ? 'Un-select' : 'Select'} all course sections`"
             class="my-2"
             :indeterminate="indeterminate"
             @change="toggleAll"
           >
             <div class="text-secondary">
               Select {{ allSelected ? 'None' : 'All' }}
+              <span class="sr-only">of the course sections</span>
             </div>
           </b-form-checkbox>
         </div>

@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    <div v-if="jobStatus === 'Completed'" :aria-expanded="jobStatus === 'Completed'">
+    <div v-if="jobStatus === 'Completed'" :aria-expanded="`${jobStatus === 'Completed'}`">
       <div class="cc-spinner"></div>
       <div class="cc-visuallyhidden" role="alert">
         Redirecting to new course site.

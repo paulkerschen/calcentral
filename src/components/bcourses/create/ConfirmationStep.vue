@@ -120,7 +120,6 @@ export default {
     this.siteName = `${section.courseTitle} (${this.currentSemesterName})`
     this.siteAbbreviation = `${section.courseCode}-${section.instruction_format}-${section.section_number}`
     this.iframeScrollToTop()
-    this.$putFocusNextTick('siteName')
     this.alertScreenReader('Confirm the course site name.')
   },
   methods: {
