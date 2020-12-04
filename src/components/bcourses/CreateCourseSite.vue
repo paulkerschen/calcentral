@@ -3,15 +3,15 @@
     <div v-if="loading" class="cc-spinner"></div>
     <div v-if="!loading && !displayError" class="bc-accessibility-no-outline">
       <div class="d-flex flex-column pt-3">
-        <div class="order-3">
-          <h1 class="bc-page-create-course-site-header bc-page-create-course-site-header1">Create a Course Site</h1>
-        </div>
-        <div class="order-2">
+        <div>
           <div v-if="showMaintenanceNotice" role="alert">
             <MaintenanceNotice course-action-verb="site is created" />
           </div>
         </div>
-        <div class="order-1">
+        <div>
+          <h1 class="bc-page-create-course-site-header bc-page-create-course-site-header1">Create a Course Site</h1>
+        </div>
+        <div>
           <CreateCourseSiteHeader
             v-if="isAdmin && currentWorkflowStep !== 'monitoring_job'"
             :admin-mode="adminMode"
