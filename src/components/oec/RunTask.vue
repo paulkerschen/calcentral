@@ -16,7 +16,7 @@
       :variant="(!status || status === 'In progress') ? 'info' : status === 'Error' ? 'danger' : 'success'"
     >
       <div v-if="$_.size(output)">
-        <div v-for="(row, index) in output" :key="index">
+        <div v-for="(row, index) in output" :key="index" class="oec-log">
           <span v-if="index < output.length - 1">{{ row }}</span>
           <span v-if="index === output.length - 1" aria-live="polite" role="alert">{{ row }}</span>
         </div>
@@ -121,6 +121,9 @@ export default {
 <style scoped>
 .alert-box {
   height: 300px;
+}
+.oec-log {
+  white-space: pre;
 }
 .task-status {
   font-size: 14px;
