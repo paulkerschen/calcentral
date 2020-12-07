@@ -158,7 +158,7 @@
                   <dd class="bc-user-search-notice-description">
                     Go to this
                     <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010842">bCourses help page</OutboundLink>
-                    for more information about adding people to bCourse sites.
+                    for more information about adding people to bCourses sites.
                   </dd>
                 </dl>
               </div>
