@@ -48,7 +48,7 @@
             Please refine your search to limit the number of results.
           </div>
 
-          <div v-if="userSearchResultsCount === userSearchResults.length" class="cc-visuallyhidden">
+          <div v-if="userSearchResultsCount && (userSearchResultsCount === userSearchResults.length)" class="cc-visuallyhidden">
             {{ userSearchResultsCount }} user search results loaded.
           </div>
 
@@ -158,7 +158,7 @@
                   <dd class="bc-user-search-notice-description">
                     Go to this
                     <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0010842">bCourses help page</OutboundLink>
-                    for more information about adding people to bCourse sites.
+                    for more information about adding people to bCourses sites.
                   </dd>
                 </dl>
               </div>
@@ -170,7 +170,7 @@
       <div v-if="isLoading" class="cc-spinner"></div>
 
       <b-row v-if="showUsersArea" no-gutters>
-        <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="searchResultsFocus">User Search Results</h2>
+        <h2 id="bc-user-search-results-header" class="cc-visuallyhidden" tabindex="-1">User Search Results</h2>
         <b-col v-if="userSearchResults.length > 0" md="12">
           <form class="bc-canvas-page-form">
             <fieldset class="bc-form-fieldset">
@@ -321,6 +321,7 @@ export default {
       this.showAlerts = false
       this.resetSearchState()
       this.resetImportState()
+      this.$putFocusNextTick('search-text')
     },
     resetImportState() {
       this.userAdded = false
@@ -352,6 +353,7 @@ export default {
           if (response.users && response.users.length) {
             this.userSearchResultsCount = response.users[0].resultCount
             this.selectedUser = response.users[0]
+            this.$putFocusNextTick('bc-user-search-results-header')
           } else {
             this.userSearchResultsCount = 0
             let noResultsAlert = 'Your search did not match any users with a CalNet ID.'
@@ -423,6 +425,7 @@ export default {
           this.courseSections = response.courseSections
           this.selectedSection = response.courseSections[0]
           this.showSearchForm = true
+          this.$ready()
         }, this.showUnauthorized)
       } else {
         this.showUnauthorized()
