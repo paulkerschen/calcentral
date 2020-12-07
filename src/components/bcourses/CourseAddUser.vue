@@ -170,7 +170,7 @@
       <div v-if="isLoading" class="cc-spinner"></div>
 
       <b-row v-if="showUsersArea" no-gutters>
-        <h2 class="cc-visuallyhidden" data-cc-focus-reset-directive="searchResultsFocus">User Search Results</h2>
+        <h2 id="bc-user-search-results-header" class="cc-visuallyhidden" tabindex="-1">User Search Results</h2>
         <b-col v-if="userSearchResults.length > 0" md="12">
           <form class="bc-canvas-page-form">
             <fieldset class="bc-form-fieldset">
@@ -352,6 +352,7 @@ export default {
           if (response.users && response.users.length) {
             this.userSearchResultsCount = response.users[0].resultCount
             this.selectedUser = response.users[0]
+            this.$putFocusNextTick('bc-user-search-results-header')
           } else {
             this.userSearchResultsCount = 0
             let noResultsAlert = 'Your search did not match any users with a CalNet ID.'
