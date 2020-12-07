@@ -251,6 +251,9 @@ export default {
         this.alerts.error.push('You can attempt to correct the errors by running the update again.')
       }
     }
+  },
+  mounted() {
+    this.$ready()
   }
 }
 </script>

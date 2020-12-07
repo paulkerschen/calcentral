@@ -84,6 +84,7 @@ export default {
       return getSiteMailingList(this.canvasCourseId).then(
         response => {
           this.updateDisplay(response)
+          this.$ready()
         },
         this.$errorHandler
       )
