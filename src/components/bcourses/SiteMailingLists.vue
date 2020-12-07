@@ -19,6 +19,10 @@
       The list <strong>"{{ mailingList.name }}@{{ mailingList.domain }}"</strong> has been created. Choose "Update membership from course site" to add members.
     </div>
 
+    <div v-if="siteSelected && !listCreated" role="alert" class="bc-alert bc-alert-info">
+      No mailing list has been created for this site.
+    </div>
+
     <div v-if="!siteSelected">
       <form class="bc-page-site-mailing-list-form" @submit.prevent="findSiteMailingList">
         <b-row no-gutters>
@@ -81,10 +85,6 @@
         >
           View course site
         </OutboundLink>
-      </div>
-
-      <div v-if="!listCreated" class="bc-page-site-mailing-list-text">
-        No mailing list has been created for this site.
       </div>
 
       <form class="bc-canvas-page-form bc-canvas-form">
@@ -224,6 +224,7 @@ export default {
       this.listCreated = (this.$_.get(data, 'mailingList.state') === 'created')
       if (this.siteSelected) {
         this.updateCodeAndTerm(this.canvasSite)
+        this.$putFocusNextTick('mailing-list-details-header')
       }
       if (this.listCreated) {
         this.updateListLastPopulated(this.mailingList)
