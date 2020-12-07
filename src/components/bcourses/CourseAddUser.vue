@@ -423,6 +423,7 @@ export default {
           this.courseSections = response.courseSections
           this.selectedSection = response.courseSections[0]
           this.showSearchForm = true
+          this.$ready()
         }, this.showUnauthorized)
       } else {
         this.showUnauthorized()
