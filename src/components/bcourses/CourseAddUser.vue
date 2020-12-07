@@ -321,6 +321,7 @@ export default {
       this.showAlerts = false
       this.resetSearchState()
       this.resetImportState()
+      this.$putFocusNextTick('search-text')
     },
     resetImportState() {
       this.userAdded = false
