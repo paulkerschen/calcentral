@@ -24,16 +24,11 @@
         <div class="cc-page-roster-student-name font-weight-bolder">{{ student.last_name }}</div>
       </div>
       <div v-if="student.email" class="pt-2">
-        <div class="cc-page-roster-student-name">
-          <OutboundLink :id="`student-email-${student.student_id}-first-name`" :href="`mailto:${student.email}`">
-            {{ student.first_name }}
-          </OutboundLink>
-        </div>
-        <div class="cc-page-roster-student-name font-weight-bolder">
-          <OutboundLink :id="`student-email-${student.student_id}`" :href="`mailto:${student.email}`">
-            {{ student.last_name }}
-          </OutboundLink>
-        </div>
+        <OutboundLink :id="`student-email-${student.student_id}`" :href="`mailto:${student.email}`">
+          <div class="sr-only">Email</div>
+          <div class="cc-page-roster-student-name">{{ student.first_name }}</div>
+          <div class="cc-page-roster-student-name font-weight-bolder">{{ student.last_name }}</div>
+        </OutboundLink>
       </div>
       <div :id="`student-id-${student.student_id}`" class="cc-print-hide">
         <span class="sr-only">Student ID: </span>
