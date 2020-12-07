@@ -55,7 +55,7 @@
 
     <div v-if="siteSelected">
       <div id="mailing-list-details" class="bc-page-site-mailing-list-info-box">
-        <h2 id="mailing-list-details-header" class="bc-header bc-page-site-mailing-list-header2">
+        <h2 id="mailing-list-details-header" class="bc-header bc-page-site-mailing-list-header2" tabindex="-1">
           <span v-if="!listCreated" class="cc-ellipsis">{{ canvasSite.name }}</span>
           <span v-if="listCreated" class="cc-ellipsis">{{ mailingList.name }}@{{ mailingList.domain }}</span>
         </h2>
@@ -201,6 +201,8 @@ export default {
       this.canvasSite = {}
       this.mailingList = {}
       this.updateDisplay({})
+      this.alertScreenReader('Canceled.')
+      this.putFocusNextTick('bc-page-site-mailing-list-site-id')
     },
     trackExternalLink() {
       // TODO implement CLC-7512
