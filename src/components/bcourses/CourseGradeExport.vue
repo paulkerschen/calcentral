@@ -169,7 +169,7 @@
             >
               <option value="">Select a grade</option>
               <option v-for="grade in letterGrades" :key="grade" :value="grade">
-                {{ grade }}
+                {{ grade.replace('-', '&minus;').replace('+', '&plus;') }}
               </option>
             </select>
           </p>
