@@ -48,7 +48,7 @@
             Please refine your search to limit the number of results.
           </div>
 
-          <div v-if="userSearchResultsCount === userSearchResults.length" class="cc-visuallyhidden">
+          <div v-if="userSearchResultsCount && (userSearchResultsCount === userSearchResults.length)" class="cc-visuallyhidden">
             {{ userSearchResultsCount }} user search results loaded.
           </div>
 
