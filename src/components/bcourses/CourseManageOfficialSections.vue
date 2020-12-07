@@ -481,8 +481,10 @@ export default {
       if (section.stagedState === 'add') {
         this.expandParentClass(section)
         this.alertScreenReader('Removed section from the list of sections to be added')
-      } else {
-        this.alertScreenReader('Included in the list of sections to be deleted')
+      } else if (section.stagedState === 'delete') {
+        this.alertScreenReader('Removed section from the list of sections to be deleted')
+      } else if (section.stagedState === 'update') {
+        this.alertScreenReader('Removed section from the list of sections to be updated')
       }
       section.stagedState = null
       this.updateStagedCount()
