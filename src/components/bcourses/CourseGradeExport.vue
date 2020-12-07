@@ -115,7 +115,7 @@
         <b-col md="12">
           <h1
             id="bc-page-course-grade-export-header"
-            class="bc-page-course-grade-export-header bc-accessibility-no-outline"
+            class="bc-page-course-grade-export-header"
             tabindex="-1"
           >
             Export E-Grades

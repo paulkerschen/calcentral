@@ -7,7 +7,7 @@
         <MaintenanceNotice course-action-verb="site is updated" />
       </div>
 
-      <h1 class="bc-page-course-official-sections-header1 bc-accessibility-no-outline">Official Sections</h1>
+      <h1 class="bc-page-course-official-sections-header1">Official Sections</h1>
 
       <div v-if="currentWorkflowStep === 'preview'">
         <div
@@ -262,6 +262,7 @@ export default {
   created() {
     this.getCanvasCourseId()
     this.fetchFeed()
+    this.$ready()
   },
   methods: {
     addAllSections(course) {
