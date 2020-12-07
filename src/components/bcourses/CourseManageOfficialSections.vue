@@ -275,6 +275,7 @@ export default {
           section.stagedState = 'add'
         }
       })
+      this.$eventHub.emit('sections-table-updated')
     },
     allSectionsAdded(course) {
       return !this.$_.find(course.sections, section => {
