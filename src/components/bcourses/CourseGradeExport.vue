@@ -17,7 +17,7 @@
         <b-col md="12">
           <div>
             <fa icon="angle-left" class="cc-icon bc-template-back-icon mr-2"></fa>
-            <a class="bc-template-back-link" :href="`/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
+            <a class="bc-template-back-link" :href="`${canvasRootUrl}/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
           </div>
         </b-col>
       </b-row>
@@ -31,11 +31,11 @@
           <h2 class="bc-page-course-grade-export-sub-header">1. Select a grading scheme:</h2>
           <p v-if="!noGradingStandardEnabled" class="bc-page-course-grade-export-download-description">
             You have already set a grading scheme. You can view your grading scheme or select an alternate grading scheme in
-            <a :href="`/courses/${canvasCourseId}/settings#tab-details`" target="_top">Course Settings</a>.
+            <a :href="`${canvasRootUrl}/courses/${canvasCourseId}/settings#tab-details`" target="_top">Course Settings</a>.
           </p>
           <p v-if="noGradingStandardEnabled" class="bc-page-course-grade-export-download-description">
             Set a grading scheme in
-            <a :href="`/courses/${canvasCourseId}/settings#tab-details`" target="_top">Course Settings</a>
+            <a :href="`${canvasRootUrl}/courses/${canvasCourseId}/settings#tab-details`" target="_top">Course Settings</a>
             and return once completed.
           </p>
           <p class="bc-page-course-grade-export-download-description">
@@ -48,7 +48,7 @@
           <h2 class="bc-page-course-grade-export-sub-header">2. Post all assignment grades:</h2>
           <p class="bc-page-course-grade-export-download-description">
             All assignment grades must be posted (published/unmuted) to ensure that your E-Grades export matches what you see in the gradebook. To confirm that all grades have been posted, review all columns in
-            <a :href="`/courses/${canvasCourseId}/grades`" target="_top">your gradebook</a>
+            <a :href="`${canvasRootUrl}/courses/${canvasCourseId}/grades`" target="_top">your gradebook</a>
             for any assignments with a crossed-out eye icon
             <span class="cc-nowrap">
               (<img class="bc-page-course-grade-export-image-inline" src="@/assets/images/canvas/crossed_out_eye.png" alt="Crossed-out eye icon">)
@@ -108,7 +108,7 @@
       <b-row no-gutters aria-hidden="true">
         <b-col md="12">
           <fa icon="angle-left" class="bc-template-back-icon cc-icon mr-2"></fa>
-          <a class="bc-template-back-link" :href="`/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
+          <a class="bc-template-back-link" :href="`${canvasRootUrl}/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
         </b-col>
       </b-row>
       <b-row no-gutters>
@@ -123,7 +123,7 @@
         </b-col>
       </b-row>
       <b-row class="cc-visuallyhidden">
-        <a :href="`/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
+        <a :href="`${canvasRootUrl}/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
       </b-row>
       <b-row v-if="officialSections.length > 1" no-gutters>
         <h2 class="bc-page-course-grade-export-download-header">Select section</h2>
@@ -248,7 +248,7 @@
       </b-row>
       <b-row no-gutters>
         <b-col v-if="canvasCourseId && canvasRootUrl" md="12" class="bc-page-course-grade-export-grade-link">
-          <a :href="`/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
+          <a :href="`${canvasRootUrl}/courses/${canvasCourseId}/grades`" target="_top">Back to Gradebook</a>
         </b-col>
       </b-row>
     </b-container>
