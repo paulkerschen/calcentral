@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div v-if="listCreated && !mailingList.timeLastPopulated" class="bc-alert bc-alert-info">
+    <div v-if="listCreated && !mailingList.timeLastPopulated" role="alert" class="bc-alert bc-alert-info">
       The list <strong>"{{ mailingList.name }}@{{ mailingList.domain }}"</strong> has been created. Choose "Update membership from course site" to add members.
     </div>
 
@@ -144,13 +144,14 @@
 
 <script>
 import {createSiteMailingListAdmin, getSiteMailingListAdmin, populateSiteMailingList} from '@/api/canvas'
+import Context from '@/mixins/Context'
 import OutboundLink from '@/components/util/OutboundLink'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingLists',
   components: {OutboundLink},
-  mixins: [Utils],
+  mixins: [Context, Utils],
   data: () => ({
     alerts: {
       error: [],
@@ -174,6 +175,7 @@ export default {
       )
     },
     populateMailingList() {
+      this.alertScreenReader('Updating membership')
       this.isProcessing = true
       populateSiteMailingList(this.canvasSite.canvasCourseId).then(
         response => {
@@ -186,6 +188,7 @@ export default {
       )
     },
     registerMailingList() {
+      this.alertScreenReader('Creating list')
       this.isProcessing = true
       createSiteMailingListAdmin(this.canvasSite.canvasCourseId, this.mailingList).then(
         response => {
