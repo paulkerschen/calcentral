@@ -55,6 +55,10 @@
               {{ section.section_label }}
             </label>
             <span v-if="mode !== 'createCourseForm'">{{ section.section_label }}</span>
+            <span v-if="mode === 'currentStaging' && section.nameDiscrepancy && section.stagedState !== 'update'" class="sr-only">
+              The section name in bCourses no longer matches the Student Information System.
+              Use the "Update" button to rename your bCourses section name to match SIS.
+            </span>
           </td>
           <td class="bc-template-sections-table-cell-section-ccn">{{ section.ccn }}</td>
           <td class="bc-template-sections-table-cell-section-timestamps d-none d-sm-none d-md-table-cell">
@@ -134,6 +138,7 @@
         </tr>
         <tr
           v-if="mode === 'currentStaging' && section.nameDiscrepancy && section.stagedState !== 'update'"
+          aria-hidden="true"
           :class="sectionDisplayClass[section.ccn]"
         >
           <td colspan="7" class="bc-template-sections-table-sites-cell">
