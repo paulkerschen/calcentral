@@ -7,7 +7,7 @@
         <MaintenanceNotice course-action-verb="site is updated" />
       </div>
 
-      <h1 class="bc-page-course-official-sections-header1 bc-accessibility-no-outline">Official Sections</h1>
+      <h1 class="bc-page-course-official-sections-header1">Official Sections</h1>
 
       <div v-if="currentWorkflowStep === 'preview'">
         <div
@@ -143,6 +143,8 @@
                   type="button"
                   class="bc-button-link bc-page-course-official-sections-form-course-button"
                   :aria-controls="course.course_id"
+                  :aria-expanded="`${!course.collapsed}`"
+                  aria-haspopup="true"
                   @click="toggleCollapse(course)"
                 >
                   <fa
@@ -160,7 +162,6 @@
                   v-if="!course.collapsed"
                   :id="course.course_id"
                   class="bc-page-course-official-sections-form-collapsible-container"
-                  :aria-expanded="`${!course.collapsed}`"
                   role="region"
                 >
                   <div v-if="course.sections.length > 1" class="bc-page-course-official-sections-form-select-all-option">
@@ -262,6 +263,7 @@ export default {
   created() {
     this.getCanvasCourseId()
     this.fetchFeed()
+    this.$ready()
   },
   methods: {
     addAllSections(course) {
@@ -273,6 +275,7 @@ export default {
           section.stagedState = 'add'
         }
       })
+      this.$eventHub.emit('sections-table-updated')
     },
     allSectionsAdded(course) {
       return !this.$_.find(course.sections, section => {
@@ -480,8 +483,10 @@ export default {
       if (section.stagedState === 'add') {
         this.expandParentClass(section)
         this.alertScreenReader('Removed section from the list of sections to be added')
-      } else {
-        this.alertScreenReader('Included in the list of sections to be deleted')
+      } else if (section.stagedState === 'delete') {
+        this.alertScreenReader('Removed section from the list of sections to be deleted')
+      } else if (section.stagedState === 'update') {
+        this.alertScreenReader('Removed section from the list of sections to be updated')
       }
       section.stagedState = null
       this.updateStagedCount()
