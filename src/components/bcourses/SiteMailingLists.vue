@@ -15,8 +15,12 @@
       </div>
     </div>
 
-    <div v-if="listCreated && !mailingList.timeLastPopulated" class="bc-alert bc-alert-info">
+    <div v-if="listCreated && !mailingList.timeLastPopulated" role="alert" class="bc-alert bc-alert-info">
       The list <strong>"{{ mailingList.name }}@{{ mailingList.domain }}"</strong> has been created. Choose "Update membership from course site" to add members.
+    </div>
+
+    <div v-if="siteSelected && !listCreated" role="alert" class="bc-alert bc-alert-info">
+      No mailing list has been created for this site.
     </div>
 
     <div v-if="!siteSelected">
@@ -51,7 +55,7 @@
 
     <div v-if="siteSelected">
       <div id="mailing-list-details" class="bc-page-site-mailing-list-info-box">
-        <h2 id="mailing-list-details-header" class="bc-header bc-page-site-mailing-list-header2">
+        <h2 id="mailing-list-details-header" class="bc-header bc-page-site-mailing-list-header2" tabindex="-1">
           <span v-if="!listCreated" class="cc-ellipsis">{{ canvasSite.name }}</span>
           <span v-if="listCreated" class="cc-ellipsis">{{ mailingList.name }}@{{ mailingList.domain }}</span>
         </h2>
@@ -81,10 +85,6 @@
         >
           View course site
         </OutboundLink>
-      </div>
-
-      <div v-if="!listCreated" class="bc-page-site-mailing-list-text">
-        No mailing list has been created for this site.
       </div>
 
       <form class="bc-canvas-page-form bc-canvas-form">
@@ -144,13 +144,14 @@
 
 <script>
 import {createSiteMailingListAdmin, getSiteMailingListAdmin, populateSiteMailingList} from '@/api/canvas'
+import Context from '@/mixins/Context'
 import OutboundLink from '@/components/util/OutboundLink'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingLists',
   components: {OutboundLink},
-  mixins: [Utils],
+  mixins: [Context, Utils],
   data: () => ({
     alerts: {
       error: [],
@@ -174,6 +175,7 @@ export default {
       )
     },
     populateMailingList() {
+      this.alertScreenReader('Updating membership')
       this.isProcessing = true
       populateSiteMailingList(this.canvasSite.canvasCourseId).then(
         response => {
@@ -186,6 +188,7 @@ export default {
       )
     },
     registerMailingList() {
+      this.alertScreenReader('Creating list')
       this.isProcessing = true
       createSiteMailingListAdmin(this.canvasSite.canvasCourseId, this.mailingList).then(
         response => {
@@ -198,6 +201,8 @@ export default {
       this.canvasSite = {}
       this.mailingList = {}
       this.updateDisplay({})
+      this.alertScreenReader('Canceled.')
+      this.putFocusNextTick('bc-page-site-mailing-list-site-id')
     },
     trackExternalLink() {
       // TODO implement CLC-7512
@@ -221,6 +226,7 @@ export default {
       this.listCreated = (this.$_.get(data, 'mailingList.state') === 'created')
       if (this.siteSelected) {
         this.updateCodeAndTerm(this.canvasSite)
+        this.$putFocusNextTick('mailing-list-details-header')
       }
       if (this.listCreated) {
         this.updateListLastPopulated(this.mailingList)
@@ -251,6 +257,9 @@ export default {
         this.alerts.error.push('You can attempt to correct the errors by running the update again.')
       }
     }
+  },
+  mounted() {
+    this.$ready()
   }
 }
 </script>

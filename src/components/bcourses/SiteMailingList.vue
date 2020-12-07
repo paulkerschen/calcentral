@@ -12,11 +12,11 @@
         </div>
       </div>
 
-      <div v-if="errorMessages" class="bc-alert bc-alert-error">
+      <div v-if="errorMessages" role="alert" class="bc-alert bc-alert-error">
         <div v-for="errorMessage in errorMessages" :key="errorMessage">{{ errorMessage }}</div>
       </div>
 
-      <div v-if="!errorMessages && listCreated" class="bc-alert bc-alert-success">
+      <div v-if="!errorMessages && listCreated" role="alert" class="bc-alert bc-alert-success">
         A Mailing List has been created at <strong>{{ mailingList.name }}@{{ mailingList.domain }}</strong>.
         Messages can now be sent through this address.
       </div>
@@ -54,11 +54,12 @@
 <script>
 import {createSiteMailingList, getSiteMailingList} from '@/api/canvas'
 import CanvasUtils from '@/mixins/CanvasUtils'
+import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingList',
-  mixins: [CanvasUtils, Utils],
+  mixins: [CanvasUtils, Context, Utils],
   data: () => ({
     alerts: {
       error: [],
@@ -72,6 +73,7 @@ export default {
   }),
   methods: {
     createMailingList() {
+      this.alertScreenReader('Creating list')
       this.isCreating = true
       createSiteMailingList(this.canvasCourseId, this.mailingList).then(
         response => {
@@ -84,6 +86,7 @@ export default {
       return getSiteMailingList(this.canvasCourseId).then(
         response => {
           this.updateDisplay(response)
+          this.$ready()
         },
         this.$errorHandler
       )
