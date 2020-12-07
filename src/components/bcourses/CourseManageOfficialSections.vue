@@ -143,6 +143,8 @@
                   type="button"
                   class="bc-button-link bc-page-course-official-sections-form-course-button"
                   :aria-controls="course.course_id"
+                  :aria-expanded="`${!course.collapsed}`"
+                  aria-haspopup="true"
                   @click="toggleCollapse(course)"
                 >
                   <fa
@@ -160,7 +162,6 @@
                   v-if="!course.collapsed"
                   :id="course.course_id"
                   class="bc-page-course-official-sections-form-collapsible-container"
-                  :aria-expanded="`${!course.collapsed}`"
                   role="region"
                 >
                   <div v-if="course.sections.length > 1" class="bc-page-course-official-sections-form-select-all-option">
