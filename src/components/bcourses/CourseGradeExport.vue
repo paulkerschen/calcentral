@@ -113,8 +113,13 @@
       </b-row>
       <b-row no-gutters>
         <b-col md="12">
-          <!-- TODO: data-cc-focus-reset-directive -->
-          <h1 class="bc-page-course-grade-export-header bc-accessibility-no-outline" data-cc-focus-reset-directive="focusOnSelectionHeader">Export E-Grades</h1>
+          <h1
+            id="bc-page-course-grade-export-header"
+            class="bc-page-course-grade-export-header bc-accessibility-no-outline"
+            tabindex="-1"
+          >
+            Export E-Grades
+          </h1>
         </b-col>
       </b-row>
       <b-row class="cc-visuallyhidden">
@@ -292,7 +297,6 @@ export default {
     courseUserRoles: [],
     enablePnpConversion: null,
     exportTimer: null,
-    focusOnSelectionHeader: false,
     jobStatus: null,
     letterGrades: ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'],
     noGradingStandardEnabled: false,
@@ -340,6 +344,7 @@ export default {
               this.noGradingStandardEnabled = true
             }
             this.initializePnpCutoffGrades()
+            this.$ready()
           }
         },
         this.$errorHandler
@@ -416,7 +421,7 @@ export default {
     switchToSelection() {
       this.iframeScrollToTop()
       this.appState = 'selection'
-      this.focusOnSelectionHeader = true
+      this.$putFocusNextTick('bc-page-course-grade-export-header')
     }
   },
   beforeDestroy() {
