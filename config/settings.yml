@@ -131,6 +131,7 @@ ldap:
 google_proxy:
   client_id: 1
   client_secret: 'bogusClientSecret'
+  max_retries: 5
   scope:
     - profile
     - email
