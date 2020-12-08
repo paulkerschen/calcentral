@@ -211,6 +211,17 @@ describe Oec::ValidationTask do
         task.run
       end
     end
+
+    context 'case mismatch on EVALUATE' do
+      let(:row_with_lowercase_y) { '2015-B-32960,2015-B-32960,GWS 103 LEC 001 IDENTITY ACROSS DIF,,,GWS,103,LEC,001,P,104033,UID:104033,Flora,Ffff,ffff@berkeley.edu,23,y,GWS,F,,01-26-2015,05-11-2015' }
+      it 'should pass without warning' do
+        merged_course_confirmations_csv.concat row_with_lowercase_y
+        allow(Rails.logger).to receive(:info)
+        expect(Rails.logger).to receive(:info).with /Validation passed./
+        task.run
+        expect(task.errors).to be_empty
+      end
+    end
   end
 
   context 'instructors sheet validations' do

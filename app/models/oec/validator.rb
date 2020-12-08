@@ -17,10 +17,17 @@ module Oec
       opts[:strict] = true unless opts.has_key? :strict
       key = key_columns.map { |col| row[col] }.join('-')
       candidate_row = row.slice(*sheet.headers)
+      case_insensitive_fields = %w(EVALUATE EVALUATION_TYPE)
       validate(sheet.export_name, key) do |errors|
         sheet.errors_for_row(candidate_row).each { |error| errors.add error }
         if sheet[key] && (sheet[key] != candidate_row)
-          conflicting_keys = candidate_row.keys.select { |k| candidate_row[k] != sheet[key][k] }
+          conflicting_keys = candidate_row.keys.select do |k|
+            if case_insensitive_fields.include? k
+              candidate_row[k].to_s.upcase != sheet[key][k].to_s.upcase
+            else
+              candidate_row[k] != sheet[key][k]
+            end
+          end
           conflicting_keys.each do |conflicting_key|
             errors.add "Conflicting values found under #{conflicting_key}: '#{sheet[key][conflicting_key]}', '#{candidate_row[conflicting_key]}'"
           end
