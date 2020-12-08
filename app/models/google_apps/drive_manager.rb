@@ -2,6 +2,9 @@ module GoogleApps
   class DriveManager
     include ClassLogger
 
+    # See https://github.com/googleapis/google-api-ruby-client#errors--retries
+    Google::Apis::RequestOptions.default.retries = Settings.google_proxy.max_retries
+
     def initialize(app_id, uid, options = {})
       @app_id = app_id
       @uid = uid
