@@ -5,12 +5,19 @@ module Oec
 
     LOG_DIRECTORY = Pathname.new Settings.oec.local_write_directory
 
-    class << self; attr_accessor :success_callback; end
+    class << self
+      attr_accessor :task_before
+      attr_accessor :task_after
+    end
 
     class UnexpectedDataError < StandardError; end
 
+    def self.before_task_run(task_class, opts={})
+      self.task_before = opts.merge(class: task_class)
+    end
+
     def self.on_success_run(task_class, opts={})
-      self.success_callback = opts.merge(class: task_class)
+      self.task_after = opts.merge(class: task_class)
     end
 
     def self.date_format
@@ -61,12 +68,13 @@ module Oec
       logger.warn "OEC job started. Job state updated in cache key #{@api_task_id}"
       return if @status == 'Error'
       begin
+        run_child_task(self.class.task_before) if self.class.task_before
         log :info, "Starting #{self.class.name}"
         if !@opts[:allow_past_term] && @term_end < DateTime.now
           raise StandardError, "Past ending date #{@term_end} for term #{@term_code}"
         end
         run_internal
-        @status = 'Success' unless (@status == 'Error' || self.class.success_callback)
+        @status = 'Success' unless (@status == 'Error' || self.class.task_after)
         true
       rescue UnexpectedDataError => e
         log :warn, "#{self.class.name} aborted with unexpected data: #{e.message}"
@@ -79,7 +87,9 @@ module Oec
       ensure
         write_log
         write_status_to_cache if @opts[:log_to_cache]
-        run_success_callback if self.class.success_callback && @status != 'Error'
+        if self.class.task_after && @status != 'Error'
+          run_child_task self.class.task_after
+        end
       end
     end
 
@@ -216,10 +226,10 @@ module Oec
       end
     end
 
-    def run_success_callback
-      return if (condition = self.class.success_callback[:if]) && !instance_eval(&condition)
+    def run_child_task(child_task)
+      return if (condition = child_task[:if]) && !instance_eval(&condition)
       task_opts = @opts.merge(previous_task_log: @log)
-      self.class.success_callback[:class].new(task_opts).run
+      child_task[:class].new(task_opts).run
     end
 
     def set_term_dates

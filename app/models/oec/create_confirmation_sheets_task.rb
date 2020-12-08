@@ -3,6 +3,8 @@ module Oec
 
     include Validator
 
+    before_task_run Oec::SisImportTask, if: proc { !@opts[:local_write] }
+
     def run_internal
       term_folder = @remote_drive.find_first_matching_item @term_code
       imports_folder = @remote_drive.find_first_matching_item(Oec::Folder.sis_imports, term_folder)
