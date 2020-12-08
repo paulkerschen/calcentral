@@ -237,9 +237,11 @@ export default {
         this.jobId = data.jobId
         this.jobStatus = data.jobStatus
         this.completedSteps = data.completedSteps
-        this.percentComplete = data.percentComplete
         if (this.jobStatus === 'Processing' || this.jobStatus === 'New') {
-          this.alertScreenReader(`${Math.round(this.percentComplete * 100)} percent done in creating new course site.`)
+          if (this.percentComplete !== data.percentComplete) {
+            this.percentComplete = data.percentComplete
+            this.alertScreenReader(`${Math.round(this.percentComplete * 100)} percent done in creating new course site.`)
+          }
           this.jobStatusLoader()
         } else {
           clearTimeout(this.timeoutPromise)
