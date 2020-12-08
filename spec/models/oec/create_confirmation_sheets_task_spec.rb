@@ -41,8 +41,22 @@ describe Oec::CreateConfirmationSheetsTask do
     end
   end
 
+  shared_context 'local-write mode and no preparatory SIS import' do
+    let(:local_write) { true }
+    before do
+      expect(Oec::SisImportTask).not_to receive(:new)
+    end
+  end
+
+  shared_context 'no local-write mode and preparatory SIS import' do
+    let(:local_write) { false }
+    before do
+      expect(Oec::SisImportTask).to receive(:new).and_return double(run: true)
+    end
+  end
+
   context 'expected API calls' do
-    let(:local_write) { nil }
+    include_context 'no local-write mode and preparatory SIS import'
     let(:template) { double(id: 'template_id', name: 'TEMPLATE', mime_type: 'application/vnd.google-apps.spreadsheet') }
     let(:spreadsheet) { double(worksheets: [courses_worksheet, report_viewers_worksheet]) }
     let(:courses_worksheet) { double(title: 'Courses', rows: [Oec::CourseConfirmation.new.headers], :[]= => true, save: true) }
@@ -59,7 +73,7 @@ describe Oec::CreateConfirmationSheetsTask do
   end
 
   context 'generated sheet structure' do
-    let(:local_write) { 'Y' }
+    include_context 'local-write mode and no preparatory SIS import'
 
     it 'should produce sane course confirmation sheets' do
       task.run
@@ -94,7 +108,7 @@ describe Oec::CreateConfirmationSheetsTask do
   end
 
   context 'conflicting course data' do
-    let(:local_write) { 'Y' }
+    include_context 'local-write mode and no preparatory SIS import'
     let(:conflicting_row) { '2015-B-58070,2015-B-58070,MCELLBI 102 LEC 001 SURV BIOCHEM & MOBI,,,MCELLBI,102,LEC,1,P,100001,UID:100001,Monster,Zero,monster.zero@berkeley.edu,23,,MCELLBI,F,Y,2/1/2015,4/1/2015' }
     before { import_csv.concat conflicting_row }
 
@@ -111,7 +125,7 @@ describe Oec::CreateConfirmationSheetsTask do
   end
 
   context 'conflicting supervisor data' do
-    let(:local_write) { 'Y' }
+    include_context 'local-write mode and no preparatory SIS import'
     let(:conflicting_row) { '245968,UID:245968,Bronwen,Biology,biology2@berkeley.edu,DEPT_ADMIN,,,PLANTBI,MCELLBI,,,' }
     before { supervisors_csv.concat conflicting_row }
 
