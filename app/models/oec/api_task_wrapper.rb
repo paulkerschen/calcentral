@@ -27,7 +27,7 @@ module Oec
       {
         name: 'MergeConfirmationSheetsTask',
         friendlyName: 'Merge confirmation sheets',
-        htmlDescription: "Merge confirmation sheets from participating departments into master sheets for preflight review. Two new sheets will be created in the <strong>#{Oec::Folder.merged_confirmations}</strong> folder: <strong>Merged course confirmations</strong> and <strong>Merged supervisor confirmations</strong>.",
+        htmlDescription: "Merge confirmation sheets from participating departments into master sheets for preflight review. A <strong>Merged course confirmations</strong> sheet will be created in the <strong>#{Oec::Folder.merged_confirmations}</strong> folder.",
       },
       {
         name: 'ValidationTask',

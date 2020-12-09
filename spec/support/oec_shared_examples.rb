@@ -2,7 +2,7 @@ shared_context 'OEC data validation' do
 
   let(:fake_remote_drive) { double() }
   let(:merged_course_confirmations_csv) { File.read Rails.root.join('fixtures', 'oec', 'merged_course_confirmations.csv') }
-  let(:merged_supervisor_confirmations_csv) { File.read Rails.root.join('fixtures', 'oec', 'supervisors.csv') }
+  let(:supervisor_overrides_csv) { File.read Rails.root.join('fixtures', 'oec', 'supervisors.csv') }
   let(:previous_course_supervisors_csv) { Oec::CourseSupervisors.new.headers.join(',') }
   let(:merged_course_confirmations) { Oec::SisImportSheet.from_csv merged_course_confirmations_csv }
 
@@ -39,11 +39,12 @@ shared_context 'OEC data validation' do
     allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
     allow(fake_remote_drive).to receive(:find_items_by_name).and_return [mock_csv]
     allow(fake_remote_drive).to receive(:find_first_matching_folder).and_return mock_google_drive_item
+    allow(fake_remote_drive).to receive(:find_first_matching_item).and_return mock_google_drive_item
     allow(fake_remote_drive).to receive(:find_folders).and_return [mock_google_drive_item('2014-D')]
 
     allow(fake_remote_drive).to receive(:export_csv).and_return(
       merged_course_confirmations_csv,
-      merged_supervisor_confirmations_csv,
+      supervisor_overrides_csv,
       previous_course_supervisors_csv
     )
     allow(fake_remote_drive).to receive(:download_string).and_return(

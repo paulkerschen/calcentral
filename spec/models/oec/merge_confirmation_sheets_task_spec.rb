@@ -14,8 +14,6 @@ describe Oec::MergeConfirmationSheetsTask do
   def mock_sheet(filename)
     sheet_title = if filename.start_with? 'course'
                     'Courses'
-                  elsif filename.start_with? 'supervisor'
-                    'Report Viewers'
                   else
                     filename
                   end
@@ -27,19 +25,15 @@ describe Oec::MergeConfirmationSheetsTask do
     sheet
   end
 
-  let(:supervisors) { mock_sheet 'supervisors' }
   let(:gws_import) { mock_sheet 'import_GWS' }
   let(:gws_course_confirmation) { mock_sheet 'course_confirmations_GWS' }
-  let(:gws_supervisor_confirmation) { mock_sheet 'supervisor_confirmations_GWS' }
   let(:mcellbi_import) { mock_sheet 'import_MCELLBI' }
   let(:mcellbi_course_confirmation) { mock_sheet 'course_confirmations_MCELLBI' }
-  let(:mcellbi_supervisor_confirmation) { mock_sheet 'supervisor_confirmations_MCELLBI' }
 
   let(:gws_confirmation_spreadsheet) { mock_google_drive_item 'Gender and Women\'s Studies' }
   let(:mcellbi_confirmation_spreadsheet) { mock_google_drive_item 'Molecular and Cell Biology' }
 
   let(:merged_course_confirmation) { Oec::SisImportSheet.from_csv(File.read Rails.root.join('tmp', 'oec', 'Merged course confirmations.csv')) }
-  let(:merged_supervisor_confirmation) { Oec::Supervisors.from_csv(File.read Rails.root.join('tmp', 'oec', 'Merged supervisor confirmations.csv')) }
 
   let(:departments) { %w(SWOME IMMCB) }
 
@@ -58,11 +52,10 @@ describe Oec::MergeConfirmationSheetsTask do
     allow(fake_remote_drive).to receive(:find_folders).and_return [last_import_folder]
     allow(fake_remote_drive).to receive(:get_items_in_folder).and_return [gws_confirmation_spreadsheet, mcellbi_confirmation_spreadsheet]
     allow(fake_remote_drive).to receive(:spreadsheet_by_id).and_return(gws_confirmation_spreadsheet, mcellbi_confirmation_spreadsheet)
-    allow(gws_confirmation_spreadsheet).to receive(:worksheets).and_return [gws_course_confirmation[:sheet], gws_supervisor_confirmation[:sheet]]
-    allow(mcellbi_confirmation_spreadsheet).to receive(:worksheets).and_return [mcellbi_course_confirmation[:sheet], mcellbi_supervisor_confirmation[:sheet]]
+    allow(gws_confirmation_spreadsheet).to receive(:worksheets).and_return [gws_course_confirmation[:sheet]]
+    allow(mcellbi_confirmation_spreadsheet).to receive(:worksheets).and_return [mcellbi_course_confirmation[:sheet]]
 
     allow(fake_remote_drive).to receive(:find_first_matching_item).with(Oec::Folder.confirmations, anything).and_return departments_folder
-    allow(fake_remote_drive).to receive(:find_first_matching_item).with('supervisors', anything).and_return supervisors[:sheet]
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('Gender and Women\'s Studies', last_import_folder).and_return gws_import[:sheet]
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('Molecular and Cell Biology', last_import_folder).and_return mcellbi_import[:sheet]
 
@@ -71,7 +64,6 @@ describe Oec::MergeConfirmationSheetsTask do
 
   after(:all) do
     FileUtils.rm_rf Rails.root.join('tmp', 'oec', 'Merged course confirmations.csv')
-    FileUtils.rm_rf Rails.root.join('tmp', 'oec', 'Merged supervisor confirmations.csv')
     Dir.glob(Rails.root.join 'tmp', 'oec', "*#{Oec::CreateConfirmationSheetsTask.name.demodulize.underscore}.log").each do |file|
       FileUtils.rm_rf file
     end
@@ -82,7 +74,6 @@ describe Oec::MergeConfirmationSheetsTask do
 
     it 'should upload merged confirmation sheets and log' do
       expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Oec::SisImportSheet), 'Merged course confirmations', Oec::Worksheet, anything, anything).and_return true
-      expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Oec::Supervisors), 'Merged supervisor confirmations', Oec::Worksheet, anything, anything).and_return true
       expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Pathname), kind_of(String), 'text/plain', anything, anything).and_return true
       task.run
     end
@@ -93,11 +84,8 @@ describe Oec::MergeConfirmationSheetsTask do
 
     let(:gws_course_confirmation_worksheet) { Oec::CourseConfirmation.from_csv gws_course_confirmation[:csv] }
     let(:mcellbi_course_confirmation_worksheet) { Oec::CourseConfirmation.from_csv mcellbi_course_confirmation[:csv] }
-    let(:gws_supervisor_confirmation_worksheet) { Oec::SupervisorConfirmation.from_csv gws_supervisor_confirmation[:csv] }
-    let(:mcellbi_supervisor_confirmation_worksheet) { Oec::SupervisorConfirmation.from_csv mcellbi_supervisor_confirmation[:csv] }
     let(:gws_sis_import) { Oec::SisImportSheet.from_csv gws_import[:csv] }
     let(:mcellbi_sis_import) { Oec::SisImportSheet.from_csv mcellbi_import[:csv] }
-    let(:supervisors_worksheet) { Oec::Supervisors.from_csv supervisors[:csv] }
 
     before { task.run }
 
@@ -135,33 +123,6 @@ describe Oec::MergeConfirmationSheetsTask do
       end
     end
 
-    it 'should produce a merged supervisors confirmation' do
-      expect(merged_supervisor_confirmation.first).to_not be_empty
-    end
-
-    it 'should include supervisors for all participating departments' do
-      expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_1'] == 'GWS'}).to have(2).items
-      expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_1'] == 'LGBT'}).to have(1).item
-      expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_2'] == 'MCELLBI'}).to have(2).items
-      expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_3'] == 'MCELLBI'}).to have(1).item
-    end
-
-    it 'should overwrite supervisors sheet when confirmed report viewers sheet includes column' do
-      [gws_supervisor_confirmation_worksheet, mcellbi_supervisor_confirmation_worksheet].each do |confirmation|
-        confirmation.each do |confirmation_row|
-          merged_confirmation_row = merged_supervisor_confirmation.find { |row| row['LDAP_UID'] == confirmation_row['LDAP_UID'] }
-          supervisors_row = supervisors_worksheet.find { |row| row['LDAP_UID'] == confirmation_row['LDAP_UID'] }
-          merged_supervisor_confirmation.headers.each do |header|
-            if confirmation.headers.include? header
-              expect(merged_confirmation_row[header]).to eq confirmation_row[header]
-            else
-              expect(merged_confirmation_row[header]).to eq supervisors_row[header]
-            end
-          end
-        end
-      end
-    end
-
     context 'when a department filter is specified' do
       let(:departments) { %w(SWOME) }
 
@@ -169,13 +130,6 @@ describe Oec::MergeConfirmationSheetsTask do
         expect(merged_course_confirmation.select { |row| row['DEPT_FORM'] == 'GWS' }).to have(20).items
         expect(merged_course_confirmation.select { |row| row['DEPT_FORM'] == 'LGBT' }).to have(3).items
         expect(merged_course_confirmation.select { |row| row['DEPT_FORM'] == 'MCELLBI' }).to have(0).items
-      end
-
-      it 'should include supervisors for filtered departments only' do
-        expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_1'] == 'GWS'}).to have(2).items
-        expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_1'] == 'LGBT'}).to have(1).item
-        expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_2'] == 'MCELLBI'}).to have(0).items
-        expect(merged_supervisor_confirmation.select { |row| row['DEPT_NAME_3'] == 'MCELLBI'}).to have(0).item
       end
     end
   end
@@ -236,59 +190,6 @@ describe Oec::MergeConfirmationSheetsTask do
       task.run
       row_without_sis_data = merged_course_confirmation.find { |row| row['COURSE_ID'] == '2015-B-91111' }
       expect(row_without_sis_data['SIS_ID']).to eq '2345678'
-    end
-  end
-
-  context 'when supervisor data conflicts between department forms' do
-    let(:local_write) { 'Y' }
-    before do
-      supervisors[:csv].concat '999999,UID:999999,Alice,Sheldon,raccoona@berkeley.edu,DEPT_ADMIN,Y,,MCELLBI,GWS,,,,,,,,'
-      gws_supervisor_confirmation[:csv].concat '999999,Raccoona,Sheldon,raccoona@berkeley.edu,DEPT_ADMIN,Y,,MCELLBI,GWS,,,,,,,,'
-      mcellbi_supervisor_confirmation[:csv].concat '999999,James,Tiptree,raccoona@berkeley.edu,DEPT_ADMIN,Y,,MCELLBI,GWS,,,,,,,,'
-    end
-
-    it 'should record errors' do
-      expect(Rails.logger).to receive(:warn).at_least(1).times
-      task.run
-      expect(task.errors['Merged supervisor confirmations']['999999'].keys).to match_array([
-        "Conflicting values found under FIRST_NAME: 'Raccoona', 'James'",
-        "Conflicting values found under LAST_NAME: 'Sheldon', 'Tiptree'",
-      ])
-    end
-
-    it 'should include both rows in merged sheet' do
-      task.run
-      conflicting_rows = merged_supervisor_confirmation.select { |row| row['LDAP_UID'] == '999999' }
-      expect(conflicting_rows).to have(2).items
-      expect(conflicting_rows.map { |row| row['LAST_NAME'] }).to match_array %w(Sheldon Tiptree)
-    end
-  end
-
-  context 'when confirmed supervisor data cannot be matched to supervisors sheet' do
-    let(:local_write) { 'Y' }
-    before do
-      mcellbi_supervisor_confirmation[:csv].concat '999999,Alice,Sheldon,raccoona@berkeley.edu,DEPT_ADMIN,,,MCELLBI,GWS,,,,,,,,'
-    end
-
-    it 'should record errors' do
-      expect(Rails.logger).to receive(:warn).at_least(1).times
-      task.run
-      expect(task.errors['Merged supervisor confirmations']['999999'].keys).to include 'No supervisors row found matching confirmation row'
-    end
-
-    it 'should fill in empty SIS_ID values' do
-      expect(User::BasicAttributes).to receive(:attributes_for_uids).with(['999999']).and_return([{
-        ldap_uid: '999999',
-        student_id: '1234567',
-        roles: {
-          exStudent: true,
-          staff: true
-        }
-      }])
-      task.run
-      rows_without_sis_data = merged_supervisor_confirmation.select { |row| row['LDAP_UID'] == '999999' }
-      expect(rows_without_sis_data).to have(1).items
-      expect(rows_without_sis_data.first['SIS_ID']).to eq 'UID:999999'
     end
   end
 end

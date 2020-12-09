@@ -7,8 +7,11 @@ module Oec
       course_confirmations_file = @remote_drive.find_nested [@term_code, Oec::Folder.merged_confirmations, 'Merged course confirmations'], on_failure: :error
       course_confirmations = Oec::SisImportSheet.from_csv(@remote_drive.export_csv(course_confirmations_file), dept_code: nil, term_code: @term_code)
 
-      supervisor_confirmations_file = @remote_drive.find_nested [@term_code, Oec::Folder.merged_confirmations, 'Merged supervisor confirmations'], on_failure: :error
-      supervisor_confirmations = Oec::Supervisors.from_csv @remote_drive.export_csv(supervisor_confirmations_file)
+      term_folder = @remote_drive.find_first_matching_item @term_code
+      overrides = @remote_drive.find_first_matching_item(Oec::Folder.overrides, term_folder)
+      supervisors_sheet = @remote_drive.find_first_matching_item('supervisors', overrides)
+      raise UnexpectedDataError, "No supervisor sheet found in overrides for term #{@term_code}" unless supervisors_sheet
+      supervisor_overrides = Oec::Supervisors.from_csv @remote_drive.export_csv(supervisors_sheet)
 
       instructors = Oec::Instructors.new
       course_instructors = Oec::CourseInstructors.new
@@ -46,8 +49,8 @@ module Oec
       participating_dept_names = Oec::DepartmentMappings.new(term_code: @term_code).participating_dept_names
       participating_dept_forms = participating_dept_names.collect {|d| Oec::Worksheet.dept_form_from_name d}
 
-      log :info, "Validating #{supervisor_confirmations.count} supervisor confirmation rows"
-      add_from_supervisor_confirmations(supervisor_confirmations, supervisors, department_hierarchy, report_viewer_hierarchy)
+      log :info, "Validating #{supervisor_overrides.count} supervisor confirmation rows"
+      add_from_supervisor_overrides(supervisor_overrides, supervisors, department_hierarchy, report_viewer_hierarchy)
 
       log :info, "Validating #{course_confirmations.count} course confirmation rows"
       course_confirmations.each do |confirmation|
@@ -181,10 +184,10 @@ module Oec
       end
     end
 
-    def add_from_supervisor_confirmations(supervisor_confirmations, supervisors, department_hierarchy, report_viewer_hierarchy)
+    def add_from_supervisor_overrides(supervisor_overrides, supervisors, department_hierarchy, report_viewer_hierarchy)
       dept_keys = %w(DEPT_NAME_1 DEPT_NAME_2 DEPT_NAME_3 DEPT_NAME_4 DEPT_NAME_5 DEPT_NAME_6 DEPT_NAME_7 DEPT_NAME_8 DEPT_NAME_9 DEPT_NAME_10)
       validate_and_add(department_hierarchy, department_hierarchy.university_row(), ['NODE_ID'])
-      supervisor_confirmations.each do |confirmation|
+      supervisor_overrides.each do |confirmation|
         validate_and_add(supervisors, confirmation, %w(LDAP_UID))
         depts = confirmation.slice(*dept_keys).values.compact
         depts.each do |dept|
