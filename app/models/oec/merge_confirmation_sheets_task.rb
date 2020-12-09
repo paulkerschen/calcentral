@@ -14,14 +14,7 @@ module Oec
       merged_confirmations_folder = @remote_drive.find_first_matching_item(Oec::Folder.merged_confirmations, term_folder)
       raise UnexpectedDataError, "No '#{Oec::Folder.merged_confirmations}' folder found for term #{@term_code}" unless merged_confirmations_folder
 
-      overrides = @remote_drive.find_first_matching_item(Oec::Folder.overrides, term_folder)
-      supervisors_sheet = @remote_drive.find_first_matching_item('supervisors', overrides)
-      raise UnexpectedDataError, "No supervisor sheet found in overrides for term #{@term_code}" unless supervisors_sheet
-
-      supervisors = Oec::Supervisors.from_csv @remote_drive.export_csv(supervisors_sheet)
-
       merged_course_confirmations = Oec::SisImportSheet.new(export_name: 'Merged course confirmations', term_code: @term_code)
-      merged_supervisor_confirmations = Oec::Supervisors.new(export_name: 'Merged supervisor confirmations')
 
       department_names = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(@departments_filter).keys.map { |code| Berkeley::Departments.get(code, concise: true) }
 
@@ -41,13 +34,6 @@ module Oec
           log :info, "Retrieved course confirmations from department sheet '#{department_item.name}'"
         else
           raise UnexpectedDataError, "Could not find worksheet 'Courses' in sheet '#{confirmation_sheet.name}'"
-        end
-
-        if (supervisor_confirmation_worksheet = confirmation_sheet.worksheets.find { |w| w.title == 'Report Viewers' })
-          supervisor_confirmation = Oec::SupervisorConfirmation.from_csv @remote_drive.export_csv(supervisor_confirmation_worksheet)
-          log :info, "Retrieved supervisor confirmations from department sheet '#{department_item.name}'"
-        else
-          raise UnexpectedDataError, "Could not find worksheet 'Report Viewers' in sheet '#{confirmation_sheet.name}'"
         end
 
         merged_course_rows = []
@@ -71,27 +57,6 @@ module Oec
           validate_and_add(merged_course_confirmations, row, %w(COURSE_ID LDAP_UID), strict: false)
         end
 
-        merged_supervisor_rows = []
-        supervisor_confirmation.each do |supervisor_confirmation_row|
-          validate('Merged supervisor confirmations', supervisor_confirmation_row['LDAP_UID']) do |errors|
-            supervisor_rows = supervisors.select { |row| row['LDAP_UID'] == supervisor_confirmation_row['LDAP_UID']}
-            if supervisor_rows.none?
-              errors.add 'No supervisors row found matching confirmation row'
-              merged_supervisor_rows << WorksheetRow.new({}, merged_supervisor_confirmations).merge(supervisor_confirmation_row)
-            else
-              errors.add 'Multiple supervisor rows found matching confirmation row' if supervisor_rows.count > 1
-              supervisor_rows.each do |supervisor_row|
-                merged_supervisor_rows << supervisor_row.merge(supervisor_confirmation_row)
-              end
-            end
-          end
-        end
-
-        fill_in_sis_ids merged_supervisor_rows
-        merged_supervisor_rows.each do |row|
-          validate_and_add(merged_supervisor_confirmations, row, %w(LDAP_UID), strict: false)
-        end
-
         log :info, "Merged all rows from department sheet '#{department_item.name}'"
 
         # Without a delay, this loop will hit enough sheets in quick succession to trigger API throttling.
@@ -103,7 +68,6 @@ module Oec
         log_validation_errors
       end
       export_sheet(merged_course_confirmations, merged_confirmations_folder)
-      export_sheet(merged_supervisor_confirmations, merged_confirmations_folder)
     end
 
     def fill_in_sis_ids(confirmation_sheet)

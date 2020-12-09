@@ -90,7 +90,7 @@ describe Oec::PublishTask do
       end
 
       it 'should export the same supervisors sheet it was given' do
-        expect(read_exported_csv 'supervisors').to eq merged_supervisor_confirmations_csv
+        expect(read_exported_csv 'supervisors').to eq supervisor_overrides_csv
       end
 
       it 'should produce a sane report_viewer_hierarchy sheet' do
