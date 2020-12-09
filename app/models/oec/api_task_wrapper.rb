@@ -13,25 +13,21 @@ module Oec
         name: 'SisImportTask',
         friendlyName: 'SIS data import',
         htmlDescription: "Import course and instructor data for one or more campus departments. Imported data will appear in a new, timestamped subfolder of the <strong>#{Oec::Folder.sis_imports}</strong> folder.",
-        departmentOptions: 'single'
       },
       {
         name: 'CreateConfirmationSheetsTask',
         friendlyName: 'Create confirmation sheets',
         htmlDescription: "Create confirmation sheets for review and edits by department administrators. Sheets will appear under the <strong>#{Oec::Folder.confirmations}</strong> folder. If that folder contains a sheet named <strong>TEMPLATE</strong>, it will be used as a model for the confirmation sheets.",
-        departmentOptions: 'single'
       },
       {
         name: 'ReportDiffTask',
         friendlyName: 'Diff confirmation sheets',
         htmlDescription: "Compare department confirmation sheets to the most recent SIS import data and report on differences. The diff report will appear as a new sheet in the <strong>#{Oec::Folder.confirmations}</strong> folder, and will replace any previous diff report.",
-        departmentOptions: 'single'
       },
       {
         name: 'MergeConfirmationSheetsTask',
         friendlyName: 'Merge confirmation sheets',
         htmlDescription: "Merge confirmation sheets from participating departments into master sheets for preflight review. Two new sheets will be created in the <strong>#{Oec::Folder.merged_confirmations}</strong> folder: <strong>Merged course confirmations</strong> and <strong>Merged supervisor confirmations</strong>.",
-        departmentOptions: 'multiple'
       },
       {
         name: 'ValidationTask',

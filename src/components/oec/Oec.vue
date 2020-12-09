@@ -7,7 +7,7 @@
       <div v-if="isTaskRunning">
         <RunTask
           :key="taskName"
-          :department-code="departmentCode || departmentCodes"
+          :department-code="runTaskDepartmentCodes"
           :on-finish="taskRunDone"
           :task="getTaskObject(taskName)"
           :term="term"
@@ -38,57 +38,60 @@
             option-label="friendlyName"
           ></b-form-select>
         </div>
-        <div v-if="$_.includes(['SisImportTask', 'CreateConfirmationSheetsTask', 'ReportDiffTask'], taskName)" class="pt-2">
+        <b-form-group
+          v-if="taskRequiresDepartments"
+          id="cc-page-oec-select-departments"
+          class="pt-1 mt-3 mb-0"
+          label="Select departments:"
+        >
           <div>
+            <b-form-radio
+              v-model="selectDeptsMode"
+              name="select-departments-mode"
+              value="all"
+              @change="resetDepartments"
+            >
+              All participating departments
+            </b-form-radio>
+            <b-form-radio
+              v-model="selectDeptsMode"
+              name="select-departments-mode"
+              value="individual"
+              @change="resetDepartments"
+            >
+              Individual departments
+            </b-form-radio>
+            <b-alert
+              v-if="selectDeptsMode === 'all'"
+              class="alert-box m-2 mt-3 overflow-auto"
+              show
+              variant="info"
+            >
+              <ul id="cc-page-oec-departments-participating" class="cc-text-small participating-list">
+                <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
+              </ul>
+            </b-alert>
             <b-form-select
-              id="cc-page-oec-department"
-              v-model="departmentCode"
+              v-if="selectDeptsMode === 'individual'"
+              id="cc-page-oec-department-multiselect"
+              v-model="departmentCodes"
+              class="mt-3"
               :options="departments"
+              multiple
+              :select-size="15"
               text-field="name"
               value-field="code"
             >
-              <template #first>
-                <b-form-select-option :value="null">All participating departments</b-form-select-option>
-              </template>
             </b-form-select>
           </div>
-          <div v-if="departmentsParticipating.length">
-            <b-button
-              id="show-participating-departments"
-              v-b-toggle.participating-collapse
-              class="pb-0 pt-0"
-              size="sm"
-              variant="link"
-            >
-              Show participating departments
-            </b-button>
-            <b-collapse id="participating-collapse" class="mt-2">
-              <b-alert class="alert-box m-2 overflow-auto" show variant="info">
-                <ul id="cc-page-oec-departments-participating" class="cc-text-small participating-list">
-                  <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
-                </ul>
-              </b-alert>
-            </b-collapse>
-          </div>
-        </div>
-        <div v-if="taskName === 'MergeConfirmationSheetsTask'" class="pt-2">
-          <b-form-select
-            id="cc-page-oec-department-multiselect"
-            v-model="departmentCodes"
-            :options="departments"
-            multiple
-            :select-size="10"
-            text-field="name"
-            value-field="code"
-          ></b-form-select>
-        </div>
+        </b-form-group>
         <div v-if="taskName" class="p-3">
           <span id="oec-task-description" class="cc-text-small text-secondary" v-html="$_.get(this.getTaskObject(taskName), 'htmlDescription')"></span>
         </div>
         <div class="p-2">
           <b-button
             id="oec-run-task-button"
-            :disabled="!taskName || !term || (taskName === 'MergeConfirmationSheetsTask' && !departmentCodes.length)"
+            :disabled="!taskName || !term || (taskRequiresDepartments && (selectDeptsMode !== 'all') && !departmentCodes.length)"
             size="sm"
             variant="primary"
             @click="run"
@@ -108,20 +111,28 @@ import {getTasks} from '@/api/oec'
 
 export default {
   name: 'Oec',
+  components: {RunTask},
+  mixins: [Context],
   data: () => ({
     currentTerm: null,
-    departmentCode: null,
     departmentCodes: [],
-    departmentsParticipating: [],
-    taskName: null,
-    term: undefined,
     departments: undefined,
+    departmentsParticipating: [],
     isTaskRunning: false,
+    selectDeptsMode: null,
+    taskName: null,
     tasks: undefined,
+    term: undefined,
     terms: undefined
   }),
-  mixins: [Context],
-  components: {RunTask},
+  computed: {
+    runTaskDepartmentCodes() {
+      return this.selectDeptsMode === 'all' ? 'all_participating' : this.departmentCodes
+    },
+    taskRequiresDepartments() {
+      return ['SisImportTask', 'CreateConfirmationSheetsTask', 'ReportDiffTask', 'MergeConfirmationSheetsTask'].includes(this.taskName)
+    }
+  },
   created() {
     getTasks().then(data => {
       this.departments = data.oecDepartments
@@ -139,16 +150,20 @@ export default {
     getTaskObject(name) {
       return name && this.$_.find(this.tasks, ['name', name])
     },
+    resetDepartments() {
+      this.departmentCodes = []    
+    },
     resetModelObjects() {
-      this.departmentCode = null
-      this.departmentCodes = []
+      this.departmentCodes = []    
+      this.selectDeptsMode = null
     },
     run() {
       this.isTaskRunning = true
     },
     taskRunDone() {
-      this.departmentCode = null
+      this.departmentCodes = []    
       this.isTaskRunning = false
+      this.selectDeptsMode = null
       this.taskName = null
       this.term = this.currentTerm
     }
