@@ -57,11 +57,11 @@ module Oec
       set_term_dates
 
       @date_time = opts[:date_time] || default_date_time
-      @departments_filter = if opts[:dept_codes]
-                             {dept_code: opts[:dept_codes].split}
-                           else
-                             {include_in_oec: true}
-                           end
+      @departments_filter = if !opts[:dept_codes] || opts[:dept_codes].include?('all_participating')
+                              {include_in_oec: true}
+                            else
+                              {dept_code: opts[:dept_codes].split}
+                            end
     end
 
     def run

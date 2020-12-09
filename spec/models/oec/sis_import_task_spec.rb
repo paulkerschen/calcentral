@@ -476,6 +476,11 @@ describe Oec::SisImportTask do
       expect_any_instance_of(Oec::DepartmentMappings).to receive(:by_dept_code).with(dept_code: %w(IBIBI IMMCB)).and_return({})
       Oec::SisImportTask.new(default_opts.merge(dept_codes: 'IBIBI IMMCB')).run
     end
+
+    it 'understands all_participating option' do
+      expect_any_instance_of(Oec::DepartmentMappings).to receive(:by_dept_code).with(include_in_oec: true).and_return({})
+      Oec::SisImportTask.new(default_opts.merge(dept_codes: 'all_participating')).run
+    end
   end
 
   context 'task not told to allow past terms' do
