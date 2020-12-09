@@ -18,7 +18,6 @@ module Oec
         EVALUATE
         DEPT_FORM
         EVALUATION_TYPE
-        MODULAR_COURSE
         START_DATE
         END_DATE
       )

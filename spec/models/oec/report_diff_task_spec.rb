@@ -95,7 +95,7 @@ describe Oec::ReportDiffTask do
       it 'should include diff for STAT department only' do
         expect(diff_rows_by_dept['SZANT']).to have(0).items
         expect(diff_rows_by_dept['SPOLS']).to have(0).items
-        expect(diff_rows_by_dept['PSTAT']).to have(14).items
+        expect(diff_rows_by_dept['PSTAT']).to have(13).items
       end
 
       it 'should note rows missing from the department confirmation sheet' do

@@ -19,8 +19,6 @@ module Oec
         DEPT_FORM
         sis:EVALUATION_TYPE
         EVALUATION_TYPE
-        sis:MODULAR_COURSE
-        MODULAR_COURSE
         sis:START_DATE
         START_DATE
         sis:END_DATE
