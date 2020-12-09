@@ -52,7 +52,9 @@ module Oec
           end
         end
 
-        fill_in_sis_ids merged_course_rows
+        fill_in_sis_ids(merged_course_rows)
+        fill_in_modular_flags(merged_course_rows)
+
         merged_course_rows.each do |row|
           validate_and_add(merged_course_confirmations, row, %w(COURSE_ID LDAP_UID), strict: false)
         end
@@ -70,8 +72,8 @@ module Oec
       export_sheet(merged_course_confirmations, merged_confirmations_folder)
     end
 
-    def fill_in_sis_ids(confirmation_sheet)
-      rows_without_sis_id = confirmation_sheet.select { |r| r['SIS_ID'].blank? }
+    def fill_in_sis_ids(merged_sheet)
+      rows_without_sis_id = merged_sheet.select { |r| r['SIS_ID'].blank? }
       uids = rows_without_sis_id.map { |r| r['LDAP_UID'] }
       user_data = CanvasCsv::Base.new().accumulate_user_data uids
       uid_to_sid = user_data.inject({}) do |hash, user|
@@ -82,5 +84,11 @@ module Oec
       end
     end
 
+    def fill_in_modular_flags(merged_sheet)
+      term_dates = default_term_dates
+      merged_sheet.each do |row|
+        row['MODULAR_COURSE'] = row.slice('START_DATE', 'END_DATE') == default_term_dates ? nil : 'Y'
+      end
+    end
   end
 end

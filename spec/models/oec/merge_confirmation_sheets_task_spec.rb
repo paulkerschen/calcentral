@@ -25,6 +25,8 @@ describe Oec::MergeConfirmationSheetsTask do
     sheet
   end
 
+  let(:overrides_courses) { mock_sheet 'overrides_courses' }
+
   let(:gws_import) { mock_sheet 'import_GWS' }
   let(:gws_course_confirmation) { mock_sheet 'course_confirmations_GWS' }
   let(:mcellbi_import) { mock_sheet 'import_MCELLBI' }
@@ -47,6 +49,7 @@ describe Oec::MergeConfirmationSheetsTask do
 
     allow(fake_remote_drive).to receive(:check_conflicts_and_create_folder).and_return mock_google_drive_item
     allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
+    allow(fake_remote_drive).to receive(:find_nested).with([term_code, Oec::Folder.overrides, Oec::Courses.export_name]).and_return overrides_courses[:sheet]
     allow(fake_remote_drive).to receive(:find_first_matching_item).and_return mock_google_drive_item
 
     allow(fake_remote_drive).to receive(:find_folders).and_return [last_import_folder]
@@ -115,10 +118,20 @@ describe Oec::MergeConfirmationSheetsTask do
           merged_course_confirmation.headers.each do |header|
             if confirmation.headers.include? header
               expect(merged_confirmation_row[header]).to eq confirmation_row[header]
-            else
+            elsif header != 'MODULAR_COURSE'
               expect(merged_confirmation_row[header]).to eq sis_import_row[header]
             end
           end
+        end
+      end
+    end
+
+    it 'should determine modular flag based on comparison of course and term dates' do
+      merged_course_confirmation.each do |row|
+        if row['START_DATE'] == '01-20-2015' && row['END_DATE'] == '05-08-2015'
+          expect(row['MODULAR_COURSE']).to be_nil
+        else
+          expect(row['MODULAR_COURSE']).to eq 'Y'
         end
       end
     end
