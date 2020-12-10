@@ -117,6 +117,13 @@ describe Oec::ValidationTask do
       include_examples 'validation error logging'
     end
 
+    context 'blank start and end dates' do
+      let(:invalid_row) { '2015-B-99999,2015-B-99999,GWS 150 LEC 001 VINDICATION OF RIGHTS,,,GWS,150,LEC,001,P,155555,UID:155555,Zachary,Zzzz,zzzz@berkeley.edu,23,Y,GWS,F,Y,,' }
+      let(:key) { '2015-B-99999' }
+      let(:expected_message) { 'START_DATE nil does not match term code 2015-B' }
+      include_examples 'validation error logging'
+    end
+
     context 'date not matching term code' do
       let(:invalid_row) { '2015-B-99999,2015-B-99999,GWS 150 LEC 001 VINDICATION OF RIGHTS,,,GWS,150,LEC,001,P,155555,UID:155555,Zachary,Zzzz,zzzz@berkeley.edu,23,Y,GWS,F,Y,01-26-2015,05-11-2016' }
       let(:key) { '2015-B-99999' }
