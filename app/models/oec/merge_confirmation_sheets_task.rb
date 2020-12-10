@@ -55,6 +55,8 @@ module Oec
         fill_in_sis_ids(merged_course_rows)
         fill_in_modular_flags(merged_course_rows)
 
+        flag_co_taught_distinct_dates(merged_course_rows)
+
         merged_course_rows.each do |row|
           validate_and_add(merged_course_confirmations, row, %w(COURSE_ID LDAP_UID), strict: false)
         end
@@ -88,6 +90,35 @@ module Oec
       term_dates = default_term_dates
       merged_sheet.each do |row|
         row['MODULAR_COURSE'] = row.slice('START_DATE', 'END_DATE') == default_term_dates ? nil : 'Y'
+      end
+    end
+
+    def flag_co_taught_distinct_dates(merged_sheet)
+      merged_sheet.group_by { |row| row['COURSE_ID'] }.each do |course_id, course_rows|
+        rows_by_end_date = course_rows.group_by { |row| row['END_DATE'] }
+        if rows_by_end_date.length > 1
+          # Rows with distinct end dates must also have distinct instructors to be flagged.
+          distinct_instructors = true
+          uid_sets = []
+          rows_by_end_date.each do |end_date, rows|
+            uid_set = Set.new(rows.map { |r| r['LDAP_UID'] })
+            if uid_sets.find { |comparison_set| uid_set.intersect?(comparison_set) } 
+              distinct_instructors = false
+              break
+            end
+            uid_sets << uid_set
+          end
+          next unless distinct_instructors
+          course_rows.each do |r|
+            m, d, y = r['END_DATE'].split('-')
+            r['COURSE_ID'] = "#{r['COURSE_ID']}_#{y}#{m}#{d}"
+            r['COURSE_ID_2'] = "#{r['COURSE_ID']}_#{y}#{m}#{d}"
+            r['COURSE_NAME'] = "#{r['COURSE_NAME']} (#{y}#{m}#{d})"
+            if r['CROSS_LISTED_NAME']
+              r['CROSS_LISTED_NAME'] = "#{r['CROSS_LISTED_NAME']} (#{y}#{m}#{d})"
+            end
+          end
+        end
       end
     end
   end
