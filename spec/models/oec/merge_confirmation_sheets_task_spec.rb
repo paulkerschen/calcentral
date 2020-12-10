@@ -152,8 +152,8 @@ describe Oec::MergeConfirmationSheetsTask do
     before do
       gws_import[:csv].concat '2015-B-91111,2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,GWS,165,LEC,001,P,100008,Instructor,Eight,instructor8@berkeley.edu,,,F,,1/20/2015,5/8/2015'
       mcellbi_import[:csv].concat '2015-B-91111,2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,GWS,165,LEC,001,P,100008,Instructor,Eight,instructor8@berkeley.edu,,,F,,1/20/2015,5/8/2015'
-      gws_course_confirmation[:csv].concat '2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,100008,Instructor,Eight,instructor8@berkeley.edu,Y,GWS,F,,1/20/2015,5/8/2015'
-      mcellbi_course_confirmation[:csv].concat '2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,100008,Instructor,Eight,instructor8@berkeley.edu,Y,MCELLBI,F,,1/20/2015,5/8/2015'
+      gws_course_confirmation[:csv].concat '2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,100008,Instructor,Eight,instructor8@berkeley.edu,Y,GWS,F,1/20/2015,5/8/2015'
+      mcellbi_course_confirmation[:csv].concat '2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,100008,Instructor,Eight,instructor8@berkeley.edu,Y,MCELLBI,F,1/20/2015,5/8/2015'
     end
 
     it 'should record errors' do
@@ -167,6 +167,45 @@ describe Oec::MergeConfirmationSheetsTask do
       conflicting_rows = merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111' }
       expect(conflicting_rows).to have(2).items
       expect(conflicting_rows.map { |row| row['DEPT_FORM'] }).to match_array %w(GWS MCELLBI)
+    end
+  end
+
+  context 'when course confirmation sheets differ on end date' do
+    let(:local_write) { 'Y' }
+    before do
+      gws_import[:csv].concat "2015-B-91111,2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,GWS,165,LEC,001,P,#{instructor_1_data},,,F,,01-20-2015,05-08-2015"
+      gws_course_confirmation[:csv].concat "2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,#{instructor_1_data},Y,GWS,F,01-20-2015,03-08-2015"
+      gws_course_confirmation[:csv].concat "\n2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,#{instructor_2_data},Y,GWS,F,03-20-2015,05-08-2015"
+    end
+
+    context 'with same instructor' do
+      let(:instructor_1_data) { '100008,Instructor,Eight,instructor8@berkeley.edu' }
+      let(:instructor_2_data) { '100008,Instructor,Eight,instructor8@berkeley.edu' }
+
+      it 'notes a conflict and leaves rows unmodified' do
+        expect(Rails.logger).to receive(:warn).at_least(1).times
+        task.run
+        expect(task.errors['Merged course confirmations']['2015-B-91111-100008'].keys).to include("Conflicting values found under START_DATE: '01-20-2015', '03-20-2015'")
+        expect(task.errors['Merged course confirmations']['2015-B-91111-100008'].keys).to include("Conflicting values found under END_DATE: '03-08-2015', '05-08-2015'")
+        conflicting_rows = merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111' }
+        expect(conflicting_rows).to have(2).items
+        expect(conflicting_rows.map { |row| row['END_DATE'] }).to match_array %w(03-08-2015 05-08-2015)
+      end
+    end
+
+    context 'with different instructors' do
+      let(:instructor_1_data) { '100008,Instructor,Eight,instructor8@berkeley.edu' }
+      let(:instructor_2_data) { '100009,Instructor,Nine,instructor9@berkeley.edu' }
+      before do
+        gws_import[:csv].concat "\n2015-B-91111,2015-B-91111,GWS 165 LEC 001 MEIOSIS AND GENDER TROUBLE,Y,GWS/MCELLBI 165 LEC 001,GWS,165,LEC,001,P,#{instructor_2_data},,,F,,01-20-2015,05-08-2015"
+      end
+
+      it 'appends disambiguating suffixes to the course ID' do
+        task.run
+        expect(task.errors).to be_empty
+        expect(merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111_20150308' }).to have(1).item
+        expect(merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111_20150508' }).to have(1).item
+      end
     end
   end
 
