@@ -221,13 +221,18 @@ describe Oec::MergeConfirmationSheetsTask do
       expect(task.errors['Merged course confirmations']['2015-B-91111-100008'].keys).to eq ['No SIS import row found matching confirmation row']
     end
 
-    it 'should export a row with blank values for SIS data' do
+    it 'should export a row with inferred values for SIS data' do
       task.run
-      rows_without_sis_data = merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111' }
-      expect(rows_without_sis_data).to have(1).items
-      %w(COURSE_ID_2 DEPT_NAME CATALOG_ID INSTRUCTION_FORMAT SECTION_NUM PRIMARY_SECONDARY_CD).each do |sis_column|
-        expect(rows_without_sis_data.first[sis_column]).to be_blank
-      end
+      inferred_rows = merged_course_confirmation.select { |row| row['COURSE_ID'] == '2015-B-91111' }
+      expect(inferred_rows).to have(1).items
+      expect(inferred_rows[0].to_h).to include({
+        'COURSE_ID_2' => '2015-B-91111',
+        'DEPT_NAME' => 'GWS',
+        'CATALOG_ID' => '165',
+        'INSTRUCTION_FORMAT' => 'LEC',
+        'SECTION_NUM' => '001',
+        'PRIMARY_SECONDARY_CD' => 'P'
+      })
     end
 
     it 'should fill in empty SIS_ID values' do
