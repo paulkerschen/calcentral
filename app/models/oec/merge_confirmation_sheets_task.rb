@@ -42,7 +42,8 @@ module Oec
             sis_import_rows = sis_import.select { |row| row['LDAP_UID'] == course_confirmation_row['LDAP_UID'] && row['COURSE_ID'] == course_confirmation_row['COURSE_ID']  }
             if sis_import_rows.none?
               errors.add 'No SIS import row found matching confirmation row'
-              merged_course_rows << WorksheetRow.new({}, merged_course_confirmations).merge(course_confirmation_row)
+              inferred_sis_row = infer_sis_values(course_confirmation_row)
+              merged_course_rows << WorksheetRow.new(inferred_sis_row, merged_course_confirmations).merge(course_confirmation_row)
             else
               errors.add 'Multiple SIS import rows found matching confirmation row' if sis_import_rows.count > 1
               sis_import_rows.each do |sis_import_row|
@@ -120,6 +121,29 @@ module Oec
           end
         end
       end
+    end
+
+    def infer_sis_values(confirmation_row)
+      inferred = {
+        'COURSE_ID_2' => confirmation_row['COURSE_ID'],
+        'BLUE_ROLE' => '23'
+      }
+      if (m = confirmation_row['COURSE_NAME'].match /^(.*?)\s([A-Z]?\d+[A-Z]*)\s([A-Z]{3})\s(\d{3})/)
+        inferred['DEPT_NAME'] = m[1]
+        inferred['CATALOG_ID'] = m[2]
+        inferred['INSTRUCTION_FORMAT'] = m[3]
+        inferred['SECTION_NUM'] = m[4]
+        # Deriving primary/secondary status from instruction format is a best guess, not a hard-and-fast business rule.
+        # It will occasionally yield values that disagree with SIS data, but we're assured this is not a disaster for
+        # OEC purposes.
+        inferred['PRIMARY_SECONDARY_CD'] = case inferred['INSTRUCTION_FORMAT']
+          when 'DIS', 'LAB', 'WBD'
+            'S'
+          else
+            'P'
+        end
+      end
+      inferred
     end
   end
 end
