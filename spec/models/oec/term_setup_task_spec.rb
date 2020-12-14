@@ -13,12 +13,16 @@ describe Oec::TermSetupTask do
 
   shared_context 'remote drive interaction' do
     before(:each) do
+      allow(fake_remote_drive).to receive(:find_first_matching_folder).and_return mock_google_drive_item
+      allow(fake_remote_drive).to receive(:find_first_matching_item).and_return mock_google_drive_item
       allow(fake_remote_drive).to receive(:find_nested).and_return mock_google_drive_item
     end
 
     let(:term_folder) { mock_google_drive_item term_code }
     let(:logs_today_folder) { mock_google_drive_item today }
     let(:overrides_folder) { mock_google_drive_item Oec::Folder.overrides }
+    let(:tracking_worksheet) { double(:[]= => true, save: true) }
+    let(:tracking_spreadsheet) { double(worksheets: [tracking_worksheet]) }
 
     before do
       expect(fake_remote_drive).to receive(:find_folders).with(no_args).and_return []
@@ -42,6 +46,11 @@ describe Oec::TermSetupTask do
           .with(kind_of(Oec::Worksheet), sheet, Oec::Worksheet, overrides_folder, anything)
           .and_return mock_google_drive_item(sheet)
       end
+
+      expect(fake_remote_drive).to receive(:copy_item_to_folder)
+        .with(anything, "#{term_code}_id", 'Spring 2013 Course Evaluations Tracking Sheet').and_return double(id: 'tracking_sheet_id')
+
+      expect(fake_remote_drive).to receive(:spreadsheet_by_id).with('tracking_sheet_id').and_return tracking_spreadsheet
 
       expect(fake_remote_drive).to receive(:check_conflicts_and_create_folder)
         .with(today, anything, anything).and_return logs_today_folder

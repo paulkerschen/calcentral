@@ -245,6 +245,11 @@ module Oec
       arg.strftime self.class.timestamp_format
     end
 
+    def tracking_sheet_name
+      term_name = Berkeley::TermCodes.to_english(*@term_code.split('-'))
+      "#{term_name} Course Evaluations Tracking Sheet"
+    end
+
     def upload_file(path, remote_name, type, folder)
       @remote_drive.check_conflicts_and_upload(path, remote_name, type, folder,
         on_success: -> { log :debug, "Uploaded item #{path} to remote drive folder '#{folder.name}'" })
