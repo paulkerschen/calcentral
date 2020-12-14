@@ -29,8 +29,34 @@ module Oec
       set_default_term_dates courses
       export_sheet(courses, term_subfolders[:overrides])
 
-      if !@opts[:local_write] && (department_template = @remote_drive.find_nested ['templates', 'Department confirmations'])
-        @remote_drive.copy_item_to_folder(department_template, term_subfolders[:confirmations].id, 'TEMPLATE')
+      if !@opts[:local_write] && (templates_folder = @remote_drive.find_first_matching_folder('templates'))
+        if (department_template = @remote_drive.find_first_matching_item('Department confirmations', templates_folder))
+          @remote_drive.copy_item_to_folder(department_template, term_subfolders[:confirmations].id, 'TEMPLATE')
+        end
+        if (tracking_sheet_template = @remote_drive.find_first_matching_item('Tracking sheet', templates_folder))
+          tracking_sheet_copy = @remote_drive.copy_item_to_folder(tracking_sheet_template, term_folder.id, tracking_sheet_name)
+          tracking_sheet = (s = @remote_drive.spreadsheet_by_id(tracking_sheet_copy.id)) && s.worksheets.first
+          mappings = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(include_in_oec: true)
+          # Order departments alphabetically by concise name, with engineering separate.
+          engineering_codes = %w(EFBIO EGCEE EHEEC EDDNO EIIEO EJMSM EKMEG ELNUC)
+          codes = (mappings.keys - engineering_codes).sort_by { |c| Berkeley::Departments.get(c, concise: true) }
+          codes.concat (engineering_codes & mappings.keys)
+          codes.each_with_index do |dept_code, i|
+            dept_heading = Berkeley::Departments.get(dept_code, concise: true)
+            # FSSEM has too many course codes for notation to be useful.
+            unless dept_code == 'FSSEM'
+              dept_names = mappings[dept_code].map(&:dept_name).uniq.sort.join ', '
+              dept_heading << " (#{dept_names})"
+            end
+            tracking_sheet[i+3, 1] = dept_heading
+          end
+          begin
+            tracking_sheet.save
+            log :debug, "Added department names to tracking sheet"
+          rescue Errors::ProxyError => e
+            log :error, "Failed to add department names to tracking sheet"
+          end
+        end
       end
     end
 
