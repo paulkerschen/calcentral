@@ -13,6 +13,9 @@ describe Oec::CreateConfirmationSheetsTask do
   let(:import_csv) { File.read Rails.root.join('fixtures', 'oec', 'import_MCELLBI.csv') }
   let(:supervisors_csv) { File.read Rails.root.join('fixtures', 'oec', 'supervisors.csv') }
 
+  let(:tracking_worksheet) { double(:[] => nil, :[]= => true, save: true) }
+  let(:tracking_spreadsheet) { double(worksheets: [tracking_worksheet]) }
+
   before(:each) do
     allow_any_instance_of(Oec::DepartmentMappings).to receive(:by_dept_code).and_return({'IMMCB' => [double(dept_name: 'MCELLBI')]})
     allow(Oec::RemoteDrive).to receive(:new).and_return fake_remote_drive
@@ -27,7 +30,12 @@ describe Oec::CreateConfirmationSheetsTask do
     allow(fake_remote_drive).to receive(:find_first_matching_item).and_return mock_google_drive_item
     allow(fake_remote_drive).to receive(:find_first_matching_item).with(Oec::Folder.confirmations, anything).and_return departments_folder
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('Molecular and Cell Biology', departments_folder).and_return nil
+    allow(fake_remote_drive).to receive(:find_first_matching_item).with('Molecular and Cell Biology', departments_folder).and_return nil
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('supervisors', anything).and_return supervisors_sheet
+    allow(fake_remote_drive).to receive(:find_first_matching_item).with('Spring 2015 Course Evaluations Tracking Sheet', anything)
+      .and_return double(id: 'tracking_sheet_id')
+
+    allow(fake_remote_drive).to receive(:spreadsheet_by_id).with('tracking_sheet_id').and_return tracking_spreadsheet
 
     allow(fake_remote_drive).to receive(:export_csv).with(import_sheet).and_return import_csv
     allow(fake_remote_drive).to receive(:export_csv).with(supervisors_sheet).and_return supervisors_csv
@@ -58,16 +66,27 @@ describe Oec::CreateConfirmationSheetsTask do
   context 'expected API calls' do
     include_context 'no local-write mode and preparatory SIS import'
     let(:template) { double(id: 'template_id', name: 'TEMPLATE', mime_type: 'application/vnd.google-apps.spreadsheet') }
-    let(:spreadsheet) { double(worksheets: [courses_worksheet, report_viewers_worksheet]) }
+    let(:spreadsheet_url) { 'https://docs.google.com/mc3llb1' }
+    let(:spreadsheet) { double(human_url: spreadsheet_url, worksheets: [courses_worksheet, report_viewers_worksheet]) }
     let(:courses_worksheet) { double(title: 'Courses', rows: [Oec::CourseConfirmation.new.headers], :[]= => true, save: true) }
     let(:report_viewers_worksheet) { double(title: 'Report Viewers', rows: [Oec::SupervisorConfirmation.new.headers], :[]= => true, save: true) }
 
-    it 'should copy template, update cells and upload log' do
+    before do
       expect(fake_remote_drive).to receive(:find_first_matching_item).with('TEMPLATE', anything).and_return template
       expect(fake_remote_drive).to receive(:copy_item).with(template.id, 'Molecular and Cell Biology').and_return double(id: 'spreadsheet_id')
       expect(fake_remote_drive).to receive(:spreadsheet_by_id).with('spreadsheet_id').and_return spreadsheet
-      expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Pathname), kind_of(String), 'text/plain', anything, anything).and_return true
+      expect(fake_remote_drive).to receive(:check_conflicts_and_upload).with(kind_of(Pathname), kind_of(String), 'text/plain', anything, anything).and_return true    
+    end
 
+    it 'should copy template, update cells and upload log' do
+      task.run
+    end
+
+    it 'should link confirmation sheet URLs from tracking sheet' do
+      expect(tracking_worksheet).to receive(:[]).with(2, 1).twice.and_return 'Department'
+      expect(tracking_worksheet).to receive(:[]).with(2, 2).and_return 'Confirmation sheet'
+      expect(tracking_worksheet).to receive(:[]).with(3, 1).twice.and_return 'Molecular and Cell Biology'
+      expect(tracking_worksheet).to receive(:[]=).with(3, 2, spreadsheet_url).and_return true
       task.run
     end
   end
