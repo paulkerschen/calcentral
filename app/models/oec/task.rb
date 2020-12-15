@@ -64,17 +64,31 @@ module Oec
                             end
     end
 
-    def run
+    def run(run_opts={})
       logger.warn "OEC job started. Job state updated in cache key #{@api_task_id}"
       return if @status == 'Error'
       begin
-        run_child_task(self.class.task_before) if self.class.task_before
+        if self.class.task_before
+          # If a preliminary task writes success status to the cache, then the front end will assume
+          # the whole job is finished and stop checking. 
+          result = run_child_task(self.class.task_before, log_success_to_cache: false)
+          child_task_output = self.class.fetch_from_cache(@api_task_id)
+          if child_task_output && child_task_output[:log]
+            @log = child_task_output[:log]
+          end
+          if !result
+            @status == 'Error'
+            return nil
+          end
+        end
         log :info, "Starting #{self.class.name}"
         if !@opts[:allow_past_term] && @term_end < DateTime.now
           raise StandardError, "Past ending date #{@term_end} for term #{@term_code}"
         end
         run_internal
-        @status = 'Success' unless (@status == 'Error' || self.class.task_after)
+        unless (@status == 'Error' || self.class.task_after)
+          @status = (run_opts[:log_success_to_cache] == false) ? 'In progress' : 'Success'
+        end
         true
       rescue UnexpectedDataError => e
         log :warn, "#{self.class.name} aborted with unexpected data: #{e.message}"
@@ -88,7 +102,7 @@ module Oec
         write_log
         write_status_to_cache if @opts[:log_to_cache]
         if self.class.task_after && @status != 'Error'
-          run_child_task self.class.task_after
+          run_child_task(self.class.task_after, run_opts)
         end
       end
     end
@@ -226,10 +240,10 @@ module Oec
       end
     end
 
-    def run_child_task(child_task)
-      return if (condition = child_task[:if]) && !instance_eval(&condition)
+    def run_child_task(child_task, run_opts)
+      return true if (condition = child_task[:if]) && !instance_eval(&condition)
       task_opts = @opts.merge(previous_task_log: @log)
-      child_task[:class].new(task_opts).run
+      child_task[:class].new(task_opts).run(run_opts)
     end
 
     def set_term_dates

@@ -23,6 +23,7 @@ module Oec
         raise UnexpectedDataError, "No '#{Oec::Folder.confirmations}' folder found for term #{@term_code}" unless confirmations_folder
         template = @remote_drive.find_first_matching_item('TEMPLATE', confirmations_folder)
 
+        confirmation_urls = {}
         confirmations.each do |dept_name, dept_confirmations|
           if @remote_drive.find_first_matching_item(dept_name, confirmations_folder)
             log :warn, "File '#{dept_name}' exists in department confirmations folder, will not create new confirmation sheet"
@@ -51,8 +52,10 @@ module Oec
               dept_confirmations[:supervisors].headers.each_with_index { |header, i| report_viewers_worksheet[1, i+1] = header }
               report_viewers_worksheet.save
             end
+            confirmation_urls[dept_name] = dept_sheet.human_url
             update_worksheet(courses_worksheet, dept_confirmations[:courses])
             update_worksheet(report_viewers_worksheet, dept_confirmations[:supervisors])
+            update_confirmation_sheet_urls(confirmation_urls, term_folder)
           end
         end
       else
@@ -95,6 +98,42 @@ module Oec
         end
       end
       supervisor_confirmation
+    end
+
+    def update_confirmation_sheet_urls(confirmation_urls, term_folder)
+      if !(tracking_sheet_item = @remote_drive.find_first_matching_item(tracking_sheet_name, term_folder))
+        log :error, "No tracking sheet found for term, cannot update with confirmation sheet URLs."
+        return
+      end
+      tracking_sheet = (s = @remote_drive.spreadsheet_by_id(tracking_sheet_item.id)) && s.worksheets.first
+      confirmation_sheet_column_idx = nil
+      1.step do |x|
+        if tracking_sheet[2, x] == 'Confirmation sheet'
+          confirmation_sheet_column_idx = x
+          break
+        end
+        break if tracking_sheet[2, x].blank?
+      end
+      if confirmation_sheet_column_idx
+        3.step do |y|
+          if (dept_name = confirmation_urls.keys.find { |name| tracking_sheet[y, 1].start_with?(name) } )
+            tracking_sheet[y, confirmation_sheet_column_idx] = confirmation_urls[dept_name]
+            confirmation_urls.delete dept_name
+          end
+          if tracking_sheet[y, 1].blank?
+            confirmation_urls.keys.each { |dept_name| log :error, "Could not find tracking sheet row matching department '#{dept_name}'" }
+            break
+          end
+        end 
+      else
+        log :error, "Could not find column to update tracking sheet with confirmation sheet URLs"
+      end
+      begin
+        tracking_sheet.save
+        log :debug, "Updated tracking sheet with confirmation sheet URLs"
+      rescue Errors::ProxyError => e
+        log :error, "Failed to update tracking sheet with confirmation sheet URLs"
+      end
     end
 
     def update_worksheet(remote_sheet, local_sheet)
