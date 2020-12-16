@@ -260,9 +260,8 @@ module Oec
         arg.strftime self.class.timestamp_format
       end
 
-      def tracking_sheet_name
-        term_name = Berkeley::TermCodes.to_english(*@term_code.split('-'))
-        "#{term_name} Course Evaluations Tracking Sheet"
+      def term_tracking_sheet
+        @term_tracking_sheet ||= Oec::TermTrackingSheet.new(@remote_drive, @term_code)
       end
 
       def upload_file(path, remote_name, type, folder)

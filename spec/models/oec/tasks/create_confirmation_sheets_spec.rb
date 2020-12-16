@@ -83,9 +83,9 @@ describe Oec::Tasks::CreateConfirmationSheets do
     end
 
     it 'should link confirmation sheet URLs from tracking sheet' do
-      expect(tracking_worksheet).to receive(:[]).with(2, 1).twice.and_return 'Department'
+      expect(tracking_worksheet).to receive(:[]).with(2, 1).and_return 'Department'
       expect(tracking_worksheet).to receive(:[]).with(2, 2).and_return 'Confirmation sheet'
-      expect(tracking_worksheet).to receive(:[]).with(3, 1).twice.and_return 'Molecular and Cell Biology'
+      expect(tracking_worksheet).to receive(:[]).with(3, 1).and_return 'Molecular and Cell Biology'
       expect(tracking_worksheet).to receive(:[]=).with(3, 2, spreadsheet_url).and_return true
       task.run
     end

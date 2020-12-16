@@ -125,8 +125,44 @@ describe OecTasksController do
         make_request
         expect(response.status).to eq 200
         response_body = JSON.parse response.body
-        expect(response_body['oecTaskStatus']['status']).to eq 'In progress'
         expect(response_body['oecTaskStatus']['log']).to eq []
+      end
+    end
+  end
+
+  describe '#depts_ready_to_publish' do
+    let(:make_request) { get :depts_ready_to_publish, params: {term_slug: term_slug} }
+    let(:term_slug) { 'fall-2020' }
+
+    include_context 'OEC course codes'
+
+    before do
+      allow_any_instance_of(Oec::TermTrackingSheet).to receive(:departments_with_status).with('Ready to Publish').and_return([
+        'Chemistry (CHEM)',
+        'Spanish and Portuguese (CATALAN, ILA, PORTUG, SPANISH)' 
+      ])
+    end
+
+    it_should_behave_like 'an api endpoint' do
+      before { allow(Oec::ApiTaskWrapper).to receive(:departments_ready_to_publish).and_raise RuntimeError, 'Something went wrong' }
+    end
+
+    it 'should return sensible JSON' do
+      expect(Oec::TermTrackingSheet).to receive(:new).with(anything, '2020-D').and_call_original
+      make_request
+      expect(response.status).to eq 200
+      response_body = JSON.parse response.body
+      expect(response_body['departments']).to eq [
+        {'code' => 'CCHEM', 'name' => 'Chemistry', 'participating' => true},
+        {'code' => 'LPSPP', 'name' => 'Spanish and Portuguese', 'participating' => true}    
+      ]
+    end
+
+    context 'bad term' do
+      let(:term_slug) { 'guy-fawkes-day' }
+      it 'returns an error' do
+        make_request
+        expect(response.status).to eq 400
       end
     end
   end

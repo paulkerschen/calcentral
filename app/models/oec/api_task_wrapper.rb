@@ -53,6 +53,20 @@ module Oec
       departments.sort_by { |dept| dept[:name] }
     end
 
+    def self.departments_ready_to_publish(term_code)
+      remote_drive = Oec::RemoteDrive.new
+      term_code_str = term_code.values_at(:term_yr, :term_cd).join '-'
+      tracking_sheet = Oec::TermTrackingSheet.new(remote_drive, term_code_str)
+      depts_all = self.department_list
+      depts_ready = []
+      tracking_sheet.departments_with_status('Ready to Publish').each do |name|
+        if (dept = depts_all.find { |d| name.start_with? d[:name] })
+          depts_ready << dept
+        end
+      end
+      depts_ready
+    end
+
     def self.generate_task_id
       [Time.now.to_f.to_s.gsub('.', ''), SecureRandom.hex(8)].join '-'
     end
