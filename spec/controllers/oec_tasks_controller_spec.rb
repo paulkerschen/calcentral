@@ -46,7 +46,7 @@ describe OecTasksController do
 
   describe '#run' do
     let(:task_id) { Oec::ApiTaskWrapper.generate_task_id }
-    let(:task_name) { 'TermSetupTask' }
+    let(:task_name) { 'TermSetup' }
     let(:term_name) { 'Summer 2013' }
     let(:make_request) { post :run, params: {task_name: task_name, term: term_name} }
     include_examples 'authorization and error handling'
@@ -103,11 +103,11 @@ describe OecTasksController do
     let(:task_id) { Oec::ApiTaskWrapper.generate_task_id }
 
     it_should_behave_like 'an api endpoint' do
-      before { allow(Oec::Task).to receive(:fetch_from_cache).and_raise RuntimeError, 'Something went wrong' }
+      before { allow(Oec::Tasks::Base).to receive(:fetch_from_cache).and_raise RuntimeError, 'Something went wrong' }
     end
 
     context 'task not found for id' do
-      before { expect(Oec::Task).to receive(:fetch_from_cache).with(task_id).and_return nil }
+      before { expect(Oec::Tasks::Base).to receive(:fetch_from_cache).with(task_id).and_return nil }
 
       it 'should return bad request error' do
         make_request
@@ -118,7 +118,7 @@ describe OecTasksController do
     context 'task found for id' do
       before do
         allow(Oec::RemoteDrive).to receive(:new).and_return double
-        Oec::TermSetupTask.new(term_code: '2013-C', api_task_id: task_id, log_to_cache: true)
+        Oec::Tasks::TermSetup.new(term_code: '2013-C', api_task_id: task_id, log_to_cache: true)
       end
 
       it 'should return task status and log' do
