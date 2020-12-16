@@ -3,8 +3,8 @@ shared_context 'OEC data validation' do
   let(:fake_remote_drive) { double() }
   let(:merged_course_confirmations_csv) { File.read Rails.root.join('fixtures', 'oec', 'merged_course_confirmations.csv') }
   let(:supervisor_overrides_csv) { File.read Rails.root.join('fixtures', 'oec', 'supervisors.csv') }
-  let(:previous_course_supervisors_csv) { Oec::CourseSupervisors.new.headers.join(',') }
-  let(:merged_course_confirmations) { Oec::SisImportSheet.from_csv merged_course_confirmations_csv }
+  let(:previous_course_supervisors_csv) { Oec::Worksheets::CourseSupervisors.new.headers.join(',') }
+  let(:merged_course_confirmations) { Oec::Worksheets::SisImport.from_csv merged_course_confirmations_csv }
 
   let(:course_ids) { merged_course_confirmations_csv.scan(/2015-B-\d+/).uniq.flatten }
 
@@ -31,8 +31,8 @@ shared_context 'OEC data validation' do
   end
 
   let(:mock_csv) { double(mime_type: 'text/csv', download_url: 'https://drive.google.com/mock.csv') }
-  let(:previous_course_instructors_csv) { Oec::CourseInstructors.new.headers.join ',' }
-  let(:previous_instructors_csv) { Oec::Instructors.new.headers.join ',' }
+  let(:previous_course_instructors_csv) { Oec::Worksheets::CourseInstructors.new.headers.join ',' }
+  let(:previous_instructors_csv) { Oec::Worksheets::Instructors.new.headers.join ',' }
 
   before(:each) do
     allow(Oec::RemoteDrive).to receive(:new).and_return fake_remote_drive
@@ -53,7 +53,7 @@ shared_context 'OEC data validation' do
     )
 
     allow(Settings.terms).to receive(:fake_now).and_return DateTime.parse('2015-03-09 12:00:00')
-    allow_any_instance_of(Oec::Task).to receive(:default_term_dates).and_return({'START_DATE' => '01-26-2015', 'END_DATE' => '05-11-2015'})
+    allow_any_instance_of(Oec::Tasks::Base).to receive(:default_term_dates).and_return({'START_DATE' => '01-26-2015', 'END_DATE' => '05-11-2015'})
     allow_any_instance_of(Oec::DepartmentMappings).to receive(:participating_dept_names).and_return %w(GWS LGBT)
     allow(Oec::Queries).to receive(:get_enrollments).and_return enrollment_data
   end

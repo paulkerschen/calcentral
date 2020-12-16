@@ -92,8 +92,8 @@ module EdoOracle
             row.delete 'end_date'
           else
             row['modular_course'] = 'Y'
-            row['start_date'] = row['start_date'].strftime ::Oec::Worksheet::WORKSHEET_DATE_FORMAT
-            row['end_date'] = row['end_date'].strftime ::Oec::Worksheet::WORKSHEET_DATE_FORMAT
+            row['start_date'] = row['start_date'].strftime ::Oec::Worksheets::WORKSHEET_DATE_FORMAT
+            row['end_date'] = row['end_date'].strftime ::Oec::Worksheets::WORKSHEET_DATE_FORMAT
           end
         end
       end

@@ -129,7 +129,7 @@ module EdoOracle
       safe_query(sql, do_not_stringify: true)
     end
 
-    # Used to generate the Oec::SisImportTask query.
+    # Used to generate the Oec::Tasks::SisImport query.
     # Awkward substring matches on sec."displayName" are necessary because the better-parsed dept_name and catalog_id
     # fields are derived from a join and not guaranteed to be present.
     def self.depts_clause(term_code, course_codes)

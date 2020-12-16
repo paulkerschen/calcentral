@@ -27,7 +27,7 @@ class OecTasksController < ApplicationController
   # POST /api/oec/tasks/:task_name
 
   def run
-    task_class = "Oec::#{params['task_name']}".constantize
+    task_class = "Oec::Tasks::#{params['task_name']}".constantize
     params.require('term')
     task_opts = params.slice('term', 'departmentCode')
     task_status = Oec::ApiTaskWrapper.new(task_class, task_opts).start_in_background
@@ -40,7 +40,7 @@ class OecTasksController < ApplicationController
   # GET /api/oec/tasks/status/:task_id
 
   def task_status
-    task_status = Oec::Task.fetch_from_cache params['task_id']
+    task_status = Oec::Tasks::Base.fetch_from_cache params['task_id']
     raise Errors::BadRequestError, "OEC task id '#{params['task_id']}' not found" unless task_status
     render json: {
       oecTaskStatus: task_status

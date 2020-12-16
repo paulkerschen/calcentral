@@ -130,7 +130,7 @@ export default {
       return this.selectDeptsMode === 'all' ? 'all_participating' : this.departmentCodes
     },
     taskRequiresDepartments() {
-      return ['SisImportTask', 'CreateConfirmationSheetsTask', 'ReportDiffTask', 'MergeConfirmationSheetsTask'].includes(this.taskName)
+      return ['SisImport', 'CreateConfirmationSheets', 'ReportDiff', 'MergeConfirmationSheets'].includes(this.taskName)
     }
   },
   created() {
