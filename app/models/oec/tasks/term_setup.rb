@@ -35,7 +35,7 @@ module Oec
             @remote_drive.copy_item_to_folder(department_template, term_subfolders[:confirmations].id, 'TEMPLATE')
           end
           if (tracking_sheet_template = @remote_drive.find_first_matching_item('Tracking sheet', templates_folder))
-            tracking_sheet_copy = @remote_drive.copy_item_to_folder(tracking_sheet_template, term_folder.id, tracking_sheet_name)
+            tracking_sheet_copy = @remote_drive.copy_item_to_folder(tracking_sheet_template, term_folder.id, term_tracking_sheet.name)
             tracking_sheet = (s = @remote_drive.spreadsheet_by_id(tracking_sheet_copy.id)) && s.worksheets.first
             mappings = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(include_in_oec: true)
             # Order departments alphabetically by concise name, with engineering separate.

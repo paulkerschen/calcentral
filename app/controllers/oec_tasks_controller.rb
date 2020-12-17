@@ -47,6 +47,15 @@ class OecTasksController < ApplicationController
     }
   end
 
+  # GET /api/oec/depts_ready_to_publish/:term_slug
+  def depts_ready_to_publish
+    term_code = Berkeley::TermCodes.from_slug params['term_slug']
+    raise Errors::BadRequestError, "Bad term slug '#{params['term_slug']}'" unless term_code
+    render json: {
+      departments: Oec::ApiTaskWrapper.departments_ready_to_publish(term_code)
+    }
+  end
+
   private
 
   def google_oauth_token_check

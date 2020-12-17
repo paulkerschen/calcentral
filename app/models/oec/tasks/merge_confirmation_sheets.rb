@@ -74,6 +74,7 @@ module Oec
           log_validation_errors
         end
         export_sheet(merged_course_confirmations, merged_confirmations_folder)
+        update_merged_status(department_names)
       end
 
       def fill_in_sis_ids(merged_sheet)
@@ -146,7 +147,35 @@ module Oec
         end
         inferred
       end
-    end
 
+      def update_merged_status(department_names)
+        unless (tracking_worksheet = term_tracking_sheet.get_worksheet)
+          log :error, 'Could not find tracking sheet to update merged status' 
+          return
+        end
+        unless (status_column_idx = term_tracking_sheet.get_header_index('Internal Status'))
+          log :error, "Could not find column to update tracking sheet with merged status"
+          return
+        end
+        (Oec::TermTrackingSheet::HEADER_ROW_INDEX + 1).step do |y|
+          value = tracking_worksheet[y, 1]
+          if value.blank?
+            department_names.each { |dept_name| log :error, "Could not find tracking sheet row matching department '#{dept_name}'" }
+            break
+          end
+          if (dept_name = department_names.find { |name| value.start_with?(name) })
+            tracking_worksheet[y, status_column_idx] = 'Merged'
+            department_names.delete dept_name
+          end
+        end 
+        begin
+          tracking_worksheet.save
+          log :debug, "Updated tracking sheet with merged status"
+        rescue Errors::ProxyError => e
+          log :error, "Failed to update tracking sheet with merged status"
+        end
+      end
+
+    end
   end
 end

@@ -101,6 +101,7 @@ Rails.application.routes.draw do
 
   if ProvidedServices.oec?
     # OEC endpoints
+    get '/api/oec/depts_ready_to_publish/:term_slug' => 'oec_tasks#depts_ready_to_publish', :defaults => { :format => 'json' }
     get '/api/oec/google/request_authorization'=> 'oec_google_auth#refresh_tokens', :defaults => { :format => 'json' }
     get '/api/oec/google/handle_callback' => 'oec_google_auth#handle_callback', :defaults => { :format => 'json' }
     get '/api/oec/google/remove_authorization' => 'oec_google_auth#remove_authorization'

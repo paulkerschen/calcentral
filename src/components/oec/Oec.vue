@@ -36,6 +36,7 @@
             class="pb-1"
             :options="terms"
             option-label="friendlyName"
+            @change="resetDepartments(selectDeptsMode)"
           ></b-form-select>
         </div>
         <b-form-group
@@ -54,6 +55,15 @@
               All participating departments
             </b-form-radio>
             <b-form-radio
+              v-if="taskName === 'MergeConfirmationSheets'"    
+              v-model="selectDeptsMode"
+              name="select-departments-mode"
+              value="readyToPublish"
+              @change="resetDepartments"
+            >
+              Departments ready to publish
+            </b-form-radio>
+            <b-form-radio
               v-model="selectDeptsMode"
               name="select-departments-mode"
               value="individual"
@@ -62,13 +72,31 @@
               Individual departments
             </b-form-radio>
             <b-alert
-              v-if="selectDeptsMode === 'all'"
+              v-if="selectDeptsMode === 'all' || selectDeptsMode === 'readyToPublish'"
               class="alert-box m-2 mt-3 overflow-auto"
               show
               variant="info"
             >
-              <ul id="cc-page-oec-departments-participating" class="cc-text-small participating-list">
+              <ul
+                v-if="selectDeptsMode === 'all'"
+                id="cc-page-oec-departments-participating"
+                class="cc-text-small participating-list"
+              >
                 <li v-for="d in departmentsParticipating" :key="d.code">{{ d.name }}</li>
+              </ul>
+              <div v-if="selectDeptsMode === 'readyToPublish' && departmentsLoading" role="alert">Loading departments...</div>
+              <div v-if="selectDeptsMode === 'readyToPublish' && !departmentsLoading && !departmentsReadyToPublish.length" role="alert">
+                No departments ready to publish for <strong>{{ term }}</strong>.
+              </div>
+              <div v-if="selectDeptsMode === 'readyToPublish' && !departmentsLoading && departmentsReadyToPublish.length" role="alert" class="mb-3">
+                <strong>{{ departmentsReadyToPublish.length }}</strong> departments ready to publish for <strong>{{ term }}</strong>.
+              </div>
+              <ul
+                v-if="selectDeptsMode === 'readyToPublish' && !departmentsLoading"
+                id="cc-page-oec-departments-ready-to-publish"
+                class="cc-text-small participating-list"
+              >
+                <li v-for="d in departmentsReadyToPublish" :key="d.code">{{ d.name }}</li>
               </ul>
             </b-alert>
             <b-form-select
@@ -91,7 +119,7 @@
         <div class="p-2">
           <b-button
             id="oec-run-task-button"
-            :disabled="!taskName || !term || (taskRequiresDepartments && (selectDeptsMode !== 'all') && !departmentCodes.length)"
+            :disabled="!taskName || !term || (taskRequiresDepartments && ((selectDeptsMode === 'individual' && !departmentCodes.length) || (selectDeptsMode === 'readyToPublish' && !departmentsReadyToPublish.length)))"
             size="sm"
             variant="primary"
             @click="run"
@@ -107,7 +135,7 @@
 <script>
 import Context from '@/mixins/Context'
 import RunTask from '@/components/oec/RunTask'
-import {getTasks} from '@/api/oec'
+import {getDeptsReadyToPublish, getTasks} from '@/api/oec'
 
 export default {
   name: 'Oec',
@@ -117,7 +145,9 @@ export default {
     currentTerm: null,
     departmentCodes: [],
     departments: undefined,
+    departmentsLoading: false,
     departmentsParticipating: [],
+    departmentsReadyToPublish: [],
     isTaskRunning: false,
     selectDeptsMode: null,
     taskName: null,
@@ -127,7 +157,13 @@ export default {
   }),
   computed: {
     runTaskDepartmentCodes() {
-      return this.selectDeptsMode === 'all' ? 'all_participating' : this.departmentCodes
+      if (this.selectDeptsMode === 'all') {
+        return 'all_participating'
+      } else if (this.selectDeptsMode === 'readyToPublish') {
+        return this.departmentsReadyToPublish.map(d => d.code)
+      } else {
+        return this.departmentCodes
+      }
     },
     taskRequiresDepartments() {
       return ['SisImport', 'CreateConfirmationSheets', 'ReportDiff', 'MergeConfirmationSheets'].includes(this.taskName)
@@ -150,8 +186,18 @@ export default {
     getTaskObject(name) {
       return name && this.$_.find(this.tasks, ['name', name])
     },
-    resetDepartments() {
-      this.departmentCodes = []    
+    resetDepartments(mode) {
+      mode = mode || this.selectDeptsMode
+      this.departmentCodes = []
+      if (this.taskName === 'MergeConfirmationSheets' && mode === 'readyToPublish') {
+        this.departmentsLoading = true
+        this.departmentsReadyToPublish = []
+        const termSlug = this.term.toLowerCase().replace(' ', '-')
+        getDeptsReadyToPublish(termSlug).then(data => {
+          this.departmentsReadyToPublish = data.departments
+          this.departmentsLoading = false
+        })
+      }
     },
     resetModelObjects() {
       this.departmentCodes = []    

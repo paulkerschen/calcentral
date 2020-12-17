@@ -1,5 +1,9 @@
 import utils from '@/api/api-utils'
 
+export function getDeptsReadyToPublish(termCode: string) {
+  return utils.get(`/api/oec/depts_ready_to_publish/${termCode}`)
+}
+
 export function getTasks() {
   return utils.get('/api/oec/tasks')
 }

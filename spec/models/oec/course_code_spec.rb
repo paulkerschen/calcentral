@@ -1,26 +1,6 @@
 describe Oec::CourseCode do
 
-  before do
-    #If test environment has no course code data, populate with subset
-    if Oec::CourseCode.count.zero?
-      Oec::CourseCode.create(dept_name: 'A,RESEC', catalog_id: '', dept_code: 'MBARC', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'BIOLOGY', catalog_id: '1A', dept_code: 'IMMCB', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'BIOLOGY', catalog_id: '1AL', dept_code: 'IMMCB', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'BIOLOGY', catalog_id: '1B', dept_code: 'IBIBI', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'BIOLOGY', catalog_id: '1BL', dept_code: 'IBIBI', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'CATALAN', catalog_id: '', dept_code: 'LPSPP', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'CHEM', catalog_id: '', dept_code: 'CCHEM', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'INTEGBI', catalog_id: '', dept_code: 'IBIBI', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'ILA', catalog_id: '', dept_code: 'LPSPP', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'MCELLBI', catalog_id: '', dept_code: 'IMMCB', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'PORTUG', catalog_id: '', dept_code: 'LPSPP', include_in_oec: true)
-      Oec::CourseCode.create(dept_name: 'SPANISH', catalog_id: '', dept_code: 'LPSPP', include_in_oec: true)
-    end
-
-    #Fake test-only course
-    Oec::CourseCode.create(dept_name: 'SPANISH', catalog_id: '99', dept_code: 'LPSPP', include_in_oec: false)
-
-  end
+  include_context 'OEC course codes'
 
   it 'should find course codes for a single department' do
     course_codes = Oec::CourseCode.where(dept_code: 'CCHEM').to_a
