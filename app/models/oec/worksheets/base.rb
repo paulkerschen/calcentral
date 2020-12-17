@@ -58,6 +58,11 @@ module Oec
         instance
       end
 
+      def self.string_coords(y, x)
+        # e.g., [1, 4] to D1
+        "#{('A'..'Z').first(x).last}#{y}"
+      end
+
       def errors_for_row(row)
         errors = self.class.row_validations.map do |validation|
           if row[validation[:key]].blank?
