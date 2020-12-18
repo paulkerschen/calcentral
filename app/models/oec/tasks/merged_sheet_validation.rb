@@ -86,7 +86,9 @@ module Oec
           if confirmation['DEPT_FORM'].present?
             dept_supervisors = supervisors.matching_dept_form(confirmation['DEPT_FORM'])
             validate('courses', confirmation['COURSE_ID']) do |errors|
-              log :warn, "DEPT_FORM #{confirmation['DEPT_FORM']} not found among participating departments" unless participating_dept_forms.include? confirmation['DEPT_FORM']
+              unless participating_dept_forms.include? confirmation['DEPT_FORM'].split('_').first
+                log :warn, "DEPT_FORM #{confirmation['DEPT_FORM']} not found among participating departments"
+              end
               report_eval_type = "#{confirmation['EVALUATION_TYPE']} in course #{confirmation['COURSE_ID']}"
               case confirmation['DEPT_FORM']
                 when 'LAW'
