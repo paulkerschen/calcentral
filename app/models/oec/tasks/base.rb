@@ -69,7 +69,8 @@ module Oec
         logger.warn "OEC job started. Job state updated in cache key #{@api_task_id}"
         return if @status == 'Error'
         begin
-          if self.class.task_before
+          # Child tasks should not themselves run children.
+          if self.class.task_before && !run_opts[:child_task]
             # If a preliminary task writes success status to the cache, then the front end will assume
             # the whole job is finished and stop checking. 
             result = run_child_task(self.class.task_before, log_success_to_cache: false)
@@ -102,7 +103,7 @@ module Oec
         ensure
           write_log
           write_status_to_cache if @opts[:log_to_cache]
-          if self.class.task_after && @status != 'Error'
+          if self.class.task_after && !run_opts[:child_task] && @status != 'Error'
             run_child_task(self.class.task_after, run_opts)
           end
         end
@@ -244,7 +245,7 @@ module Oec
       def run_child_task(child_task, run_opts)
         return true if (condition = child_task[:if]) && !instance_eval(&condition)
         task_opts = @opts.merge(previous_task_log: @log)
-        child_task[:class].new(task_opts).run(run_opts)
+        child_task[:class].new(task_opts).run(run_opts.merge(child_task: true))
       end
 
       def set_term_dates

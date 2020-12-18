@@ -39,9 +39,6 @@ describe Oec::Tasks::MergeConfirmationSheets do
 
   let(:departments) { %w(SWOME IMMCB) }
 
-  let(:tracking_worksheet) { double(:[] => nil, :[]= => true, save: true) }
-  let(:tracking_spreadsheet) { double(worksheets: [tracking_worksheet]) }
-
   before(:each) do
     @mock_sheets = []
 
@@ -61,13 +58,14 @@ describe Oec::Tasks::MergeConfirmationSheets do
     allow(gws_confirmation_spreadsheet).to receive(:worksheets).and_return [gws_course_confirmation[:sheet]]
     allow(mcellbi_confirmation_spreadsheet).to receive(:worksheets).and_return [mcellbi_course_confirmation[:sheet]]
 
+    [gws_course_confirmation[:sheet], mcellbi_course_confirmation[:sheet]].each do |sheet|
+      allow(sheet).to receive(:[]=).with(1, 4, 'Merged').and_return true
+      allow(sheet).to receive(:save).and_return true
+    end
+
     allow(fake_remote_drive).to receive(:find_first_matching_item).with(Oec::Folder.confirmations, anything).and_return departments_folder
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('Gender and Women\'s Studies', last_import_folder).and_return gws_import[:sheet]
     allow(fake_remote_drive).to receive(:find_first_matching_item).with('Molecular and Cell Biology', last_import_folder).and_return mcellbi_import[:sheet]
-    allow(fake_remote_drive).to receive(:find_first_matching_item).with('Spring 2015 Course Evaluations Tracking Sheet', anything)
-      .and_return double(id: 'tracking_sheet_id')
-
-    allow(fake_remote_drive).to receive(:spreadsheet_by_id).with('tracking_sheet_id').and_return tracking_spreadsheet
 
     @mock_sheets.each { |sheet| allow(fake_remote_drive).to receive(:export_csv).with(sheet[:sheet]).and_return sheet[:csv] }
   end
@@ -88,19 +86,6 @@ describe Oec::Tasks::MergeConfirmationSheets do
     end
 
     it 'should upload merged confirmation sheets and log' do
-      task.run
-    end
-
-    it 'should mark departments as merged in tracking sheet' do
-      expect(tracking_worksheet).to receive(:[]).with(2, 1).and_return 'Department'
-      expect(tracking_worksheet).to receive(:[]).with(2, 2).and_return 'Irrelevant column'
-      expect(tracking_worksheet).to receive(:[]).with(2, 3).and_return 'Internal Status'
-      expect(tracking_worksheet).to receive(:[]).with(3, 1).and_return 'Irrelevant Department'      
-      expect(tracking_worksheet).to receive(:[]).with(4, 1).and_return 'Gender and Women\'s Studies'
-      expect(tracking_worksheet).to receive(:[]).with(5, 1).and_return 'Molecular and Cell Biology'   
-      expect(tracking_worksheet).not_to receive(:[]=).with(3, 3, 'Merged')
-      expect(tracking_worksheet).to receive(:[]=).with(4, 3, 'Merged').and_return true
-      expect(tracking_worksheet).to receive(:[]=).with(5, 3, 'Merged').and_return true
       task.run
     end
   end

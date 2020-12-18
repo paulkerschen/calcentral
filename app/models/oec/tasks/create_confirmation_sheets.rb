@@ -106,13 +106,17 @@ module Oec
           log :error, 'Could not find tracking sheet to update confirmation sheet URLs' 
           return
         end
-        unless (confirmation_sheet_column_idx = term_tracking_sheet.get_header_index('Confirmation sheet'))
+        confirmation_sheet_column_idx = term_tracking_sheet.get_header_index('Confirmation Sheet')
+        internal_status_column_idx = term_tracking_sheet.get_header_index('Internal Status')
+        unless confirmation_sheet_column_idx && internal_status_column_idx
           log :error, "Could not find column to update tracking sheet with confirmation sheet URLs"
           return
         end
         (Oec::TermTrackingSheet::HEADER_ROW_INDEX + 1).step do |y|
           if (dept_name = confirmation_urls.keys.find { |name| tracking_worksheet[y, 1].start_with?(name) } )
             tracking_worksheet[y, confirmation_sheet_column_idx] = confirmation_urls[dept_name]
+            coords = Oec::Worksheets::Base.string_coords(*Oec::Worksheets::CourseConfirmation::STATUS_CELL_COORDS)
+            tracking_worksheet[y, internal_status_column_idx] = "=IMPORTRANGE(\"#{confirmation_urls[dept_name]}\", \"Courses!#{coords}:#{coords}\")" 
             confirmation_urls.delete dept_name
           end
           if tracking_worksheet[y, 1].blank?

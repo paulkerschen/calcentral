@@ -2,6 +2,8 @@ module Oec
   module Worksheets
     class CourseConfirmation < Base
 
+      STATUS_CELL_COORDS = [1, 4]
+
       def export_name
         'Courses'
       end
