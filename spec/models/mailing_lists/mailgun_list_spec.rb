@@ -283,8 +283,7 @@ describe MailingLists::MailgunList do
           expect(list.members.count).to eq 3
 
           expect(MailingLists::Member).not_to receive(:create!)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
-          expect_any_instance_of(MailingLists::Member).to receive(:destroy).exactly(1).times.and_call_original
+          expect_any_instance_of(MailingLists::Member).to receive(:update).exactly(1).times.with(deleted_at: anything).and_call_original
 
           list.populate
 
@@ -295,8 +294,10 @@ describe MailingLists::MailgunList do
           expect(response['populationResults']['success']).to eq true
           expect(response['populationResults']['messages']).to eq ['1 former member was removed.']
 
-          expect(list.members.count).to eq 2
-          expect(list.members.reload.map { |member| member.email_address}).not_to include 'kerschen@berkeley.edu'
+          list.members.reload
+          expect(list.members.count).to eq 3
+          expect(list.members.select { |m| m.deleted_at.nil? }.count).to eq 2
+          expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
         end
       end
 

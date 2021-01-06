@@ -19,7 +19,7 @@ module MailingLists
 
       if !(mailing_list = find_mailing_list)
         bounce_nonexistent
-      elsif !(member = find_member mailing_list)
+      elsif !(member = find_active_member mailing_list)
         bounce_not_member
       elsif !member.can_send
         bounce_unauthorized_to_send
@@ -43,9 +43,9 @@ module MailingLists
       end
     end
 
-    def find_member(mailing_list)
+    def find_active_member(mailing_list)
       if @sender_address
-        mailing_list.members.find_by email_address: @sender_address.address
+        mailing_list.active_members.find_by email_address: @sender_address.address
       end
     end
 

@@ -27,7 +27,7 @@ module MailingLists
     end
 
     def log_population_results
-      self.members_count = self.members.count
+      self.members_count = self.active_members.count
 
       logger.info "Added #{population_results[:add][:success]} of #{population_results[:add][:total]} new site members."
       if population_results[:add][:failure].any?
@@ -47,8 +47,12 @@ module MailingLists
 
     def remove_member(address)
       if (member = self.members.find_by email_address: address)
-        member.destroy
+        member.update(deleted_at: DateTime.now)
       end
+    end
+
+    def reactivate_member(member, course_user_data)
+      member.update course_user_data.slice(:first_name, :last_name, :can_send).merge(deleted_at: null)
     end
 
     def update_member(member, course_user_data)

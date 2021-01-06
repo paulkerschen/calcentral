@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_30_212057) do
+ActiveRecord::Schema.define(version: 2021_01_05_224707) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,7 +23,11 @@ ActiveRecord::Schema.define(version: 2020_11_30_212057) do
     t.boolean "can_send", default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "deleted_at"
+    t.datetime "welcomed_at"
+    t.index ["deleted_at"], name: "index_canvas_site_mailing_list_members_on_deleted_at"
     t.index ["mailing_list_id", "email_address"], name: "mailing_list_membership_index", unique: true
+    t.index ["welcomed_at"], name: "index_canvas_site_mailing_list_members_on_welcomed_at"
   end
 
   create_table "canvas_site_mailing_lists", force: :cascade do |t|

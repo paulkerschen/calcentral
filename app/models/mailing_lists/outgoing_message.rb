@@ -26,7 +26,7 @@ module MailingLists
 
       # Mailgun limits batch sending to 1000 members at a time.
       response = nil
-      @mailing_list.members.each_slice(1000) do |members|
+      @mailing_list.active_members.each_slice(1000) do |members|
         recipient_fields = get_recipient_fields members
         response = Mailgun::SendMessage.new.post payload.merge(recipient_fields)
         break unless response.try(:[], :response).try(:[], :sending)
