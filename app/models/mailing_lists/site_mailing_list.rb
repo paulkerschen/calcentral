@@ -33,6 +33,10 @@ module MailingLists
     # Subclasses override.
     def self.domain; end
 
+    def active_members
+      self.members.where(deleted_at: nil)
+    end
+
     def populate
       if self.state != 'created'
         self.request_failure = "Mailing List \"#{self.list_name}\" must be created before being populated."
@@ -252,8 +256,17 @@ module MailingLists
             user_address.downcase!
             addresses_to_remove.delete user_address
             if list_members.has_key? user_address
-              # Address is in the list; check if any data needs updating.
-              if update_required?(list_members[user_address], user)
+              # Address is in the list but deleted; reactivate with latest data.
+              if list_members[user_address].deleted_at
+                population_results[:add][:total] += 1
+                logger.debug "Reactivating previously deleted address #{user_address}"
+                if reactivate_member(user_address, user[:first_name], user[:last_name], user[:can_send])
+                  population_results[:add][:success] += 1
+                else
+                  population_results[:add][:failure] << user_address
+                end
+              # Address is in the list and active; check if any data needs updating.
+              elsif update_required?(list_members[user_address], user)
                 population_results[:update][:total] += 1
                 logger.debug "Updating address #{user_address}"
                 if update_member(list_members[user_address], user)
