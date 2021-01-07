@@ -52,7 +52,7 @@ module MailingLists
     end
 
     def reactivate_member(member, course_user_data)
-      member.update course_user_data.slice(:first_name, :last_name, :can_send).merge(deleted_at: null)
+      member.update course_user_data.slice(:first_name, :last_name, :can_send).merge(deleted_at: nil)
     end
 
     def update_member(member, course_user_data)

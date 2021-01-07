@@ -299,6 +299,30 @@ describe MailingLists::MailgunList do
           expect(list.members.select { |m| m.deleted_at.nil? }.count).to eq 2
           expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
         end
+
+        context 'user removed and returned' do
+          let (:course_users_including_returned) { {statusCode: 200, body: canvas_site_members + [paul]} }
+          let (:member_attributes_including_returned) { campus_member_attributes + [basic_attributes(paul)] }
+
+          before do
+            expect(course_users).to receive(:course_users).exactly(1).times.and_return(course_users_including_returned)
+            expect(User::BasicAttributes).to receive(:attributes_for_uids).exactly(1).times.and_return(member_attributes_including_returned)
+          end
+
+          it 'can resurrect a departed user from the grave' do
+            list.populate
+            list.members.reload
+            expect(list.members.count).to eq 3
+            expect(list.active_members.count).to eq 2
+            expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
+
+            list.populate
+            list.members.reload
+            expect(list.members.count).to eq 3
+            expect(list.active_members.count).to eq 3
+            expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_nil
+          end
+        end
       end
 
       context 'user with changed permissions' do
