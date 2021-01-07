@@ -20,6 +20,8 @@ module Oec
         department_names = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(@departments_filter).keys.map { |code| Berkeley::Departments.get(code, concise: true) }
         @term_dates = default_term_dates
 
+        course_confirmation_worksheets = []
+
         @remote_drive.get_items_in_folder(confirmations_folder.id).each do |department_item|
           next unless department_names.include? department_item.name
 
@@ -32,6 +34,7 @@ module Oec
           confirmation_sheet = @remote_drive.spreadsheet_by_id department_item.id
 
           if (course_confirmation_worksheet = confirmation_sheet.worksheets.find { |w| w.title == 'Courses' })
+            course_confirmation_worksheets << course_confirmation_worksheet
             course_confirmation = Oec::Worksheets::CourseConfirmation.from_csv @remote_drive.export_csv(course_confirmation_worksheet)
             log :info, "Retrieved course confirmations from department sheet '#{department_item.name}'"
           else
@@ -64,14 +67,18 @@ module Oec
             validate_and_add(merged_course_confirmations, row, %w(COURSE_ID LDAP_UID), strict: false)
           end
 
-          course_confirmation_worksheet[*Oec::Worksheets::CourseConfirmation::STATUS_CELL_COORDS] = 'Merged'
-          course_confirmation_worksheet.save
-
           log :info, "Merged all rows from department sheet '#{department_item.name}'"
 
           # Without a delay, this loop will hit enough sheets in quick succession to trigger API throttling.
           sleep Settings.oec.google.api_delay
         end
+
+        course_confirmation_worksheets.each do |cc_worksheet|
+          cc_worksheet[*Oec::Worksheets::CourseConfirmation::STATUS_CELL_COORDS] = 'Merged'
+          cc_worksheet.save
+        end
+
+        log :info, "Updated confirmation/tracking sheet status"
 
         if !valid?
           log :warn, 'Confirmation sheets generated validation errors:'
