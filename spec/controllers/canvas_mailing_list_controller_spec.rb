@@ -14,6 +14,13 @@ describe CanvasMailingListController do
       )
     end
 
+    after do
+      MailingLists::SiteMailingList.destroy_all
+    end
+
+    let(:welcome_email_body) { 'A most welcome body' }
+    let(:welcome_email_subject) { 'A most welcome subject' }
+
     shared_examples 'not authorized' do
       it 'forbids list lookup' do
         expect(MailingLists::SiteMailingList).to_not receive(:find_or_initialize_by)
@@ -24,6 +31,24 @@ describe CanvasMailingListController do
       it 'forbids list creation' do
         expect(MailingLists::MailgunList).to_not receive(:create!)
         create_request
+        expect(response.status).to eq(403)
+      end
+
+      it 'forbids welcome email activation' do
+        expect(MailingLists::SiteMailingList).to_not receive(:find_by)
+        email_activate_request
+        expect(response.status).to eq(403)
+      end
+
+      it 'forbids welcome email deactivation' do
+        expect(MailingLists::SiteMailingList).to_not receive(:find_by)
+        email_deactivate_request
+        expect(response.status).to eq(403)
+      end
+
+      it 'forbids welcome email update' do
+        expect(MailingLists::SiteMailingList).to_not receive(:find_by)
+        email_update_request
         expect(response.status).to eq(403)
       end
     end
@@ -43,6 +68,99 @@ describe CanvasMailingListController do
         expect(response.status).to eq 200
         response_json = JSON.parse(response.body)
         expect(response_json['mailingList']['state']).to eq 'created'
+      end
+
+      context 'welcome emails' do
+        before { expect(MailingLists::SiteMailingList).to receive(:find_by).at_least(:once).and_call_original }
+        context 'nonexistent course site' do
+          it 'refuses activation' do
+            email_activate_request
+            expect(response.status).to eq 400
+          end
+
+          it 'refuses deactivation' do
+            email_deactivate_request
+            expect(response.status).to eq 400
+          end
+
+          it 'refuses updates' do
+            email_update_request
+            expect(response.status).to eq 400
+          end
+        end
+
+        context 'existent course site' do
+          before { create_request }
+          context 'activation' do          
+            it 'allows activation' do
+              email_update_request
+              email_activate_request
+              expect(response.status).to eq 200
+              response_json = JSON.parse(response.body)
+              expect(response_json['welcomeEmailActive']).to eq true
+            end
+
+            context 'no email content set' do
+              it 'returns error' do
+                email_activate_request
+                expect(response.status).to eq 400
+              end
+            end
+
+            context 'no email body' do
+              let(:welcome_email_body) { nil }
+              it 'returns error' do
+                email_update_request
+                email_activate_request
+                expect(response.status).to eq 400
+              end
+            end
+
+            context 'no email subject' do
+              let(:welcome_email_subject) { nil }
+              it 'returns error' do
+                email_update_request
+                email_activate_request
+                expect(response.status).to eq 400
+              end
+            end
+          end
+
+          context 'deactivation' do
+            it 'is allowed' do
+              email_deactivate_request
+              expect(response.status).to eq 200
+              response_json = JSON.parse(response.body)
+              expect(response_json['welcomeEmailActive']).to eq false
+            end
+          end
+
+          context 'update' do
+            it 'is allowed' do
+              email_update_request
+              expect(response.status).to eq 200
+              response_json = JSON.parse(response.body)
+              expect(response_json['mailingList']['welcomeEmailBody']).to eq welcome_email_body
+              expect(response_json['mailingList']['welcomeEmailSubject']).to eq welcome_email_subject
+            end
+
+            context 'no body provided' do
+              let(:welcome_email_body) { nil }
+              it 'returns error' do
+                email_update_request
+                expect(response.status).to eq 400
+              end
+            end
+
+            context 'no subject provided' do
+              let(:welcome_email_subject) { nil }
+              it 'returns error' do
+                email_update_request
+                expect(response.status).to eq 400
+              end
+            end          
+          end
+        end
       end
     end
 
@@ -76,6 +194,9 @@ describe CanvasMailingListController do
   context 'in CalCentral context with explicit Canvas course ID' do
     let(:lookup_request) { get :show, params: {canvas_course_id: canvas_course_id.to_s} }
     let(:create_request) { post :create, params: {canvas_course_id: canvas_course_id.to_s} }
+    let(:email_activate_request) { post :activate_welcome_email, params: {canvas_course_id: canvas_course_id.to_s} }
+    let(:email_deactivate_request) { post :deactivate_welcome_email, params: {canvas_course_id: canvas_course_id.to_s} }
+    let(:email_update_request) { post :update_welcome_email, params: {canvas_course_id: canvas_course_id.to_s, subject: welcome_email_subject, body: welcome_email_body} }
     it_behaves_like 'a user authenticated api endpoint'
     it_behaves_like 'a protected controller'
   end
@@ -83,6 +204,10 @@ describe CanvasMailingListController do
   context 'in LTI context' do
     let(:lookup_request) { get :show, params: {canvas_course_id: 'embedded'} }
     let(:create_request) { post :create, params: {canvas_course_id: 'embedded'} }
+    let(:email_activate_request) { post :activate_welcome_email, params: {canvas_course_id: 'embedded'} }
+    let(:email_deactivate_request) { post :deactivate_welcome_email, params: {canvas_course_id: 'embedded'} }
+    let(:email_update_request) { post :update_welcome_email, params: {canvas_course_id: 'embedded', subject: welcome_email_subject, body: welcome_email_body} }
+
     before do
       session['canvas_course_id'] = canvas_course_id.to_s
     end

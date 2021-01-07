@@ -70,7 +70,10 @@ module MailingLists
         feed[:mailingList] = {
           name: self.list_name,
           domain: self.class.domain,
-          state: self.state
+          state: self.state,
+          welcomeEmailActive: self.welcome_email_active,
+          welcomeEmailBody: self.welcome_email_body,
+          welcomeEmailSubject: self.welcome_email_subject,          
         }
 
         add_list_urls feed
