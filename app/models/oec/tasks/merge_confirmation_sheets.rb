@@ -73,11 +73,6 @@ module Oec
           sleep Settings.oec.google.api_delay
         end
 
-        course_confirmation_worksheets.each do |cc_worksheet|
-          cc_worksheet[*Oec::Worksheets::CourseConfirmation::STATUS_CELL_COORDS] = 'Merged'
-          cc_worksheet.save
-        end
-
         log :info, "Updated confirmation/tracking sheet status"
 
         if !valid?
@@ -85,6 +80,11 @@ module Oec
           log_validation_errors
         end
         export_sheet(merged_course_confirmations, merged_confirmations_folder)
+
+        course_confirmation_worksheets.each do |cc_worksheet|
+          cc_worksheet[*Oec::Worksheets::CourseConfirmation::STATUS_CELL_COORDS] = 'Merged'
+          cc_worksheet.save
+        end
       end
 
       def fill_in_sis_ids(merged_sheet)
