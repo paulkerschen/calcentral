@@ -18,6 +18,7 @@ module Oec
         merged_course_confirmations = Oec::Worksheets::SisImport.new(export_name: 'Merged course confirmations', term_code: @term_code)
 
         department_names = Oec::DepartmentMappings.new(term_code: @term_code).by_dept_code(@departments_filter).keys.map { |code| Berkeley::Departments.get(code, concise: true) }
+        @term_dates = default_term_dates
 
         @remote_drive.get_items_in_folder(confirmations_folder.id).each do |department_item|
           next unless department_names.include? department_item.name
@@ -92,9 +93,8 @@ module Oec
       end
 
       def fill_in_modular_flags(merged_sheet)
-        term_dates = default_term_dates
         merged_sheet.each do |row|
-          row['MODULAR_COURSE'] = row.slice('START_DATE', 'END_DATE') == default_term_dates ? nil : 'Y'
+          row['MODULAR_COURSE'] = row.slice('START_DATE', 'END_DATE') == @term_dates ? nil : 'Y'
         end
       end
 
