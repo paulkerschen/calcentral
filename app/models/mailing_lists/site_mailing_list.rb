@@ -225,7 +225,7 @@ module MailingLists
 
     def update_memberships(course_users, list_members)
       # List members are keyed by email addresses; keep track of any needed removals in a separate set.
-      addresses_to_remove = list_members.keys.to_set
+      addresses_to_remove = list_members.select{ |k, v| v.deleted_at.nil? }.keys.to_set
 
       # Note UIDs for users with send permission, defined for now as having a teacher role in the course site,
       # or an Owner or Maintainer role in a project site.
@@ -260,7 +260,7 @@ module MailingLists
               if list_members[user_address].deleted_at
                 population_results[:add][:total] += 1
                 logger.debug "Reactivating previously deleted address #{user_address}"
-                if reactivate_member(user_address, user[:first_name], user[:last_name], user[:can_send])
+                if reactivate_member(list_members[user_address], user)
                   population_results[:add][:success] += 1
                 else
                   population_results[:add][:failure] << user_address
