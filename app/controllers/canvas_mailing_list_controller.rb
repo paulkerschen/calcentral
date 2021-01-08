@@ -20,18 +20,57 @@ class CanvasMailingListController < ApplicationController
     authorize canvas_course, :can_manage_mailing_list?
   end
 
-  # GET /api/academics/canvas/mailing_list
+  def find_mailing_list_by_id
+    MailingLists::SiteMailingList.find_by canvas_site_id: canvas_course_id.to_s
+  end
+
+  # GET /api/academics/canvas/mailing_list/:canvas_course_id
 
   def show
     list = MailingLists::SiteMailingList.find_or_initialize_by canvas_site_id: canvas_course_id.to_s
     render json: list.to_json
   end
 
-  # POST /api/academics/canvas/mailing_list/create
+  # POST /api/academics/canvas/mailing_list/:canvas_course_id/create
 
   def create
     list = MailingLists::MailgunList.create! canvas_site_id: canvas_course_id.to_s
     list.populate
     render json: list.to_json
   end
+
+  # POST /api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/activate
+
+  def activate_welcome_email
+    unless (list = find_mailing_list_by_id)
+      raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
+    end
+    if list.welcome_email_subject.blank? || list.welcome_email_body.blank?
+      raise Errors::BadRequestError, "Welcome email requires subject and body to be activated"
+    end
+    list.update(welcome_email_active: true)
+    render json: {'welcomeEmailActive': list.welcome_email_active}
+  end
+
+  # POST /api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/deactivate
+
+  def deactivate_welcome_email
+    unless (list = find_mailing_list_by_id)
+      raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
+    end
+    list.update(welcome_email_active: false)
+    render json: {'welcomeEmailActive': list.welcome_email_active}
+  end
+
+  # POST /api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/update
+
+  def update_welcome_email    
+    unless (list = find_mailing_list_by_id)
+      raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
+    end
+    raise Errors::BadRequestError, "Subject and body required" unless params['body'].present? && params['subject'].present?
+    list.update(welcome_email_body: params['body'], welcome_email_subject: params['subject'])
+    render json: list.to_json
+  end
+
 end

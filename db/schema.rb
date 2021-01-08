@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_05_224707) do
+ActiveRecord::Schema.define(version: 2021_01_07_222456) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,6 +42,9 @@ ActiveRecord::Schema.define(version: 2021_01_05_224707) do
     t.integer "populate_add_errors"
     t.integer "populate_remove_errors"
     t.string "type", limit: 255
+    t.boolean "welcome_email_active", default: false, null: false
+    t.text "welcome_email_subject"
+    t.text "welcome_email_body"
     t.index ["canvas_site_id"], name: "index_canvas_site_mailing_lists_on_canvas_site_id", unique: true
   end
 
