@@ -27,16 +27,6 @@ export function externalTools() {
   return utils.get('/api/academics/canvas/external_tools')
 }
 
-// Mailing lists: endpoints with minimal permissions, to be used by instructors
-
-export function createSiteMailingList(canvasCourseId: string) {
-  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/create`)
-}
-
-export function getSiteMailingList(canvasCourseId: string) {
-  return utils.get(`/api/academics/canvas/mailing_list/${canvasCourseId}`)
-}
-
 // Grade export
 
 export function downloadGradeCsv(courseId: string, ccn: string, termCode: string, termYear: string, type: string, pnpCutoff: string) {
@@ -61,6 +51,31 @@ export function getExportJobStatus(canvasCourseId: string, jobId: string) {
 
 export function prepareGradesCacheJob(canvasCourseId: string) {
   return utils.post(`/api/academics/canvas/egrade_export/prepare/${canvasCourseId}`)
+}
+
+// Mailing lists: endpoints used by instructors
+
+export function activateWelcomeEmail(canvasCourseId: string) {
+  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/activate`)
+}
+
+export function createSiteMailingList(canvasCourseId: string) {
+  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/create`)
+}
+
+export function deactivateWelcomeEmail(canvasCourseId: string) {
+  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/deactivate`)
+}
+
+export function getSiteMailingList(canvasCourseId: string) {
+  return utils.get(`/api/academics/canvas/mailing_list/${canvasCourseId}`)
+}
+
+export function updateWelcomeEmail(canvasCourseId: string, mailingList: any) {
+  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/update`, {
+    body: mailingList.welcomeEmailBody,
+    subject: mailingList.welcomeEmailSubject
+  })
 }
 
 // Mailing lists: endpoints requiring admin permissions
