@@ -6,6 +6,7 @@ namespace :mailing_lists do
     failed_lists = []
     add = {total: 0, success: 0}
     remove = {total: 0, success: 0}
+    welcome_emails = {total: 0, success: 0}
     MailingLists::SiteMailingList.find_each do |list|
       list.populate
       if list.population_results
@@ -13,12 +14,15 @@ namespace :mailing_lists do
         add[:success] += list.population_results[:add][:success]
         remove[:total] += list.population_results[:remove][:total]
         remove[:success] += list.population_results[:remove][:success]
+        welcome_emails[:total] += list.population_results[:welcome][:total]
+        welcome_emails[:success] += list.population_results[:welcome][:success]
       else
         Rails.logger.warn "Update task failed for #{list.list_name}: #{list.request_failure}."
         failed_lists << list.list_name
       end
     end
     Rails.logger.warn "Update complete; #{add[:success]} of #{add[:total]} new members added, #{remove[:success]} of #{remove[:total]} former members removed."
+    Rails.logger.warn "Welcome emails sent to #{welcome_emails[:success]} of #{welcome_emails[:total]} members not previously welcomed."
     if failed_lists.any?
       Rails.logger.warn "Update failed on #{failed_lists.count} lists: #{failed_lists.join(', ')}"
     end
