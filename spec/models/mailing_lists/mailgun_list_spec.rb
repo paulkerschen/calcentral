@@ -23,8 +23,19 @@ describe MailingLists::MailgunList do
   end
 
   context 'an existing list record' do
-    before { described_class.create(canvas_site_id: canvas_site_id)  }
     let(:list) { described_class.find_by(canvas_site_id: canvas_site_id) }
+    let(:welcome_email_active) { true }
+    let(:welcome_email_body) { '<p><b>Lasciate ogni speranza</b>, voi ch\'entrate!</p>' }
+    let(:welcome_email_subject) { 'Welcome to the jungle' }
+
+    before do
+      described_class.create(canvas_site_id: canvas_site_id)  
+      list.update(
+        welcome_email_active: welcome_email_active,
+        welcome_email_body: welcome_email_body,
+        welcome_email_subject: welcome_email_subject
+      ) 
+    end
 
     it 'reports state as created' do
       expect(response['mailingList']['state']).to eq 'created'
@@ -82,6 +93,7 @@ describe MailingLists::MailgunList do
             first_name: user['first_name'],
             last_name: user['last_name'],
             email_address: user['email'],
+            welcomed_at: DateTime.now,
             can_send: Canvas::CourseUser.has_instructing_role?(user)
           )
         end
@@ -111,7 +123,6 @@ describe MailingLists::MailgunList do
 
           expect(MailingLists::Member).to receive(:create!).exactly(3).times.and_call_original
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
           list.populate
 
           expect(list.population_results[:add][:success]).to eq 3
@@ -167,6 +178,47 @@ describe MailingLists::MailgunList do
           it 'correctly sets sending permissions' do
             list.populate
             expect(list.members.find_by(email_address: 'oheyer@berkeley.edu').can_send).to eq can_send
+          end
+        end
+
+        context 'welcome email configured' do
+          it 'welcomes everybody' do
+            expect_any_instance_of(Mailgun::SendMessage).to receive(:post).with(hash_including(
+              'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
+              'subject' => welcome_email_subject,
+              'html' => welcome_email_body,
+              'text' => welcome_email_body.gsub(/<[^>]+>/, ''),
+              'to' => an_object_having_attributes(length: 3, sort: [paul['email'], oliver['email'], ray['email']])
+            )).exactly(:once).and_call_original
+            list.populate
+            expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
+          end
+        end
+
+        context 'welcome email paused' do
+          let(:welcome_email_active) { false }
+          it 'welcomes nobody' do
+            expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
+            list.populate
+            expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
+          end
+        end
+
+        context 'welcome email without body' do
+          let(:welcome_email_body) { '' }
+          it 'welcomes nobody' do
+            expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
+            list.populate
+            expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
+          end
+        end
+
+        context 'welcome email without subject' do
+          let(:welcome_email_subject) { '' }
+          it 'welcomes nobody' do
+            expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
+            list.populate
+            expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
           end
         end
 
@@ -258,7 +310,6 @@ describe MailingLists::MailgunList do
             mailing_list_id: list.id
           ).and_call_original
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
-          expect_any_instance_of(MailingLists::Member).not_to receive(:update)
 
           list.populate
 
@@ -272,6 +323,19 @@ describe MailingLists::MailgunList do
           expect(response['populationResults']['messages']).to eq ['2 new members were added.']
 
           expect(list.members.count).to eq 3
+          expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
+        end
+
+        it 'welcomes new users only' do
+          expect_any_instance_of(Mailgun::SendMessage).to receive(:post).with(hash_including(
+            'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
+            'subject' => welcome_email_subject,
+            'html' => welcome_email_body,
+            'text' => welcome_email_body.gsub(/<[^>]+>/, ''),
+            'to' => an_object_having_attributes(length: 2, sort: [paul['email'], ray['email']])
+          )).exactly(:once).and_call_original
+          list.populate
+          expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
         end
       end
 
@@ -300,6 +364,11 @@ describe MailingLists::MailgunList do
           expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
         end
 
+        it 'welcomes nobody' do
+          expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
+          list.populate
+        end
+
         context 'user removed and returned' do
           let (:course_users_including_returned) { {statusCode: 200, body: canvas_site_members + [paul]} }
           let (:member_attributes_including_returned) { campus_member_attributes + [basic_attributes(paul)] }
@@ -309,13 +378,14 @@ describe MailingLists::MailgunList do
             expect(User::BasicAttributes).to receive(:attributes_for_uids).exactly(1).times.and_return(member_attributes_including_returned)
           end
 
-          it 'can resurrect a departed user from the grave' do
+          it 'can resurrect a departed user from the grave, without resending welcome email' do
             list.populate
             list.members.reload
             expect(list.members.count).to eq 3
             expect(list.active_members.count).to eq 2
             expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
 
+            expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
             list.populate
             list.members.reload
             expect(list.members.count).to eq 3
@@ -352,6 +422,11 @@ describe MailingLists::MailgunList do
           expect(list.population_results[:update][:failure]).to eq []
           expect(response['populationResults']['success']).to eq true
           expect(response['populationResults']['messages']).to eq ['1 member was updated.']
+        end
+
+        it 'welcomes nobody' do
+          expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
+          list.populate
         end
       end
     end

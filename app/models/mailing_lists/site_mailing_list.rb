@@ -52,6 +52,7 @@ module MailingLists
         self.request_failure = "Could not retrieve existing list roster for \"#{self.list_name}\"."
       else
         update_memberships(course_users, list_members)
+        send_welcome_emails if self.welcome_email_active && self.welcome_email_body.present? && self.welcome_email_subject.present?
       end
     end
 
@@ -161,6 +162,10 @@ module MailingLists
           total: 0,
           success: 0,
           failure: []
+        },
+        welcome_emails: {
+          total: 0,
+          success: 0
         }
       }
     end
@@ -312,6 +317,27 @@ module MailingLists
       self.populate_remove_errors = population_results[:remove][:failure].count
       self.populated_at = DateTime.now
       save
+    end
+
+    def send_welcome_emails
+      payload = {
+        'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
+        'subject' => self.welcome_email_subject,
+        'html' => self.welcome_email_body,
+        'text' => HtmlSanitizer.sanitize_html(self.welcome_email_body)
+      }
+
+      unwelcomed_members = active_members.where(welcomed_at: nil)
+      population_results[:welcome_emails][:total] = unwelcomed_members.count
+      unwelcomed_members.each_slice(1000) do |unwelcomed_slice|
+        recipient_fields = MailingLists::OutgoingMessage.get_recipient_fields unwelcomed_slice
+        response = Mailgun::SendMessage.new.post payload.merge(recipient_fields)
+        break unless response.try(:[], :response).try(:[], :sending)
+        ActiveRecord::Base.transaction do
+          unwelcomed_slice.each { |member| member.update(welcomed_at: DateTime.now) }
+        end
+        population_results[:welcome_emails][:success] += unwelcomed_slice.count
+      end
     end
   end
 end
