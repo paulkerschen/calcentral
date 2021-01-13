@@ -189,7 +189,7 @@ cache:
     default: <%= 35.minutes %>
     failure: <%= 30.seconds %>
     BackgroundJobsCheck: <%= 29.days %>
-    User::Api: NEXT_08_00
+    User::Api: NEXT_00_00
     User::AuthenticationValidator: <%= 8.hours %>
     User::AuthenticationValidator::short: <%= 5.minutes %>
     Cal1card::Photo: <%= 4.hours %>
@@ -200,7 +200,7 @@ cache:
     CanvasLti::Egrades: <%= 1.minute %>
     CanvasLti::Lti: <%= 5.minutes %>
 
-    Berkeley::Terms: NEXT_08_00
+    Berkeley::Terms: NEXT_00_00
     Berkeley::LegacyTerms: <%= 29.days %>
 
     EdoOracle::CourseSections: <%= 8.hours %>

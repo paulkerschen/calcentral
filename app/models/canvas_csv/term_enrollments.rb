@@ -65,9 +65,14 @@ module CanvasCsv
       @canvas_section_id_enrollments = {}
       term_set = term_enrollments_csv_filepaths(latest_term_enrollment_set_date)
       term_set.each do |term,filepath|
-        term_csv = CSV.read(filepath, {headers: true})
-        # section ids are not going to overlap acros terms, so merging is safe
-        @canvas_section_id_enrollments.merge!(term_csv.group_by {|row| row['sis_section_id']})
+        begin
+          term_csv = CSV.read(filepath, {headers: true})
+          # section ids are not going to overlap across terms, so merging is safe
+          @canvas_section_id_enrollments.merge!(term_csv.group_by {|row| row['sis_section_id']})
+        rescue StandardError => e
+          logger.error "Failed to load term enrollments from file #{filepath}, continuing with remaining terms"
+          logger.error [e.message, *e.backtrace].join("\n")
+        end
       end
       logger.warn "Enrollments loaded for terms #{term_set.keys.to_sentence}"
       logger.warn "#{@canvas_section_id_enrollments.keys.count} sections loaded"

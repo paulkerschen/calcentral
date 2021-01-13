@@ -27,5 +27,5 @@ echo "`date`: About to run the refresh script..." | $LOGIT
 set -o pipefail
 /usr/bin/flock -n /tmp/canvas-refresh.lock bundle exec rake canvas:full_refresh |& $LOGIT
 if [[ $? != 0 ]]; then
-  echo "Found a /tmp/canvas-refresh.lock file from another refresh in progress; will not run." |& $LOGIT
+  echo "Job failed. Immediate exit may indicate a /tmp/canvas-refresh.lock file from another refresh in progress." |& $LOGIT
 fi
