@@ -96,6 +96,19 @@
           </div>
         </div>
 
+        <div v-if="mailingList.welcomeEmailLastSent" class="bc-page-site-mailing-list-text">
+          <b-button
+            id="btn-download-sent-message-log"
+            type="button"
+            variant="link"
+            class="p-0"
+            @click="downloadMessageLog"
+          >
+            <fa icon="file-download"></fa>
+            Download sent message log (last updated {{ $moment(mailingList.welcomeEmailLastSent).format('MMM D, YYYY') }})
+          </b-button>
+        </div>
+
         <form
           v-if="isEditingWelcomeEmail"
           class="bc-canvas-page-form bc-canvas-form bc-page-site-mailing-list-welcome-email-form"
@@ -173,7 +186,14 @@
 </template>
 
 <script>
-import {activateWelcomeEmail, createSiteMailingList, deactivateWelcomeEmail, getSiteMailingList, updateWelcomeEmail} from '@/api/canvas'
+import {
+  activateWelcomeEmail,
+  createSiteMailingList,
+  deactivateWelcomeEmail,
+  downloadWelcomeEmailCsv,
+  getSiteMailingList,
+  updateWelcomeEmail
+} from '@/api/canvas'
 import CanvasUtils from '@/mixins/CanvasUtils'
 import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
@@ -212,6 +232,10 @@ export default {
         },
         this.$errorHandler
       )
+    },
+    downloadMessageLog() {
+      this.alertScreenReader('Downloading message log')
+      downloadWelcomeEmailCsv(this.canvasCourseId)
     },
     getMailingList() {
       return getSiteMailingList(this.canvasCourseId).then(

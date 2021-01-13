@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import moment from 'moment-timezone'
 import utils from '@/api/api-utils'
 
 // Shared
@@ -65,6 +66,11 @@ export function createSiteMailingList(canvasCourseId: string) {
 
 export function deactivateWelcomeEmail(canvasCourseId: string) {
   return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/deactivate`)
+}
+
+export function downloadWelcomeEmailCsv(canvasCourseId: string) {
+  const filename = `${canvasCourseId}-welcome-messages-log-${moment().format('YYYY-MM-DD_hhmmss')}.csv`
+  return utils.downloadViaGet(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email_log`, filename)
 }
 
 export function getSiteMailingList(canvasCourseId: string) {
