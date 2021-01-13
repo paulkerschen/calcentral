@@ -1,3 +1,7 @@
+def csv_row_count(list)
+  CSV.parse(list.members_welcomed_csv).count - 1
+end
+
 describe MailingLists::MailgunList do
   let(:canvas_site_id) { '1121' }
   let(:fake_course_data) { Canvas::Course.new(canvas_course_id: canvas_site_id, fake: true).course[:body] }
@@ -191,7 +195,9 @@ describe MailingLists::MailgunList do
               'to' => an_object_having_attributes(length: 3, sort: [paul['email'], oliver['email'], ray['email']])
             )).exactly(:once).and_call_original
             list.populate
+            expect(csv_row_count list).to eq 3
             expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
+            expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_present
           end
         end
 
@@ -200,7 +206,9 @@ describe MailingLists::MailgunList do
           it 'welcomes nobody' do
             expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
             list.populate
+            expect(csv_row_count list).to eq 0
             expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
+            expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_nil
           end
         end
 
@@ -209,7 +217,9 @@ describe MailingLists::MailgunList do
           it 'welcomes nobody' do
             expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
             list.populate
+            expect(csv_row_count list).to eq 0
             expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
+            expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_nil
           end
         end
 
@@ -218,7 +228,9 @@ describe MailingLists::MailgunList do
           it 'welcomes nobody' do
             expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
             list.populate
+            expect(csv_row_count list).to eq 0
             expect(list.members.reload.map(&:welcomed_at)).to eq [nil, nil, nil]
+            expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_nil
           end
         end
 
@@ -294,6 +306,7 @@ describe MailingLists::MailgunList do
 
         it 'requests addition of new users only' do
           expect(list.members.count).to eq 1
+          expect(csv_row_count list).to eq 1
 
           expect(MailingLists::Member).to receive(:create!).exactly(1).times.with(
             email_address: 'raydavis@berkeley.edu',
@@ -323,7 +336,9 @@ describe MailingLists::MailgunList do
           expect(response['populationResults']['messages']).to eq ['2 new members were added.']
 
           expect(list.members.count).to eq 3
+          expect(csv_row_count list).to eq 3
           expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
+          expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_present
         end
 
         it 'welcomes new users only' do
@@ -335,7 +350,9 @@ describe MailingLists::MailgunList do
             'to' => an_object_having_attributes(length: 2, sort: [paul['email'], ray['email']])
           )).exactly(:once).and_call_original
           list.populate
+          expect(csv_row_count list).to eq 3
           expect(list.members.reload.map(&:welcomed_at)).to all(be_an_instance_of ActiveSupport::TimeWithZone)
+          expect(JSON.parse(list.to_json)['mailingList']['welcomeEmailLastSent']).to be_present
         end
       end
 
@@ -382,6 +399,7 @@ describe MailingLists::MailgunList do
             list.populate
             list.members.reload
             expect(list.members.count).to eq 3
+            expect(csv_row_count list).to eq 3
             expect(list.active_members.count).to eq 2
             expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
 
@@ -389,6 +407,7 @@ describe MailingLists::MailgunList do
             list.populate
             list.members.reload
             expect(list.members.count).to eq 3
+            expect(csv_row_count list).to eq 3
             expect(list.active_members.count).to eq 3
             expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_nil
           end
