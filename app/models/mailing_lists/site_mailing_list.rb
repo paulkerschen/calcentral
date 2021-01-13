@@ -37,6 +37,16 @@ module MailingLists
       self.members.where(deleted_at: nil)
     end
 
+    def members_welcomed_csv
+      welcomed_members = self.members.where.not(welcomed_at: nil).order(:welcomed_at)
+      CSV.generate(row_sep: "\r\n") do |csv|
+        csv << ['Name', 'Email address', 'Message sent', 'Current member']
+        welcomed_members.each do |m|
+          csv << ["#{m.first_name} #{m.last_name}", m.email_address, m.welcomed_at, (m.deleted_at.nil? ? 'Y' : 'N')]
+        end
+      end
+    end
+
     def populate
       if self.state != 'created'
         self.request_failure = "Mailing List \"#{self.list_name}\" must be created before being populated."
@@ -76,6 +86,9 @@ module MailingLists
           welcomeEmailBody: self.welcome_email_body,
           welcomeEmailSubject: self.welcome_email_subject,          
         }
+        if self.respond_to? :members
+          feed[:mailingList][:welcomeEmailLastSent] = self.members.maximum('welcomed_at')
+        end
 
         add_list_urls feed
 

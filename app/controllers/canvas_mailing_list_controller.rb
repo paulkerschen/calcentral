@@ -31,6 +31,17 @@ class CanvasMailingListController < ApplicationController
     render json: list.to_json
   end
 
+  # GET /api/academics/canvas/mailing_list/:canvas_course_id/welcome_email_log.csv
+
+  def download_welcome_email_log
+    unless (list = find_mailing_list_by_id)
+      raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
+    end
+    respond_to do |format|
+      format.csv { render csv: list.members_welcomed_csv.to_s, filename: "#{canvas_course_id}-welcome-messages-log.csv" }
+    end
+  end
+
   # POST /api/academics/canvas/mailing_list/:canvas_course_id/create
 
   def create

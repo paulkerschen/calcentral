@@ -51,6 +51,12 @@ describe CanvasMailingListController do
         email_update_request
         expect(response.status).to eq(403)
       end
+
+      it 'forbids message log' do
+        expect(MailingLists::SiteMailingList).to_not receive(:find_by)
+        download_email_log_request
+        expect(response.status).to eq(403)
+      end
     end
 
     shared_examples 'authorized' do
@@ -85,6 +91,11 @@ describe CanvasMailingListController do
 
           it 'refuses updates' do
             email_update_request
+            expect(response.status).to eq 400
+          end
+
+          it 'refuses message log' do
+            download_email_log_request
             expect(response.status).to eq 400
           end
         end
@@ -123,6 +134,25 @@ describe CanvasMailingListController do
                 email_activate_request
                 expect(response.status).to eq 400
               end
+            end
+          end
+
+          context 'serving CSV sent message log' do
+            let(:csv_string) do
+              [
+                "Name,Email address,Message sent,Current member",
+                "A. Aardvark,a@berkeley.edu,,Y",
+                "B. Boa,b@berkeley.edu,,Y",
+                "C. Curlew,c@berkeley.edu,,Y",
+                "D. Dugong,d@berkeley.edu,,Y",
+              ].join("\n")
+            end
+            before { allow_any_instance_of(MailingLists::SiteMailingList).to receive(:members_welcomed_csv).and_return(csv_string) }
+            it 'is allowed' do
+              download_email_log_request
+              expect(response.status).to eq(200)
+              expect(response.headers['Content-Type']).to eq 'text/csv'
+              expect(response.headers['Content-Disposition']).to start_with 'attachment; filename'
             end
           end
 
@@ -194,6 +224,7 @@ describe CanvasMailingListController do
   context 'in CalCentral context with explicit Canvas course ID' do
     let(:lookup_request) { get :show, params: {canvas_course_id: canvas_course_id.to_s} }
     let(:create_request) { post :create, params: {canvas_course_id: canvas_course_id.to_s} }
+    let(:download_email_log_request) { get :download_welcome_email_log, params: {canvas_course_id: canvas_course_id.to_s, format: 'csv'} }
     let(:email_activate_request) { post :activate_welcome_email, params: {canvas_course_id: canvas_course_id.to_s} }
     let(:email_deactivate_request) { post :deactivate_welcome_email, params: {canvas_course_id: canvas_course_id.to_s} }
     let(:email_update_request) { post :update_welcome_email, params: {canvas_course_id: canvas_course_id.to_s, subject: welcome_email_subject, body: welcome_email_body} }
@@ -204,6 +235,7 @@ describe CanvasMailingListController do
   context 'in LTI context' do
     let(:lookup_request) { get :show, params: {canvas_course_id: 'embedded'} }
     let(:create_request) { post :create, params: {canvas_course_id: 'embedded'} }
+    let(:download_email_log_request) { get :download_welcome_email_log, params: {canvas_course_id: 'embedded', format: 'csv'} }
     let(:email_activate_request) { post :activate_welcome_email, params: {canvas_course_id: 'embedded'} }
     let(:email_deactivate_request) { post :deactivate_welcome_email, params: {canvas_course_id: 'embedded'} }
     let(:email_update_request) { post :update_welcome_email, params: {canvas_course_id: 'embedded', subject: welcome_email_subject, body: welcome_email_body} }

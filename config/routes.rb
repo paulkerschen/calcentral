@@ -90,6 +90,7 @@ Rails.application.routes.draw do
     # Administer Canvas mailing list for a single course site
     get '/api/academics/canvas/mailing_list/:canvas_course_id' => 'canvas_mailing_list#show', :defaults => { :format => 'json' }
     post '/api/academics/canvas/mailing_list/:canvas_course_id/create' => 'canvas_mailing_list#create', :defaults => { :format => 'json' }
+    get '/api/academics/canvas/mailing_list/:canvas_course_id/welcome_email_log' => 'canvas_mailing_list#download_welcome_email_log', :as => :welcome_email_csv, :defaults => { :format => 'csv' }
     post '/api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/activate' => 'canvas_mailing_list#activate_welcome_email', :defaults => { :format => 'json' }
     post '/api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/deactivate' => 'canvas_mailing_list#deactivate_welcome_email', :defaults => { :format => 'json' }
     post '/api/academics/canvas/mailing_list/:canvas_course_id/welcome_email/update' => 'canvas_mailing_list#update_welcome_email', :defaults => { :format => 'json' }
