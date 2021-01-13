@@ -38,7 +38,10 @@ class CanvasMailingListController < ApplicationController
       raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
     end
     respond_to do |format|
-      format.csv { render csv: list.members_welcomed_csv.to_s, filename: "#{canvas_course_id}-welcome-messages-log.csv" }
+      format.csv do
+        csv_filename = "#{canvas_course_id}-welcome-messages-log-#{DateTime.now.strftime('%F_%H%M%S')}.csv"
+        render csv: list.members_welcomed_csv.to_s, filename: csv_filename
+      end
     end
   end
 
