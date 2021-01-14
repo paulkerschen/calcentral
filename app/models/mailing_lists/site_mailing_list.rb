@@ -337,7 +337,7 @@ module MailingLists
         'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
         'subject' => self.welcome_email_subject,
         'html' => self.welcome_email_body,
-        'text' => HtmlSanitizer.sanitize_html(self.welcome_email_body)
+        'text' => text_format_email(self.welcome_email_body)
       }
 
       unwelcomed_members = active_members.where(welcomed_at: nil)
@@ -351,6 +351,12 @@ module MailingLists
         end
         population_results[:welcome_emails][:success] += unwelcomed_slice.count
       end
+    end
+
+    def text_format_email(body)
+      # Before stripping HTML tags, replace end tags on block elements with a couple of line breaks.
+      spaced_body = body.gsub(/(<\/[ol|ul|p]>)\s*/, '\\1' + "\n\n")
+      HtmlSanitizer.sanitize_html spaced_body
     end
   end
 end

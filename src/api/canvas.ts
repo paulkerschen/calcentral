@@ -77,11 +77,8 @@ export function getSiteMailingList(canvasCourseId: string) {
   return utils.get(`/api/academics/canvas/mailing_list/${canvasCourseId}`)
 }
 
-export function updateWelcomeEmail(canvasCourseId: string, mailingList: any) {
-  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/update`, {
-    body: mailingList.welcomeEmailBody,
-    subject: mailingList.welcomeEmailSubject
-  })
+export function updateWelcomeEmail(canvasCourseId: string, subject: string, body: string) {
+  return utils.post(`/api/academics/canvas/mailing_list/${canvasCourseId}/welcome_email/update`, {body, subject})
 }
 
 // Mailing lists: endpoints requiring admin permissions
