@@ -235,7 +235,7 @@ background_jobs_check:
   time_between_pings: <%= 5.minutes %>
 
 canvas_mailing_lists:
-  prefer_canvas_email_addresses: false
+  preferred_email_address_source: 'ldapMail' # Possible values: 'ldapMail', 'ldapAlternateId', 'canvas'
   timestamp_tolerance: 60
 
 oec:

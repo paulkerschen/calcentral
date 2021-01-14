@@ -261,19 +261,27 @@ module MailingLists
       course_users.map{ |user| user['login_id'] }.each_slice(1000) do |uid_slice|
         User::BasicAttributes.attributes_for_uids(uid_slice).each do |user|
 
+          user[:can_send] = sender_uids.include?(user[:ldap_uid])
+
           # In general we want to use official berkeley.edu email addresses sourced from User::BasicAttributes.
           # However, we may wish to override with Canvas-sourced email addresses for testing purposes.
           # Note that the course_users list will not include email addresses for any members with
           # "enrollment_state": "invited".
-          if Settings.canvas_mailing_lists.prefer_canvas_email_addresses
-            if (canvas_user = course_users.find { |course_user| course_user['login_id'] == user[:ldap_uid] })
-              logger.info "Setting email address for UID #{user[:ldap_uid]} to Canvas-sourced address #{canvas_user['email']}"
-              user[:email_address] = canvas_user['email']
-            end
+          user_address = case Settings.canvas_mailing_lists.preferred_email_address_source
+            when 'ldapAlternateId'
+              user[:official_bmail_address] || user[:email_address]
+            when 'ldapMail'
+              user[:email_address] || user[:official_bmail_address]
+            when 'canvas'
+              if (canvas_user = course_users.find { |course_user| course_user['login_id'] == user[:ldap_uid] })
+                logger.info "Setting email address for UID #{user[:ldap_uid]} to Canvas-sourced address #{canvas_user['email']}"
+                canvas_user['email']
+              else
+                user[:official_bmail_address] || user[:email_address]
+              end
           end
 
-          user[:can_send] = sender_uids.include?(user[:ldap_uid])
-          if (user_address = user[:email_address])
+          if user_address
             user_address.downcase!
             addresses_to_remove.delete user_address
             if list_members.has_key? user_address

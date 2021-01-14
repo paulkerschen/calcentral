@@ -54,7 +54,8 @@ describe MailingLists::MailgunList do
         'login_id' => '12345',
         'first_name' => 'Oliver',
         'last_name' => 'Heyer',
-        'email' => 'oheyer@berkeley.edu',
+        'email' => 'oheyer@classics.berkeley.edu',
+        'bmail' => 'oheyer@berkeley.edu',
         'enrollments' => [{
           'enrollment_state' => 'active',
           'role' => 'TeacherEnrollment'
@@ -64,7 +65,8 @@ describe MailingLists::MailgunList do
         'login_id' => '67890',
         'first_name' => 'Ray',
         'last_name' => 'Davis',
-        'email' => 'raydavis@berkeley.edu',
+        'email' => 'raydavis@cogsci.berkeley.edu',
+        'bmail' => 'raydavis@berkeley.edu',
         'enrollments' => [{
           'enrollment_state' => 'active',
           'role' => 'StudentEnrollment'
@@ -74,7 +76,8 @@ describe MailingLists::MailgunList do
         'login_id' => '65536',
         'first_name' => 'Paul',
         'last_name' => 'Kerschen',
-        'email' => 'kerschen@berkeley.edu',
+        'email' => 'kerschen@english.berkeley.edu',
+        'bmail' => 'kerschen@berkeley.edu',
         'enrollments' => [{
           'enrollment_state' => 'active',
           'role' => 'StudentEnrollment'
@@ -86,7 +89,8 @@ describe MailingLists::MailgunList do
           ldap_uid: user['login_id'],
           first_name: user['first_name'],
           last_name: user['last_name'],
-          email_address: user['email']
+          email_address: user['email'],
+          official_bmail_address: user['bmail']
         }
       end
 
@@ -158,19 +162,26 @@ describe MailingLists::MailgunList do
           let(:member_addresses) { list.members.reload.map { |member| member.email_address} }
 
           before do
-            allow(Settings.canvas_mailing_lists).to receive(:prefer_canvas_email_addresses).and_return canvas_email_preferred
+            allow(Settings.canvas_mailing_lists).to receive(:preferred_email_address_source).and_return preferred_email_address_source
             list.populate
           end
 
-          context 'Canvas email addresses not preferred' do
-            let(:canvas_email_preferred) { false }
-            it 'should use SIS addresses' do
+          context 'LDAP alternateId addresses not preferred' do
+            let(:preferred_email_address_source) { 'ldapAlternateId' }
+            it 'should use official bmail addresses' do
               expect(member_addresses).to match_array %w(oheyer@berkeley.edu raydavis@berkeley.edu kerschen@berkeley.edu)
             end
           end
 
+          context 'LDAP mail addresses preferred' do
+            let(:preferred_email_address_source) { 'ldapMail' }
+            it 'should use LDAP mail addresses' do
+              expect(member_addresses).to match_array %w(oheyer@classics.berkeley.edu raydavis@cogsci.berkeley.edu kerschen@english.berkeley.edu)
+            end
+          end
+
           context 'Canvas email addresses preferred' do
-            let(:canvas_email_preferred) { true }
+            let(:preferred_email_address_source) { 'canvas' }
             it 'should use Canvas addresses if available but skip pending invitees' do
               expect(member_addresses).to match_array %w(oheyer@compuserve.com raydavis@altavista.digital.com)
             end
@@ -181,7 +192,7 @@ describe MailingLists::MailgunList do
           before { oliver['enrollments'][0]['role'] = role }
           it 'correctly sets sending permissions' do
             list.populate
-            expect(list.members.find_by(email_address: 'oheyer@berkeley.edu').can_send).to eq can_send
+            expect(list.members.find_by(email_address: 'oheyer@classics.berkeley.edu').can_send).to eq can_send
           end
         end
 
@@ -309,14 +320,14 @@ describe MailingLists::MailgunList do
           expect(csv_row_count list).to eq 1
 
           expect(MailingLists::Member).to receive(:create!).exactly(1).times.with(
-            email_address: 'raydavis@berkeley.edu',
+            email_address: 'raydavis@cogsci.berkeley.edu',
             first_name: 'Ray',
             last_name: 'Davis',
             can_send: false,
             mailing_list_id: list.id
           ).and_call_original
           expect(MailingLists::Member).to receive(:create!).exactly(1).times.with(
-            email_address: 'kerschen@berkeley.edu',
+            email_address: 'kerschen@english.berkeley.edu',
             first_name: 'Paul',
             last_name: 'Kerschen',
             can_send: false,
@@ -378,7 +389,7 @@ describe MailingLists::MailgunList do
           list.members.reload
           expect(list.members.count).to eq 3
           expect(list.members.select { |m| m.deleted_at.nil? }.count).to eq 2
-          expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
+          expect(list.members.find { |member| member.email_address == 'kerschen@english.berkeley.edu'}.deleted_at).to be_present
         end
 
         it 'welcomes nobody' do
@@ -401,7 +412,7 @@ describe MailingLists::MailgunList do
             expect(list.members.count).to eq 3
             expect(csv_row_count list).to eq 3
             expect(list.active_members.count).to eq 2
-            expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_present
+            expect(list.members.find { |member| member.email_address == 'kerschen@english.berkeley.edu'}.deleted_at).to be_present
 
             expect_any_instance_of(Mailgun::SendMessage).not_to receive(:post)
             list.populate
@@ -409,7 +420,7 @@ describe MailingLists::MailgunList do
             expect(list.members.count).to eq 3
             expect(csv_row_count list).to eq 3
             expect(list.active_members.count).to eq 3
-            expect(list.members.find { |member| member.email_address == 'kerschen@berkeley.edu'}.deleted_at).to be_nil
+            expect(list.members.find { |member| member.email_address == 'kerschen@english.berkeley.edu'}.deleted_at).to be_nil
           end
         end
       end
@@ -423,7 +434,7 @@ describe MailingLists::MailgunList do
 
         it 'updates user\'s sending permission' do
           expect(list.members.count).to eq 3
-          expect(list.members.find_by(email_address: 'oheyer@berkeley.edu').can_send).to eq false
+          expect(list.members.find_by(email_address: 'oheyer@classics.berkeley.edu').can_send).to eq false
 
           expect(MailingLists::Member).not_to receive(:create!)
           expect_any_instance_of(MailingLists::Member).not_to receive(:destroy)
@@ -432,7 +443,7 @@ describe MailingLists::MailgunList do
           list.populate
 
           expect(list.members.count).to eq 3
-          expect(list.members.find_by(email_address: 'oheyer@berkeley.edu').can_send).to eq true
+          expect(list.members.find_by(email_address: 'oheyer@classics.berkeley.edu').can_send).to eq true
 
           expect_empty_population_results(list, :add)
           expect_empty_population_results(list, :remove)
