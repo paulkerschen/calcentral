@@ -29,7 +29,8 @@ describe MailingLists::MailgunList do
   context 'an existing list record' do
     let(:list) { described_class.find_by(canvas_site_id: canvas_site_id) }
     let(:welcome_email_active) { true }
-    let(:welcome_email_body) { '<p><b>Lasciate ogni speranza</b>, voi ch\'entrate!</p>' }
+    let(:welcome_email_body) { '<p><b>Lasciate ogni speranza</b>, voi ch\'entrate!</p><p>Thanks, your pedagogue</p>' }
+    let(:expected_welcome_email_text) { "Lasciate ogni speranza, voi ch\'entrate!\n\nThanks, your pedagogue\n\n" }
     let(:welcome_email_subject) { 'Welcome to the jungle' }
 
     before do
@@ -202,7 +203,7 @@ describe MailingLists::MailgunList do
               'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
               'subject' => welcome_email_subject,
               'html' => welcome_email_body,
-              'text' => welcome_email_body.gsub(/<[^>]+>/, ''),
+              'text' => expected_welcome_email_text,
               'to' => an_object_having_attributes(length: 3, sort: [paul['email'], oliver['email'], ray['email']])
             )).exactly(:once).and_call_original
             list.populate
@@ -357,7 +358,7 @@ describe MailingLists::MailgunList do
             'from' => 'bCourses Mailing Lists <no-reply@bcourses-mail.berkeley.edu>',
             'subject' => welcome_email_subject,
             'html' => welcome_email_body,
-            'text' => welcome_email_body.gsub(/<[^>]+>/, ''),
+            'text' => expected_welcome_email_text,
             'to' => an_object_having_attributes(length: 2, sort: [paul['email'], ray['email']])
           )).exactly(:once).and_call_original
           list.populate

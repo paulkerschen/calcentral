@@ -115,20 +115,27 @@
           @submit.prevent="saveWelcomeEmail"
         >
           <b-row no-gutters>
-            <label for="bc-page-site-mailing-list-subject" class="bc-page-site-mailing-list-welcome-email-form-heading">
+            <label for="bc-page-site-mailing-list-subject-input" class="bc-page-site-mailing-list-welcome-email-form-heading">
               Subject
             </label>
           </b-row>
           <b-row no-gutters>
-            <input id="bc-page-site-mailing-list-subject" v-model="mailingList.welcomeEmailSubject" type="text">
+            <input id="bc-page-site-mailing-list-subject-input" v-model="mailingListSubject" type="text">
           </b-row>
           <b-row no-gutters>
-            <label for="bc-page-site-mailing-list-message" class="bc-page-site-mailing-list-welcome-email-form-heading">
+            <label for="bc-page-site-mailing-list-message-input" class="bc-page-site-mailing-list-welcome-email-form-heading">
               Message
             </label>
           </b-row>
           <b-row no-gutters>
-            <input id="bc-page-site-mailing-list-message" v-model="mailingList.welcomeEmailBody" type="text">
+            <div id="bc-page-site-mailing-list-message-input" role="textbox" class="w-100 mb-4">
+              <ckeditor
+                v-model="mailingListMessage"
+                class="w-100"
+                :config="editorConfig"
+                :editor="editor"
+              ></ckeditor>
+            </div>
           </b-row>
           <b-row no-gutters>
             <button
@@ -136,7 +143,7 @@
               type="submit"
               class="bc-canvas-button bc-canvas-button-primary"
               aria-controls="cc-page-reader-alert"
-              :disabled="!mailingList.welcomeEmailBody || !mailingList.welcomeEmailSubject"
+              :disabled="!mailingListSubject || !mailingListMessage"
             >
               <span v-if="!isCreating">Save welcome email</span>
               <span v-if="isCreating"><fa icon="spinner" class="mr-2 fa-spin"></fa> Saving ...</span>
@@ -157,7 +164,7 @@
             <h3 class="bc-header bc-page-site-mailing-list-welcome-email-field-heading">
               Subject
             </h3>
-            <div>
+            <div id="bc-page-site-mailing-list-subject">
               {{ mailingList.welcomeEmailSubject }}
             </div>
           </div>
@@ -165,9 +172,7 @@
             <h3 class="bc-header bc-page-site-mailing-list-welcome-email-field-heading">
               Message
             </h3>
-            <div>
-              {{ mailingList.welcomeEmailBody }}
-            </div>
+            <div id="bc-page-site-mailing-list-body" class="bc-page-site-mailing-list-welcome-email-body" v-html="mailingList.welcomeEmailBody"></div>
           </div>     
           <div class="bc-page-site-mailing-list-welcome-email-field-content">
             <b-button
@@ -195,17 +200,26 @@ import {
   updateWelcomeEmail
 } from '@/api/canvas'
 import CanvasUtils from '@/mixins/CanvasUtils'
+import CKEditor from '@ckeditor/ckeditor5-vue2'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import Context from '@/mixins/Context'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingList',
+  components: {
+    ckeditor: CKEditor.component
+  },
   mixins: [CanvasUtils, Context, Utils],
   data: () => ({
     alertEmailActivated: false,
     alerts: {
       error: [],
       success: []
+    },
+    editor: ClassicEditor,
+    editorConfig: {
+      toolbar: ['bold', 'italic', 'bulletedList', 'numberedList', 'link']
     },
     errorMessages: null,
     isCreating: false,
@@ -216,6 +230,8 @@ export default {
     isWelcomeEmailActive: false,
     listCreated: false,
     mailingList: {},
+    mailingListMessage: '',
+    mailingListSubject: '',
   }),
   computed: {
     emailFieldsPresent() {
@@ -249,7 +265,7 @@ export default {
     saveWelcomeEmail() {
       this.alertScreenReader('Saving welcome email')
       this.savingWelcomeEmail = true
-      updateWelcomeEmail(this.canvasCourseId, this.mailingList).then(
+      updateWelcomeEmail(this.canvasCourseId, this.mailingListSubject, this.mailingListMessage).then(
         response => {
           this.updateDisplay(response)
         },
@@ -272,9 +288,11 @@ export default {
     updateDisplay(data) {
       this.mailingList = data.mailingList || {}
       this.isWelcomeEmailActive = this.mailingList.welcomeEmailActive
+      this.mailingListMessage = this.mailingList.welcomeEmailBody
+      this.mailingListSubject = this.mailingList.welcomeEmailSubject
       this.errorMessages = data.errorMessages
       this.listCreated = (data.mailingList && data.mailingList.state === 'created')
-      if (this.listCreated && (!this.mailingList.welcomeEmailBody && !this.mailingList.welcomeEmailSubject)) {
+      if (this.listCreated && (!this.mailingListMessage && !this.mailingListSubject)) {
         this.isEditingWelcomeEmail = true
       } else {
         this.isEditingWelcomeEmail = false
@@ -290,6 +308,32 @@ export default {
   }
 }
 </script>
+
+<style>
+.ck.ck-editor__editable_inline {
+  padding: 0 15px;
+}
+.ck.ck-editor__editable_inline ol {
+  margin: 0 0 10px 20px;
+}
+.ck.ck-editor__editable_inline p {
+  margin: 0 0 10px 0;
+}
+.ck.ck-editor__editable_inline ul {
+  list-style-type: disc;
+  margin: 0 0 10px 20px;
+}
+.bc-page-site-mailing-list-welcome-email-body ol {
+  margin: 0 0 10px 20px;
+}
+.bc-page-site-mailing-list-welcome-email-body p {
+  margin: 0 0 10px 0;
+}
+.bc-page-site-mailing-list-welcome-email-body ul {
+  list-style-type: disc;
+  margin: 0 0 10px 20px;
+}
+</style>
 
 <style scoped lang="scss">
 .bc-page-site-mailing-list {
@@ -312,6 +356,14 @@ export default {
     margin: 15px 15px 0 0;
   }
 
+  .bc-page-site-mailing-list-welcome-email-body ol {
+    margin-left: 20px;
+  }
+
+  .bc-page-site-mailing-list-welcome-email-body ul {
+    margin-left: 20px;
+  }
+
   .bc-page-site-mailing-list-welcome-email-field-content {
     font-size: 14px;
     font-weight: 300;
@@ -323,7 +375,7 @@ export default {
     font-size: 14px;
     font-weight: 600;
     line-height: 1.6;
-    margin: 0;
+    margin: 0 0 5px 0;
     padding: 0;
   }
 
