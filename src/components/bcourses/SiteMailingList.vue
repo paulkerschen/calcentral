@@ -48,13 +48,13 @@
         </div>
       </form>
 
-      <div v-if="listCreated">
-        <h2 class="bc-header bc-page-site-mailing-list-welcome-email-form-heading">
+      <div v-if="listCreated" class="border-top mt-3 pt-3">
+        <h2 id="send-welcome-email-header" class="bc-header bc-page-site-mailing-list-welcome-email-form-heading" tabindex="-1">
           Send Welcome Email
         </h2>
         <b-row no-gutters>
           <p class="bc-page-site-mailing-list-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+            The Welcome Email tool automatically sends a customizable message by email to all members of your course site, even if the site has not yet been published. For more information, visit <OutboundLink href="https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0013900">https://berkeley.service-now.com/kb_view.do?sysparm_article=KB0013900</OutboundLink>.
           </p>
         </b-row>
 
@@ -111,7 +111,7 @@
 
         <form
           v-if="isEditingWelcomeEmail"
-          class="bc-canvas-page-form bc-canvas-form bc-page-site-mailing-list-welcome-email-form"
+          class="bc-canvas-page-form bc-canvas-form bc-page-site-mailing-list-welcome-email-form border-top"
           @submit.prevent="saveWelcomeEmail"
         >
           <b-row no-gutters>
@@ -145,21 +145,21 @@
               aria-controls="cc-page-reader-alert"
               :disabled="!mailingListSubject || !mailingListMessage"
             >
-              <span v-if="!isCreating">Save welcome email</span>
-              <span v-if="isCreating"><fa icon="spinner" class="mr-2 fa-spin"></fa> Saving ...</span>
+              <span v-if="!isSavingWelcomeEmail">Save welcome email</span>
+              <span v-if="isSavingWelcomeEmail"><fa icon="spinner" class="mr-2 fa-spin"></fa> Saving ...</span>
             </button>
             <button
               id="btn-cancel-welcome-email-edit"
               class="bc-canvas-button bc-canvas-button-secondary"
               type="button"
-              @click="isEditingWelcomeEmail = false"
+              @click="cancelEditMode"
             >
               Cancel
             </button>
           </b-row>
         </form>
 
-        <div v-if="!isEditingWelcomeEmail">
+        <div v-if="!isEditingWelcomeEmail" class="border-top mt-3 pt-3">
           <div class="bc-page-site-mailing-list-welcome-email-field-content">
             <h3 class="bc-header bc-page-site-mailing-list-welcome-email-field-heading">
               Subject
@@ -179,7 +179,7 @@
               id="btn-edit-welcome-email"
               variant="link"
               class="p-0"
-              @click="isEditingWelcomeEmail = true"
+              @click="setEditMode"
             >
               Edit welcome email
             </b-button>
@@ -203,12 +203,14 @@ import CanvasUtils from '@/mixins/CanvasUtils'
 import CKEditor from '@ckeditor/ckeditor5-vue2'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import Context from '@/mixins/Context'
+import OutboundLink from '@/components/util/OutboundLink'
 import Utils from '@/mixins/Utils'
 
 export default {
   name: 'SiteMailingList',
   components: {
-    ckeditor: CKEditor.component
+    ckeditor: CKEditor.component,
+    OutboundLink
   },
   mixins: [CanvasUtils, Context, Utils],
   data: () => ({
@@ -239,12 +241,18 @@ export default {
     }
   },
   methods: {
+    cancelEditMode() {
+      this.isEditingWelcomeEmail = false
+      this.isWelcomeEmailActive = this.mailingList.welcomeEmailActive
+      this.$putFocusNextTick('send-welcome-email-header')
+    },
     createMailingList() {
       this.alertScreenReader('Creating list')
       this.isCreating = true
       createSiteMailingList(this.canvasCourseId, this.mailingList).then(
         response => {
           this.updateDisplay(response)
+          this.$ready()
         },
         this.$errorHandler
       )
@@ -268,9 +276,15 @@ export default {
       updateWelcomeEmail(this.canvasCourseId, this.mailingListSubject, this.mailingListMessage).then(
         response => {
           this.updateDisplay(response)
+          this.$putFocusNextTick('send-welcome-email-header')
         },
         this.$errorHandler
       )
+    },
+    setEditMode() {
+      this.isWelcomeEmailActive = false
+      this.isEditingWelcomeEmail = true
+      this.$putFocusNextTick('bc-page-site-mailing-list-subject-input')
     },
     toggleEmailActivation() {
       this.alertEmailActivated = false
@@ -351,9 +365,8 @@ export default {
   }
 
   .bc-page-site-mailing-list-welcome-email-form {
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
     margin: 15px 15px 0 0;
+    padding: 15px 0 0 15px;
   }
 
   .bc-page-site-mailing-list-welcome-email-body ol {
@@ -372,7 +385,7 @@ export default {
   }
 
   .bc-page-site-mailing-list-welcome-email-field-heading {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     line-height: 1.6;
     margin: 0 0 5px 0;

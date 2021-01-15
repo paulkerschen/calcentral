@@ -83,7 +83,7 @@ class CanvasMailingListController < ApplicationController
       raise Errors::BadRequestError, "Mailing list for Canvas course ID #{canvas_course_id} not found"
     end
     raise Errors::BadRequestError, "Subject and body required" unless params['body'].present? && params['subject'].present?
-    list.update(welcome_email_body: params['body'], welcome_email_subject: params['subject'])
+    list.update(welcome_email_active: false, welcome_email_body: params['body'], welcome_email_subject: params['subject'])
     render json: list.to_json
   end
 
