@@ -282,7 +282,7 @@ export default {
       )
     },
     setEditMode() {
-      this.isWelcomeEmailActive = false
+      this.alertEmailActivated = false
       this.isEditingWelcomeEmail = true
       this.$putFocusNextTick('bc-page-site-mailing-list-subject-input')
     },
