@@ -325,6 +325,7 @@ export default {
 
 <style>
 .ck.ck-editor__editable_inline {
+  min-height: 150px;
   padding: 0 15px;
 }
 .ck.ck-editor__editable_inline ol {
