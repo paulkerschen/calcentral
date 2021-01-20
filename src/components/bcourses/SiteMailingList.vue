@@ -149,6 +149,7 @@
               <span v-if="isSavingWelcomeEmail"><fa icon="spinner" class="mr-2 fa-spin"></fa> Saving ...</span>
             </button>
             <button
+              v-if="emailFieldsPresent"
               id="btn-cancel-welcome-email-edit"
               class="bc-canvas-button bc-canvas-button-secondary"
               type="button"
