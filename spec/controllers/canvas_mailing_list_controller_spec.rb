@@ -170,7 +170,6 @@ describe CanvasMailingListController do
               email_update_request
               expect(response.status).to eq 200
               response_json = JSON.parse(response.body)
-              expect(response_json['mailingList']['welcomeEmailActive']).to eq false
               expect(response_json['mailingList']['welcomeEmailBody']).to eq welcome_email_body
               expect(response_json['mailingList']['welcomeEmailSubject']).to eq welcome_email_subject
             end
