@@ -244,6 +244,8 @@ export default {
   methods: {
     cancelEditMode() {
       this.isEditingWelcomeEmail = false
+      this.mailingListMessage = this.mailingList.welcomeEmailBody
+      this.mailingListSubject = this.mailingList.welcomeEmailSubject
       this.$putFocusNextTick('send-welcome-email-header')
     },
     createMailingList() {
